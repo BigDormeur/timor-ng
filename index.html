@@ -404,7 +404,6 @@ nav {
   text-decoration: none; transition: all 0.2s; font-weight: 600;
 }
 .disc-link-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
-.disc-link-btn svg { flex-shrink: 0; }
 .disc-link-btn.clicked {
   color: var(--gold); background: transparent;
   border: 1px solid rgba(201,168,76,0.4); cursor: default;
@@ -420,6 +419,8 @@ nav {
 }
 .disc-confirm-btn.visible { display: inline-block; animation: fadeUp 0.3s ease; }
 .disc-confirm-btn:hover { background: rgba(74,138,90,0.22); }
+/* Loading state for confirm button */
+.disc-confirm-btn.loading { opacity: 0.6; pointer-events: none; }
 
 .discovery-step.done .discovery-step-action { display: none; }
 .discovery-step-done-badge { display: none; margin-top: 8px; font-family: 'Cinzel', serif; font-size: 0.72rem; color: #7ac98a; }
@@ -429,6 +430,15 @@ nav {
   border-left: 3px solid var(--gold-dim); border-radius: 0 4px 4px 0;
   padding: 1rem 1.25rem; font-size: 0.88rem; color: var(--text-muted); font-style: italic; line-height: 1.7;
 }
+/* ══ Banner quand non connecté dans le flow ══ */
+.disc-auth-notice {
+  background: rgba(88,101,242,0.1); border: 1px solid rgba(88,101,242,0.3);
+  border-left: 3px solid var(--discord);
+  border-radius: 0 4px 4px 0; padding: 0.9rem 1.2rem;
+  font-size: 0.88rem; color: var(--text-muted); font-style: italic;
+  margin-bottom: 1rem; display: none;
+}
+.disc-auth-notice.visible { display: block; }
 .discovery-empty {
   padding: 3rem 2rem; text-align: center; color: var(--text-dim);
   font-style: italic; font-size: 0.95rem;
@@ -588,9 +598,13 @@ footer a { color: var(--gold-dim); }
       <div class="discovery-subtitle" id="disc-subtitle">Accomplis les étapes ci-dessous pour découvrir NationsGlory et Timor.</div>
     </div>
     <div class="discovery-progress-bar"><div class="discovery-progress-fill" id="disc-progress-fill" style="width:0%"></div></div>
+    <!-- Notice quand non connecté -->
+    <div class="disc-auth-notice" id="disc-auth-notice">
+      ⚠ Connecte-toi avec Discord pour recevoir l'XP automatiquement à chaque étape accomplie.
+    </div>
     <div class="discovery-steps" id="disc-steps"></div>
     <div class="discovery-note" id="disc-note">
-      Une fois une étape accomplie, un administrateur la validera sur Discord dans <strong style="color:var(--gold);font-style:normal;">#validation</strong>.
+      L'XP est attribué automatiquement dès que tu confirmes une étape. Bonne chance !
     </div>
   </div>
 </div>
@@ -724,7 +738,7 @@ footer a { color: var(--gold-dim); }
 
     <!-- TAB DÉCOUVERTE -->
     <div class="admin-tab-panel" id="admin-tab-decouverte">
-      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Configure les étapes du flow "Commencer à jouer". Chaque étape doit avoir un lien obligatoire à cliquer.</p>
+      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Configure les étapes du flow "Commencer à jouer". L'XP est désormais attribué automatiquement à la confirmation du joueur.</p>
 
       <label class="admin-label">TITRE DU FLOW</label>
       <input class="admin-input" id="disc-flow-title" placeholder="Titre affiché en haut du flow">
@@ -733,7 +747,7 @@ footer a { color: var(--gold-dim); }
       <textarea class="admin-textarea" id="disc-flow-desc" placeholder="Texte d'introduction du flow…"></textarea>
 
       <label class="admin-label">NOTE DE BAS DE PAGE</label>
-      <textarea class="admin-textarea" id="disc-flow-note" placeholder="Instruction pour valider, canal Discord, etc."></textarea>
+      <textarea class="admin-textarea" id="disc-flow-note" placeholder="Message affiché en bas du flow…"></textarea>
 
       <label class="admin-label" style="margin-top:4px;">ÉTAPES (une par ligne : Titre|Description|XP|URL du lien|Texte du bouton)</label>
       <div class="admin-format-hint">
@@ -795,7 +809,7 @@ footer a { color: var(--gold-dim); }
   </div>
 
   <div class="auth-banner" id="auth-banner">
-    <p>Connecte-toi avec Discord pour suivre ta progression et apparaître au classement.</p>
+    <p>Connecte-toi avec Discord pour recevoir l'XP automatiquement et apparaître au classement.</p>
     <button class="btn-discord" onclick="Timor.loginWithDiscord()">
       <svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.42,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       Se connecter avec Discord
@@ -804,7 +818,7 @@ footer a { color: var(--gold-dim); }
 
   <div class="play-block">
     <h3>Prêt à rejoindre Timor ?</h3>
-    <p>Découvre NationsGlory étape par étape et gagne de l'XP en accomplissant des actions réelles dans le jeu et sur notre Discord.</p>
+    <p>Découvre NationsGlory étape par étape et gagne de l'XP instantanément en accomplissant des actions réelles dans le jeu et sur notre Discord.</p>
     <button class="btn-primary" onclick="openDiscovery()">🗺️ Commencer à jouer</button>
   </div>
 </div>
@@ -839,7 +853,7 @@ footer a { color: var(--gold-dim); }
     <div style="padding:2rem;text-align:center;color:var(--text-dim);font-style:italic;font-size:0.9rem;">Chargement du classement…</div>
   </div>
   <div style="margin-top:1.5rem;background:var(--dark2);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;font-size:0.9rem;color:var(--text-muted);font-style:italic;line-height:1.7;">
-    Le classement est mis à jour par les administrateurs. Pour signaler une action complétée, rendez-vous sur notre Discord.
+    Le classement est mis à jour en temps réel. Accomplis les quêtes de découverte pour gagner de l'XP et grimper dans le classement !
   </div>
 </div>
 
@@ -912,7 +926,7 @@ function renderProfileLevel(xp, coins) {
   document.getElementById("xp-bar-min").textContent = lvl.xpMin.toLocaleString("fr-FR") + " XP";
   document.getElementById("xp-bar-max").textContent = (lvl.level >= 20 ? "" : nextLvl.xpMin.toLocaleString("fr-FR") + " XP");
 
-  // Milestones (show all 20 levels as dots, compact rows of 10)
+  // Milestones (show all 20 levels as dots)
   var ms = document.getElementById("level-milestones");
   if (ms) {
     ms.innerHTML = "";
@@ -976,8 +990,8 @@ const db   = getFirestore(app);
 const DEFAULT_TUTOS = [];
 const DEFAULT_DISCOVERY = {
   title: "🗺️ Commencer à jouer",
-  desc:  "Accomplis les étapes ci-dessous pour découvrir NationsGlory et Timor. Chaque étape requiert de cliquer sur le lien fourni.",
-  note:  "Une fois une étape accomplie, contacte un administrateur sur Discord dans **#validation** pour recevoir ton XP.",
+  desc:  "Accomplis les étapes ci-dessous pour découvrir NationsGlory et Timor. L'XP est attribué automatiquement à chaque étape !",
+  note:  "L'XP est attribué automatiquement dès que tu confirmes une étape. Bonne chance, citoyen !",
   steps: []
 };
 const DEFAULT_PAYS = {
@@ -1079,7 +1093,7 @@ function renderPays() {
   }
 }
 
-/* ════ Discovery — forced sequential with required link clicks ════ */
+/* ════ Discovery — forced sequential with auto XP award ════ */
 // Storage key for which steps the user has clicked the link on
 function getDiscStorageKey() {
   return "timor_disc_links_" + (_currentUserUID || "anon");
@@ -1100,6 +1114,10 @@ function renderDiscovery() {
   const discTitle = document.querySelector(".discovery-title");
   if (discTitle) discTitle.textContent = d.title || DEFAULT_DISCOVERY.title;
 
+  // Show/hide auth notice
+  const authNotice = document.getElementById("disc-auth-notice");
+  if (authNotice) authNotice.classList.toggle("visible", !_currentUserUID);
+
   const container = document.getElementById("disc-steps");
   if (!container) return;
 
@@ -1114,7 +1132,7 @@ function renderDiscovery() {
 
   d.steps.forEach(function(s, i) {
     const isClicked = !!clicks[i];
-    // A step is "done" (link clicked & confirmed by user) if clicks[i] === "done"
+    // A step is "done" if clicks[i] === "done"
     const isDone    = clicks[i] === "done";
     // Find the first unlocked step (first not done)
     const firstIncomplete = d.steps.findIndex(function(_, idx) { return clicks[idx] !== "done"; });
@@ -1125,6 +1143,12 @@ function renderDiscovery() {
     if (isDone)        stateClass += " done";
     else if (isCurrent) stateClass += " current";
     else if (isLocked)  stateClass += " locked";
+
+    // Build done badge with XP info
+    const xpAmount = s.xp || 0;
+    const doneBadgeText = xpAmount > 0
+      ? "✅ Accompli — +" + xpAmount + " XP reçus !"
+      : "✅ Accompli !";
 
     let actionHtml = "";
     if (!isDone) {
@@ -1139,7 +1163,10 @@ function renderDiscovery() {
 
       // Confirm button (appears after link is clicked)
       let confirmVisible = isClicked ? " visible" : "";
-      let confirmHtml = '<div class="disc-confirm-row"><button class="disc-confirm-btn' + confirmVisible + '" id="disc-confirm-' + i + '" onclick="onDiscStepConfirm(' + i + ')">✅ J\'ai accompli cette étape</button></div>';
+      let confirmLabel = xpAmount > 0
+        ? "✅ J'ai accompli cette étape (+&nbsp;" + xpAmount + "&nbsp;XP)"
+        : "✅ J'ai accompli cette étape";
+      let confirmHtml = '<div class="disc-confirm-row"><button class="disc-confirm-btn' + confirmVisible + '" id="disc-confirm-' + i + '" onclick="onDiscStepConfirm(' + i + ', ' + xpAmount + ')">' + confirmLabel + '</button></div>';
 
       actionHtml = '<div class="discovery-step-action">' + btnContent + confirmHtml + '</div>';
     }
@@ -1151,9 +1178,9 @@ function renderDiscovery() {
         '<div class="discovery-step-body">' +
           '<div class="discovery-step-title">' + escHtml(s.title) + '</div>' +
           '<div class="discovery-step-desc">'  + escHtml(s.desc)  + '</div>' +
-          '<div class="discovery-step-xp">🏆 +' + (s.xp||0) + ' XP (si validé par un admin)</div>' +
+          '<div class="discovery-step-xp">🏆 +' + xpAmount + ' XP attribués automatiquement</div>' +
           actionHtml +
-          '<div class="discovery-step-done-badge">✅ Accompli — En attente de validation admin</div>' +
+          '<div class="discovery-step-done-badge">' + doneBadgeText + '</div>' +
         '</div>' +
       '</div>';
   });
@@ -1175,13 +1202,85 @@ window.onDiscLinkClick = function(stepIdx) {
   if (linkBtn) linkBtn.classList.add("clicked");
 };
 
-window.onDiscStepConfirm = function(stepIdx) {
+// ══ CORE CHANGE: Auto-award XP on step confirmation ══
+window.onDiscStepConfirm = async function(stepIdx, xpAmount) {
   const clicks = loadDiscLinkClicks();
+  if (clicks[stepIdx] === "done") return;
+
+  const confirmBtn = document.getElementById("disc-confirm-" + stepIdx);
+  if (confirmBtn) { confirmBtn.classList.add("loading"); confirmBtn.textContent = "Attribution de l'XP…"; }
+
+  // Award XP in Firestore if user is logged in
+  if (_currentUserUID && xpAmount > 0) {
+    try {
+      const ref  = doc(db, "users", _currentUserUID);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const profile = snap.data();
+        const oldXP   = profile.xp || 0;
+        const newXP   = oldXP + xpAmount;
+        const oldLvl  = getLevelFromXP(oldXP);
+        const newLvl  = getLevelFromXP(newXP);
+
+        // Calculate coins bonus for level-ups
+        let coinsBonus = 0;
+        if (newLvl > oldLvl) {
+          for (let l = oldLvl + 1; l <= newLvl; l++) {
+            const ld = window.LEVELS ? window.LEVELS[l - 1] : null;
+            if (ld) coinsBonus += ld.coins;
+          }
+        }
+
+        const updData = { xp: newXP };
+        if (coinsBonus > 0) updData.coins = Math.max(0, (profile.coins || 0) + coinsBonus);
+
+        await updateDoc(ref, updData);
+
+        // Update in-memory state
+        _currentUserXP = newXP;
+        if (coinsBonus > 0) _currentUserCoins = (profile.coins || 0) + coinsBonus;
+
+        // Re-render profile card
+        renderProfileLevel(_currentUserXP, _currentUserCoins);
+
+        // Trigger level-up modal if applicable
+        if (newLvl > oldLvl) {
+          checkLevelUp(oldXP, newXP, profile);
+        }
+
+        // Refresh leaderboard
+        await loadLeaderboard();
+
+        // Update nav XP display
+        const navXpEl = document.querySelector(".nav-xp");
+        if (navXpEl) navXpEl.textContent = newXP.toLocaleString("fr-FR") + " XP";
+        const navLvlEl = document.querySelector(".nav-level");
+        if (navLvlEl) navLvlEl.textContent = "Niv. " + newLvl;
+        const navCoinsEl = document.querySelector(".nav-coins");
+        if (navCoinsEl) navCoinsEl.textContent = "🪙 " + _currentUserCoins.toLocaleString("fr-FR");
+
+        showToast("🏆 +" + xpAmount + " XP reçus !" + (coinsBonus > 0 ? " 🪙 +" + coinsBonus + " pièces !" : ""));
+      }
+    } catch(err) {
+      console.error("XP award error:", err);
+      // Still mark as done locally even if Firestore fails
+      showToast("⚠ XP non enregistré. Connecte-toi et réessaie.");
+      if (confirmBtn) { confirmBtn.classList.remove("loading"); confirmBtn.textContent = "✅ J'ai accompli cette étape"; }
+      return;
+    }
+  } else if (!_currentUserUID) {
+    // Not logged in: mark done locally, no XP awarded
+    showToast("⚠ Connecte-toi avec Discord pour recevoir l'XP !");
+  } else {
+    showToast("✅ Étape accomplie !");
+  }
+
+  // Mark step as done in localStorage
   clicks[stepIdx] = "done";
   saveDiscLinkClicks(clicks);
-  // Re-render to unlock next step with animation
+
+  // Re-render discovery to unlock next step
   renderDiscovery();
-  showToast("Étape notée ! Un admin validera bientôt sur Discord.");
 };
 
 window.openDiscovery  = function() { document.getElementById("discovery-page").classList.add("active"); window.scrollTo(0,0); };
@@ -1254,11 +1353,13 @@ onAuthStateChanged(auth, async function(user) {
     window._lastKnownLevel = getLevelFromXP(_currentUserXP);
     renderConnectedState(user, profile);
     renderProfileLevel(_currentUserXP, _currentUserCoins);
+    renderDiscovery(); // re-render with UID known (updates auth notice)
     await loadLeaderboard();
   } else {
     _currentUserRole = null;
     _currentUserUID  = null;
     renderDisconnectedState();
+    renderDiscovery(); // re-render to show auth notice
     await loadLeaderboard();
   }
 });
@@ -1394,7 +1495,6 @@ window.onAdminPlayerChange = function() {
     roleDisplay.className = "role-badge-display nav-role-badge " + cls;
     roleDisplay.textContent = r.charAt(0).toUpperCase() + r.slice(1);
   }
-  // Show/hide grant/revoke buttons based on role
   const grantBtn = document.getElementById("btn-grant-modo");
   const revokeBtn = document.getElementById("btn-revoke-modo");
   if (grantBtn && revokeBtn) {
@@ -1453,7 +1553,6 @@ window.adminModifyXP = async function(sign) {
 
     let coinsBonus = 0;
     if (newLvl > oldLvl) {
-      // Sum coins for all levels gained
       for (let l = oldLvl + 1; l <= newLvl; l++) {
         const ld = window.LEVELS ? window.LEVELS[l-1] : null;
         if (ld) coinsBonus += ld.coins;
@@ -1474,7 +1573,6 @@ window.adminModifyXP = async function(sign) {
     setAdminFeedback(fb, "ok");
     showToast("✓ " + pn + " — " + label + " XP" + (coinsBonus ? " | Niv. " + newLvl + " !" : ""));
 
-    // If editing own profile, update displayed level
     if (targetUid === _currentUserUID) {
       _currentUserXP = newXP;
       if (coinsBonus > 0) _currentUserCoins = (profile.coins||0) + coinsBonus;
