@@ -221,7 +221,7 @@ nav {
 }
 .admin-textarea:focus { border-color: rgba(165,74,74,0.6); }
 .admin-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
-.admin-row label { color: var(--text-dim); font-size: 0.75rem; white-space: nowrap; padding-top: 10px; min-width: 60px; }
+.admin-row label { color: var(--text-dim); font-size: 0.75rem; white-space: nowrap; padding-top: 10px; min-width: 70px; }
 .admin-row .admin-input, .admin-row .admin-textarea { margin-bottom: 0; flex: 1; }
 .admin-card-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
 .admin-card-item {
@@ -312,15 +312,66 @@ nav {
 .tuto-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
 .tuto-card.open { border-color: var(--gold-dim); }
 .tuto-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+
+/* Image bannière du tutoriel */
+.tuto-banner {
+  width: calc(100% + 3rem); margin: -1.5rem -1.5rem 1rem -1.5rem;
+  height: 140px; object-fit: cover; border-radius: 4px 4px 0 0;
+  display: block;
+}
+
+/* Lien externe du tutoriel */
+.tuto-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.08em;
+  color: var(--accent-light); text-decoration: none;
+  border: 1px solid rgba(74,127,165,0.3); border-radius: 2px;
+  padding: 5px 12px; margin-top: 8px; margin-bottom: 4px;
+  transition: all 0.2s; background: rgba(74,127,165,0.07);
+}
+.tuto-link:hover { background: rgba(74,127,165,0.15); border-color: rgba(74,127,165,0.5); }
+.tuto-link svg { flex-shrink: 0; }
+
 .tuto-title { font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 600; color: var(--gold); margin-bottom: 6px; }
-.tuto-desc { font-size: 0.9rem; color: var(--text-muted); font-style: italic; line-height: 1.6; margin-bottom: 1rem; }
-.tuto-steps { display: none; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.5rem; }
+.tuto-desc { font-size: 0.9rem; color: var(--text-muted); font-style: italic; line-height: 1.6; margin-bottom: 0.5rem; }
+.tuto-steps { display: none; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.75rem; }
 .tuto-card.open .tuto-steps { display: block; }
-.tuto-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+.tuto-step { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
 .step-n { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold-dim); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 0.65rem; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+.step-body { flex: 1; }
 .step-text { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
 .step-text strong { color: var(--text); font-weight: 600; font-style: normal; display: block; margin-bottom: 2px; }
-.tuto-toggle { font-size: 0.78rem; color: var(--gold-dim); font-family: 'Cinzel', serif; letter-spacing: 0.06em; }
+
+/* Image dans une étape de tutoriel */
+.step-img {
+  width: 100%; max-height: 200px; object-fit: cover;
+  border-radius: 3px; margin-top: 8px; border: 1px solid var(--border);
+  display: block;
+}
+
+/* Lien dans une étape de tutoriel */
+.step-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.06em;
+  color: var(--accent-light); text-decoration: none;
+  border: 1px solid rgba(74,127,165,0.25); border-radius: 2px;
+  padding: 3px 9px; margin-top: 6px;
+  transition: all 0.2s; background: rgba(74,127,165,0.06);
+}
+.step-link:hover { background: rgba(74,127,165,0.15); }
+
+.tuto-toggle { font-size: 0.78rem; color: var(--gold-dim); font-family: 'Cinzel', serif; letter-spacing: 0.06em; margin-top: 8px; }
+
+/* Aide format dans l'admin */
+.admin-format-hint {
+  background: rgba(74,127,165,0.07); border: 1px solid rgba(74,127,165,0.2);
+  border-radius: 3px; padding: 8px 12px; margin-bottom: 8px;
+  font-size: 0.75rem; color: var(--accent-light); line-height: 1.6; font-style: italic;
+}
+.admin-format-hint code {
+  font-family: monospace; background: rgba(74,127,165,0.12);
+  padding: 1px 5px; border-radius: 2px; font-style: normal; font-size: 0.72rem;
+}
 
 /* ══ PAYS ══ */
 .pays-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 2rem; }
@@ -379,6 +430,16 @@ footer a { color: var(--gold-dim); }
 }
 .play-block h3 { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.08em; }
 .play-block p { font-size: 0.92rem; color: var(--text-muted); font-style: italic; margin-bottom: 1.5rem; line-height: 1.7; }
+
+/* ══ FIREBASE RULES ALERT ══ */
+.rules-alert {
+  background: rgba(165,74,74,0.08); border: 1px solid rgba(165,74,74,0.25);
+  border-left: 3px solid #a54a4a; border-radius: 0 4px 4px 0;
+  padding: 1rem 1.25rem; margin-bottom: 1rem;
+  font-size: 0.82rem; color: #d98080; line-height: 1.6;
+}
+.rules-alert strong { font-family: 'Cinzel', serif; display: block; margin-bottom: 4px; letter-spacing: 0.08em; }
+.rules-alert code { font-family: monospace; background: rgba(165,74,74,0.15); padding: 1px 5px; border-radius: 2px; font-size: 0.75rem; }
 </style>
 </head>
 <body>
@@ -391,12 +452,12 @@ footer a { color: var(--gold-dim); }
     <button class="discovery-back" onclick="closeDiscovery()">← Retour à l'accueil</button>
     <div class="discovery-header">
       <div class="discovery-title">🗺️ Commencer à jouer</div>
-      <div class="discovery-subtitle" id="disc-subtitle">Accomplis les étapes ci-dessous pour découvrir NationsGlory et Timor. Chaque action complétée sera validée par un administrateur qui t'attribuera l'XP correspondante.</div>
+      <div class="discovery-subtitle" id="disc-subtitle">Accomplis les étapes ci-dessous pour découvrir NationsGlory et Timor.</div>
     </div>
     <div class="discovery-progress-bar"><div class="discovery-progress-fill" id="disc-progress-fill" style="width:0%"></div></div>
     <div class="discovery-steps" id="disc-steps"></div>
     <div class="discovery-note" id="disc-note">
-      Une fois une étape cochée, un administrateur la validera sur Discord et t'attribuera l'XP manuellement. Contacte-nous dans <strong style="color:var(--gold);font-style:normal;">#validation</strong>.
+      Une fois une étape cochée, un administrateur la validera sur Discord dans <strong style="color:var(--gold);font-style:normal;">#validation</strong>.
     </div>
   </div>
 </div>
@@ -449,6 +510,13 @@ footer a { color: var(--gold-dim); }
   <!-- PANNEAU ADMIN FONCTIONNEL -->
   <div class="admin-section" id="admin-panel">
     <div class="admin-title">⚔ Panneau Administrateur</div>
+
+    <!-- Alerte règles Firestore -->
+    <div class="rules-alert" id="rules-alert" style="display:none;">
+      <strong>⚠ Règles Firestore insuffisantes détectées</strong>
+      Dans la console Firebase → Firestore → Rules, assure-toi que <code>sitedata/{docId}</code> autorise l'écriture pour les rôles <code>admin</code> et <code>modo</code>. Consulte la documentation du site pour les règles complètes.
+    </div>
+
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="switchAdminTab('joueurs', this)">👤 Joueurs</button>
       <button class="admin-tab" onclick="switchAdminTab('decouverte', this)">🗺️ Découverte</button>
@@ -466,22 +534,19 @@ footer a { color: var(--gold-dim); }
         <button class="btn-admin" onclick="adminRefreshPlayers()">↺ Actualiser liste</button>
         <button class="btn-admin" onclick="showSection('classement')">📊 Classement</button>
       </div>
-
-      <!-- XP MANUAL CONTROL -->
       <div class="xp-control-row">
         <label>Modifier XP</label>
-        <input type="number" id="admin-xp-amount" placeholder="ex: 150 ou -50" style="">
+        <input type="number" id="admin-xp-amount" placeholder="ex: 150">
         <button class="btn-admin" onclick="adminModifyXP(1)">+ Ajouter XP</button>
         <button class="btn-admin" onclick="adminModifyXP(-1)">− Retirer XP</button>
       </div>
-      <div class="xp-hint" style="margin-top:6px;">Entre un montant positif, puis clique + Ajouter ou − Retirer selon l'action souhaitée.</div>
-
+      <div class="xp-hint" style="margin-top:6px;">Entre un montant positif, puis clique + Ajouter ou − Retirer.</div>
       <div class="admin-feedback" id="admin-feedback"></div>
     </div>
 
     <!-- TAB DÉCOUVERTE -->
     <div class="admin-tab-panel" id="admin-tab-decouverte">
-      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Configure les étapes affichées aux joueurs dans le flow "Commencer à jouer". Chaque étape a un titre, une description et une valeur XP indicative (attribuée manuellement).</p>
+      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Configure les étapes du flow "Commencer à jouer".</p>
 
       <label class="admin-label">TITRE DU FLOW</label>
       <input class="admin-input" id="disc-flow-title" placeholder="Titre affiché en haut du flow">
@@ -493,7 +558,7 @@ footer a { color: var(--gold-dim); }
       <textarea class="admin-textarea" id="disc-flow-note" placeholder="Instruction pour valider, canal Discord, etc."></textarea>
 
       <label class="admin-label" style="margin-top:4px;">ÉTAPES (une par ligne : Titre|Description|XP)</label>
-      <textarea class="admin-textarea" id="disc-flow-steps" placeholder="Rejoins le Discord|Rejoins notre serveur et présente-toi.|50&#10;Installe-toi|Construis ta première maison dans Timor.|100" style="min-height:160px;font-family:monospace;font-size:0.8rem;"></textarea>
+      <textarea class="admin-textarea" id="disc-flow-steps" placeholder="Rejoins le Discord|Rejoins notre serveur et présente-toi.|50&#10;Installe-toi|Construis ta première maison dans Timor.|100" style="min-height:140px;font-family:monospace;font-size:0.8rem;"></textarea>
 
       <div class="admin-actions" style="margin-top:8px;">
         <button class="btn-admin" onclick="adminSaveDiscovery()">💾 Sauvegarder</button>
@@ -504,7 +569,7 @@ footer a { color: var(--gold-dim); }
 
     <!-- TAB TUTORIELS -->
     <div class="admin-tab-panel" id="admin-tab-tutos-edit">
-      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Modifie les tutoriels de la page Tutoriels. Clique sur une carte pour l'éditer, ou ajoute-en un nouveau.</p>
+      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Modifie les tutoriels. Chaque tutoriel peut avoir une image bannière, un lien externe, et des étapes avec images/liens.</p>
       <div class="admin-card-list" id="admin-tuto-list"></div>
       <div style="margin-bottom:8px;">
         <button class="btn-admin" onclick="adminNewTuto()">+ Nouveau tutoriel</button>
@@ -512,10 +577,19 @@ footer a { color: var(--gold-dim); }
       </div>
       <div id="admin-tuto-editor" style="display:none;">
         <div class="admin-row"><label>Titre</label><input class="admin-input" id="ate-title" placeholder="Titre du tutoriel"></div>
-        <div class="admin-row"><label>Icône</label><input class="admin-input" id="ate-icon" placeholder="Emoji" style="max-width:100px"></div>
-        <div class="admin-row"><label>Desc.</label><textarea class="admin-textarea" id="ate-desc" placeholder="Description courte"></textarea></div>
-        <label class="admin-label">ÉTAPES (une par ligne : Titre|Description)</label>
-        <textarea class="admin-textarea" id="ate-steps" placeholder="Étape 1|Description&#10;Étape 2|Description" style="min-height:120px;font-family:monospace;font-size:0.8rem;"></textarea>
+        <div class="admin-row"><label>Icône</label><input class="admin-input" id="ate-icon" placeholder="Emoji 📖" style="max-width:100px"></div>
+        <div class="admin-row"><label>Image</label><input class="admin-input" id="ate-image" placeholder="URL de l'image bannière (optionnel)"></div>
+        <div class="admin-row"><label>Lien</label><input class="admin-input" id="ate-link" placeholder="https://… (lien externe, optionnel)"></div>
+        <div class="admin-row"><label>Texte lien</label><input class="admin-input" id="ate-link-label" placeholder="Ex : Voir sur le wiki"></div>
+        <div class="admin-row"><label>Desc.</label><textarea class="admin-textarea" id="ate-desc" placeholder="Description courte du tutoriel"></textarea></div>
+
+        <label class="admin-label">ÉTAPES</label>
+        <div class="admin-format-hint">
+          Format : <code>Titre|Description</code> — optionnellement ajouter <code>|img:URL</code> et/ou <code>|lien:URL|texte-lien</code><br>
+          Exemple : <code>Rejoindre le Discord|Clique sur invitation|img:https://i.imgur.com/xxx.png|lien:https://discord.gg/xxx|Rejoindre</code>
+        </div>
+        <textarea class="admin-textarea" id="ate-steps" placeholder="Étape 1|Description&#10;Étape 2|Description|img:https://…&#10;Étape 3|Description|lien:https://…|Voir ici" style="min-height:140px;font-family:monospace;font-size:0.79rem;"></textarea>
+
         <div class="admin-actions" style="margin-top:8px;">
           <button class="btn-admin" onclick="adminSaveTuto()">💾 Sauvegarder</button>
           <button class="btn-admin" onclick="document.getElementById('admin-tuto-editor').style.display='none';document.getElementById('btn-del-tuto').style.display='none'">Annuler</button>
@@ -526,11 +600,11 @@ footer a { color: var(--gold-dim); }
 
     <!-- TAB PAYS -->
     <div class="admin-tab-panel" id="admin-tab-pays-edit">
-      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Modifie les informations affichées sur la page du pays.</p>
+      <p style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1rem;">Modifie les informations de la page du pays.</p>
       <div class="admin-row"><label>Membres</label><input class="admin-input" id="ape-membres" placeholder="142"></div>
       <div class="admin-row"><label>Rang</label><input class="admin-input" id="ape-rang" placeholder="#3"></div>
       <div class="admin-row"><label>Fondation</label><input class="admin-input" id="ape-fondation" placeholder="2022"></div>
-      <div class="admin-row"><label>Description hero</label><textarea class="admin-textarea" id="ape-herodesc" placeholder="Texte d'intro du héros"></textarea></div>
+      <div class="admin-row"><label>Desc. hero</label><textarea class="admin-textarea" id="ape-herodesc" placeholder="Texte d'intro du héros"></textarea></div>
       <div class="admin-row"><label>Présentation</label><textarea class="admin-textarea" id="ape-paydesc" placeholder="Texte de la page Pays" style="min-height:100px;"></textarea></div>
       <label class="admin-label" style="margin-top:4px;">GOUVERNEMENT (une par ligne : Initiales|Nom|Rôle|Badge)</label>
       <textarea class="admin-textarea" id="ape-gouv" placeholder="PR|Pseudo|Président de Timor|Chef d'État&#10;VP|Pseudo|Vice-Président|Gouvernement" style="min-height:120px;font-family:monospace;font-size:0.8rem;"></textarea>
@@ -549,7 +623,6 @@ footer a { color: var(--gold-dim); }
     </button>
   </div>
 
-  <!-- Bloc "Commencer à jouer" -->
   <div class="play-block">
     <h3>Prêt à rejoindre Timor ?</h3>
     <p>Découvre NationsGlory étape par étape et gagne de l'XP en accomplissant des actions réelles dans le jeu et sur notre Discord.</p>
@@ -574,7 +647,7 @@ footer a { color: var(--gold-dim); }
     <div class="info-block"><h3>Citoyens</h3><p class="big" id="pays-membres">142</p><p>Membres actifs dans la nation</p></div>
     <div class="info-block"><h3>Rang mondial</h3><p class="big" id="pays-rang">#3</p><p>Position actuelle sur le classement général</p></div>
   </div>
-  <div class="pays-desc" id="pays-desc">Timor est une nation bâtie sur trois piliers fondamentaux : la <em>discipline</em>, le <em>commerce</em> et la <em>fraternité</em>. Depuis sa fondation, elle s'est imposée comme l'une des puissances majeures de NationsGlory, reconnue pour son organisation exemplaire et son accueil des nouveaux joueurs. Rejoindre Timor, c'est intégrer une communauté qui valorise la progression, le mérite et l'entraide.</div>
+  <div class="pays-desc" id="pays-desc">Timor est une nation bâtie sur trois piliers fondamentaux : la <em>discipline</em>, le <em>commerce</em> et la <em>fraternité</em>.</div>
   <div class="divider">Gouvernement</div>
   <div class="gouvernement-title">Membres du gouvernement actuel</div>
   <div class="gov-grid" id="gov-grid"></div>
@@ -623,20 +696,17 @@ const app  = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-/* ── Données par défaut ── */
-const DEFAULT_TUTOS = []; // Vide par défaut — l'admin remplit
-
+const DEFAULT_TUTOS = [];
 const DEFAULT_DISCOVERY = {
   title: "🗺️ Commencer à jouer",
   desc:  "Accomplis les étapes ci-dessous pour découvrir NationsGlory et Timor. Chaque action sera validée par un administrateur qui t'attribuera l'XP correspondante.",
   note:  "Une fois une étape cochée, contacte un administrateur sur Discord dans #validation pour recevoir ton XP.",
   steps: []
 };
-
 const DEFAULT_PAYS = {
   membres:"142", rang:"#3", fondation:"[Année]",
   herodesc:"Nation fondée sur la discipline, le commerce et la solidarité. Rejoins nos rangs et bâtis quelque chose de grand.",
-  paydesc:"Timor est une nation bâtie sur trois piliers fondamentaux : la discipline, le commerce et la fraternité. Depuis sa fondation, elle s'est imposée comme l'une des puissances majeures de NationsGlory.",
+  paydesc:"Timor est une nation bâtie sur trois piliers fondamentaux : la discipline, le commerce et la fraternité.",
   gouv:[
     {init:"PR", nom:"[Pseudo du Président]",      role:"Président de Timor",     badge:"Chef d'État"},
     {init:"VP", nom:"[Pseudo du Vice-Président]", role:"Vice-Président",          badge:"Gouvernement"},
@@ -646,11 +716,10 @@ const DEFAULT_PAYS = {
   ]
 };
 
-/* ── Cache local ── */
-let _tutos     = null;
-let _pays      = null;
-let _discovery = null;
+let _tutos = null, _pays = null, _discovery = null;
+let _currentUserRole = null;
 
+/* ════ Chargement des données ════ */
 async function loadSiteData() {
   try {
     const [tSnap, pSnap, dSnap] = await Promise.all([
@@ -662,72 +731,18 @@ async function loadSiteData() {
     _pays      = pSnap.exists() ? pSnap.data()      : DEFAULT_PAYS;
     _discovery = dSnap.exists() ? dSnap.data()      : DEFAULT_DISCOVERY;
   } catch(e) {
-    _tutos     = DEFAULT_TUTOS;
-    _pays      = DEFAULT_PAYS;
-    _discovery = DEFAULT_DISCOVERY;
+    console.warn("loadSiteData:", e.message);
+    _tutos = DEFAULT_TUTOS; _pays = DEFAULT_PAYS; _discovery = DEFAULT_DISCOVERY;
   }
-  renderTutos();
-  renderPays();
-  renderDiscovery();
+  renderTutos(); renderPays(); renderDiscovery();
 }
 
-/* ── Discovery flow ── */
-function renderDiscovery() {
-  if (!_discovery) return;
-  const d = _discovery;
-  setEl("disc-subtitle", d.desc || DEFAULT_DISCOVERY.desc);
-  setEl("disc-note",     d.note || DEFAULT_DISCOVERY.note);
-  const discTitle = document.querySelector(".discovery-title");
-  if (discTitle) discTitle.textContent = d.title || DEFAULT_DISCOVERY.title;
-
-  const container = document.getElementById("disc-steps");
-  if (!container) return;
-
-  if (!d.steps || d.steps.length === 0) {
-    container.innerHTML = '<div class="discovery-empty">Aucune étape configurée pour le moment. Revenez bientôt !</div>';
-    document.getElementById("disc-progress-fill").style.width = "0%";
-    return;
-  }
-
-  container.innerHTML = "";
-  d.steps.forEach(function(s, i) {
-    container.innerHTML +=
-      '<div class="discovery-step" id="dstep-' + i + '">' +
-        '<div class="discovery-step-num">' + (i+1) + '</div>' +
-        '<div class="discovery-step-body">' +
-          '<div class="discovery-step-title">' + escHtml(s.title) + '</div>' +
-          '<div class="discovery-step-desc">' + escHtml(s.desc) + '</div>' +
-          '<div class="discovery-step-xp">🏆 +' + (s.xp||0) + ' XP (si validé par un admin)</div>' +
-          '<div class="discovery-step-status"><label><input type="checkbox" data-step="' + i + '" onchange="updateDiscoveryProgress()"> J\'ai accompli cette étape</label></div>' +
-          '<div class="discovery-step-done-badge">✅ En attente de validation admin</div>' +
-        '</div>' +
-      '</div>';
-  });
-  updateDiscoveryProgress();
+/* ════ ICÔNE LIEN EXTERNE ════ */
+function linkIcon() {
+  return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
 }
 
-window.updateDiscoveryProgress = function() {
-  const checks = document.querySelectorAll("#disc-steps input[type=checkbox]");
-  const total  = checks.length;
-  const done   = Array.from(checks).filter(function(c){ return c.checked; }).length;
-  const pct    = total > 0 ? Math.round((done/total)*100) : 0;
-  document.getElementById("disc-progress-fill").style.width = pct + "%";
-  checks.forEach(function(c) {
-    const step = document.getElementById("dstep-" + c.dataset.step);
-    if (step) step.classList.toggle("pending", c.checked);
-  });
-};
-
-window.openDiscovery = function() {
-  document.getElementById("discovery-page").classList.add("active");
-  window.scrollTo(0, 0);
-};
-
-window.closeDiscovery = function() {
-  document.getElementById("discovery-page").classList.remove("active");
-};
-
-/* ── Rendu des tutoriels ── */
+/* ════ Rendu des tutoriels ════ */
 function renderTutos() {
   if (!_tutos) return;
   const grid = document.getElementById("tuto-grid");
@@ -739,27 +754,48 @@ function renderTutos() {
     return;
   }
   if (emptyMsg) emptyMsg.style.display = "none";
-  // Clear existing tuto cards (but keep empty msg)
   Array.from(grid.children).forEach(function(c){ if(c.id !== "tuto-empty") c.remove(); });
 
   _tutos.forEach(function(t) {
-    let stepsHtml = (t.steps||[]).map(function(s,i) {
-      return '<div class="tuto-step"><div class="step-n">' + (i+1) + '</div><div class="step-text"><strong>' + escHtml(s.title) + '</strong>' + escHtml(s.desc) + '</div></div>';
+    // Bannière image (optionnel)
+    const bannerHtml = t.image
+      ? '<img class="tuto-banner" src="' + escHtml(t.image) + '" alt="" onerror="this.style.display=\'none\'">'
+      : '';
+
+    // Lien externe principal (optionnel)
+    const tutoLinkHtml = t.link
+      ? '<a class="tuto-link" href="' + escHtml(t.link) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' + linkIcon() + escHtml(t.linkLabel || 'Voir le lien') + '</a>'
+      : '';
+
+    // Étapes avec image + lien optionnels
+    let stepsHtml = (t.steps||[]).map(function(s, i) {
+      const imgHtml  = s.img  ? '<img class="step-img" src="' + escHtml(s.img) + '" alt="" onerror="this.style.display=\'none\'">' : '';
+      const linkHtml = s.link ? '<a class="step-link" href="' + escHtml(s.link) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' + linkIcon() + escHtml(s.linkLabel || 'Voir') + '</a>' : '';
+      return '<div class="tuto-step">' +
+        '<div class="step-n">' + (i+1) + '</div>' +
+        '<div class="step-body">' +
+          '<div class="step-text"><strong>' + escHtml(s.title) + '</strong>' + escHtml(s.desc) + '</div>' +
+          imgHtml + linkHtml +
+        '</div>' +
+      '</div>';
     }).join("");
+
     const card = document.createElement("div");
     card.className = "tuto-card";
     card.onclick = function(){ toggleTuto(card); };
     card.innerHTML =
+      bannerHtml +
       '<div class="tuto-icon">' + (t.icon||'📖') + '</div>' +
       '<div class="tuto-title">' + escHtml(t.title) + '</div>' +
-      '<div class="tuto-desc">' + escHtml(t.desc) + '</div>' +
+      '<div class="tuto-desc">'  + escHtml(t.desc)  + '</div>' +
+      tutoLinkHtml +
       '<div class="tuto-toggle">Voir le guide ▾</div>' +
       '<div class="tuto-steps">' + stepsHtml + '</div>';
     grid.appendChild(card);
   });
 }
 
-/* ── Rendu de la page Pays ── */
+/* ════ Rendu Pays ════ */
 function renderPays() {
   if (!_pays) return;
   const p = _pays;
@@ -778,9 +814,55 @@ function renderPays() {
   }
 }
 
-function setEl(id, val) { var e = document.getElementById(id); if(e) e.textContent = val; }
+/* ════ Discovery ════ */
+function renderDiscovery() {
+  if (!_discovery) return;
+  const d = _discovery;
+  setEl("disc-subtitle", d.desc || DEFAULT_DISCOVERY.desc);
+  const noteEl = document.getElementById("disc-note");
+  if (noteEl) noteEl.innerHTML = escHtml(d.note || DEFAULT_DISCOVERY.note).replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--gold);font-style:normal;">$1</strong>');
+  const discTitle = document.querySelector(".discovery-title");
+  if (discTitle) discTitle.textContent = d.title || DEFAULT_DISCOVERY.title;
 
-/* ── Discord OAuth ── */
+  const container = document.getElementById("disc-steps");
+  if (!container) return;
+
+  if (!d.steps || d.steps.length === 0) {
+    container.innerHTML = '<div class="discovery-empty">Aucune étape configurée pour le moment. Revenez bientôt !</div>';
+    document.getElementById("disc-progress-fill").style.width = "0%";
+    return;
+  }
+  container.innerHTML = "";
+  d.steps.forEach(function(s, i) {
+    container.innerHTML +=
+      '<div class="discovery-step" id="dstep-' + i + '">' +
+        '<div class="discovery-step-num">' + (i+1) + '</div>' +
+        '<div class="discovery-step-body">' +
+          '<div class="discovery-step-title">' + escHtml(s.title) + '</div>' +
+          '<div class="discovery-step-desc">'  + escHtml(s.desc)  + '</div>' +
+          '<div class="discovery-step-xp">🏆 +' + (s.xp||0) + ' XP (si validé par un admin)</div>' +
+          '<div class="discovery-step-status"><label><input type="checkbox" data-step="' + i + '" onchange="updateDiscoveryProgress()"> J\'ai accompli cette étape</label></div>' +
+          '<div class="discovery-step-done-badge">✅ En attente de validation admin</div>' +
+        '</div>' +
+      '</div>';
+  });
+  updateDiscoveryProgress();
+}
+
+window.updateDiscoveryProgress = function() {
+  const checks = document.querySelectorAll("#disc-steps input[type=checkbox]");
+  const total  = checks.length;
+  const done   = Array.from(checks).filter(function(c){ return c.checked; }).length;
+  document.getElementById("disc-progress-fill").style.width = (total > 0 ? Math.round((done/total)*100) : 0) + "%";
+  checks.forEach(function(c) {
+    const step = document.getElementById("dstep-" + c.dataset.step);
+    if (step) step.classList.toggle("pending", c.checked);
+  });
+};
+window.openDiscovery  = function() { document.getElementById("discovery-page").classList.add("active"); window.scrollTo(0,0); };
+window.closeDiscovery = function() { document.getElementById("discovery-page").classList.remove("active"); };
+
+/* ════ Discord OAuth ════ */
 function loginWithDiscord() {
   const state = crypto.randomUUID();
   sessionStorage.setItem("discord_oauth_state", state);
@@ -839,9 +921,11 @@ onAuthStateChanged(auth, async function(user) {
   if (user) {
     const snap    = await getDoc(doc(db, "users", user.uid));
     const profile = snap.exists() ? snap.data() : null;
+    _currentUserRole = profile?.role || "citoyen";
     renderConnectedState(user, profile);
     await loadLeaderboard();
   } else {
+    _currentUserRole = null;
     renderDisconnectedState();
     await loadLeaderboard();
   }
@@ -849,9 +933,9 @@ onAuthStateChanged(auth, async function(user) {
 
 function renderConnectedState(user, profile) {
   document.getElementById("auth-banner").style.display = "none";
-  const name   = escHtml(profile?.globalName || profile?.username || user.displayName || "Citoyen");
-  const xp     = profile?.xp ?? 0;
-  const role   = profile?.role || "citoyen";
+  const name = escHtml(profile?.globalName || profile?.username || user.displayName || "Citoyen");
+  const xp   = profile?.xp ?? 0;
+  const role = profile?.role || "citoyen";
   document.body.classList.toggle("is-admin", role==="admin");
   document.body.classList.toggle("is-modo",  role==="modo");
   const adminPanel = document.getElementById("admin-panel");
@@ -869,7 +953,7 @@ function renderConnectedState(user, profile) {
   else if (role==="modo") badge = '<span class="nav-role-badge role-modo">Modo</span>';
   const navAuth = document.getElementById("nav-auth");
   if (navAuth) {
-    navAuth.innerHTML = '<div class="nav-user">' + (profile?.avatar ? '<img src="'+profile.avatar+'" class="nav-avatar" alt="" onerror="this.style.display=\'none\'">' : "") + '<span class="nav-username">' + name + '</span>' + badge + '<span class="nav-xp">' + xp.toLocaleString("fr-FR") + ' XP</span><button class="btn-nav-logout" id="btn-logout" title="Déconnexion">✕</button></div>';
+    navAuth.innerHTML = '<div class="nav-user">' + (profile?.avatar ? '<img src="'+profile.avatar+'" class="nav-avatar" alt="" onerror="this.style.display=\'none\'">' : "") + '<span class="nav-username">'+name+'</span>'+badge+'<span class="nav-xp">'+xp.toLocaleString("fr-FR")+' XP</span><button class="btn-nav-logout" id="btn-logout" title="Déconnexion">✕</button></div>';
     document.getElementById("btn-logout").addEventListener("click", logout);
   }
   const dw = document.getElementById("dash-welcome");
@@ -885,12 +969,12 @@ function renderDisconnectedState() {
   if (dw) dw.textContent = "Tableau de bord";
   const navAuth = document.getElementById("nav-auth");
   if (navAuth) {
-    navAuth.innerHTML = '<button class="btn-discord" id="btn-login"><svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>Connexion Discord</button>';
+    navAuth.innerHTML = '<button class="btn-discord" id="btn-login"><svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.42,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>Connexion Discord</button>';
     document.getElementById("btn-login").addEventListener("click", loginWithDiscord);
   }
 }
 
-/* ── Classement ── */
+/* ════ Classement ════ */
 async function loadLeaderboard() {
   const lbEl = document.getElementById("leaderboard-dynamic");
   if (!lbEl) return;
@@ -913,7 +997,7 @@ async function loadLeaderboard() {
   } catch(err) { console.warn("Leaderboard error:", err.message); }
 }
 
-/* ── Admin : joueurs ── */
+/* ════ Admin : joueurs ════ */
 window.adminRefreshPlayers = async function() {
   const sel = document.getElementById("admin-target-player");
   if (!sel) return;
@@ -932,7 +1016,6 @@ window.adminRefreshPlayers = async function() {
   } catch(err) { setAdminFeedback("Erreur: "+err.message,"err"); }
 };
 
-/* ── Admin : modifier XP (+ ou -) ── */
 window.adminModifyXP = async function(sign) {
   const targetUid = document.getElementById("admin-target-player")?.value;
   if (!targetUid) { setAdminFeedback("Sélectionne un joueur.","err"); return; }
@@ -956,7 +1039,10 @@ window.adminModifyXP = async function(sign) {
   } catch(err) { setAdminFeedback("Erreur: "+err.message,"err"); }
 };
 
-/* ── Admin : discovery editor ── */
+/* ════ Admin : découverte ════
+   CORRECTION : on utilise setDoc avec merge:false pour écrire tout le document
+   et on vérifie le rôle côté client avant d'appeler Firestore.
+════ */
 window.adminLoadDiscoveryEditor = function() {
   if (!_discovery) return;
   setInputVal("disc-flow-title", _discovery.title||"");
@@ -969,35 +1055,58 @@ window.adminLoadDiscoveryEditor = function() {
 };
 
 window.adminSaveDiscovery = async function() {
+  // Vérification côté client du rôle
+  if (!_currentUserRole || (_currentUserRole !== "admin" && _currentUserRole !== "modo")) {
+    document.getElementById("admin-disc-feedback").textContent = "⚠ Accès refusé : rôle insuffisant.";
+    document.getElementById("admin-disc-feedback").className   = "admin-feedback err";
+    return;
+  }
+
   const stepsRaw = (document.getElementById("disc-flow-steps")?.value||"").trim().split("\n").filter(Boolean);
   const steps = stepsRaw.map(function(line){
     const p = line.split("|");
     return {title:(p[0]||"").trim(), desc:(p[1]||"").trim(), xp:parseInt(p[2]||"0",10)||0};
   });
-  _discovery = {
-    title: document.getElementById("disc-flow-title")?.value.trim() || _discovery.title,
-    desc:  document.getElementById("disc-flow-desc")?.value.trim()  || _discovery.desc,
-    note:  document.getElementById("disc-flow-note")?.value.trim()  || _discovery.note,
+  const newDiscovery = {
+    title: (document.getElementById("disc-flow-title")?.value||"").trim() || _discovery.title,
+    desc:  (document.getElementById("disc-flow-desc")?.value||"").trim()  || _discovery.desc,
+    note:  (document.getElementById("disc-flow-note")?.value||"").trim()  || _discovery.note,
     steps: steps,
   };
+
+  const fbEl = document.getElementById("admin-disc-feedback");
+  fbEl.textContent = "Sauvegarde en cours…";
+  fbEl.className   = "admin-feedback";
+
   try {
-    await setDoc(doc(db,"sitedata","discovery"), _discovery);
-    document.getElementById("admin-disc-feedback").textContent = "✓ Flow de découverte sauvegardé !";
-    document.getElementById("admin-disc-feedback").className   = "admin-feedback ok";
+    // Écriture directe avec setDoc (remplace tout le document)
+    await setDoc(doc(db,"sitedata","discovery"), newDiscovery);
+    _discovery = newDiscovery;
+    fbEl.textContent = "✓ Flow de découverte sauvegardé !";
+    fbEl.className   = "admin-feedback ok";
     renderDiscovery();
     showToast("Flow de découverte mis à jour !");
+    // Cacher l'alerte si elle était affichée
+    const ra = document.getElementById("rules-alert");
+    if (ra) ra.style.display = "none";
   } catch(err) {
-    document.getElementById("admin-disc-feedback").textContent = "Erreur: "+err.message;
-    document.getElementById("admin-disc-feedback").className   = "admin-feedback err";
+    console.error("adminSaveDiscovery:", err);
+    fbEl.className = "admin-feedback err";
+    if (err.code === "permission-denied" || err.message.includes("Missing or insufficient")) {
+      fbEl.textContent = "❌ Règles Firestore insuffisantes. Vérifie les Security Rules dans la console Firebase (voir l'alerte ci-dessus).";
+      const ra = document.getElementById("rules-alert");
+      if (ra) ra.style.display = "";
+    } else {
+      fbEl.textContent = "Erreur: " + err.message;
+    }
   }
 };
 
-window.previewDiscovery = function() {
-  openDiscovery();
-};
+window.previewDiscovery = function() { openDiscovery(); };
 
-/* ── Admin : tutoriels ── */
+/* ════ Admin : tutoriels ════ */
 window._editingTutoId = null;
+
 window.adminLoadTutoEditor = function() {
   if (!_tutos) return;
   const list = document.getElementById("admin-tuto-list");
@@ -1006,15 +1115,24 @@ window.adminLoadTutoEditor = function() {
   _tutos.forEach(function(t) {
     const item = document.createElement("div");
     item.className = "admin-card-item";
-    item.innerHTML = '<span style="font-size:1.1rem;">' + (t.icon||'📖') + '</span><span class="admin-card-item-name">' + escHtml(t.title) + '</span>';
+    item.innerHTML = '<span style="font-size:1.1rem;">'+(t.icon||'📖')+'</span><span class="admin-card-item-name">'+escHtml(t.title)+'</span>';
     item.onclick = function() {
       document.querySelectorAll("#admin-tuto-list .admin-card-item").forEach(function(i){ i.classList.remove("selected"); });
       item.classList.add("selected");
       window._editingTutoId = t.id;
-      document.getElementById("ate-title").value = t.title;
-      document.getElementById("ate-icon").value  = t.icon||'';
-      document.getElementById("ate-desc").value  = t.desc;
-      document.getElementById("ate-steps").value = (t.steps||[]).map(function(s){ return s.title+"|"+s.desc; }).join("\n");
+      document.getElementById("ate-title").value = t.title||"";
+      document.getElementById("ate-icon").value  = t.icon||"📖";
+      document.getElementById("ate-image").value = t.image||"";
+      document.getElementById("ate-link").value  = t.link||"";
+      document.getElementById("ate-link-label").value = t.linkLabel||"";
+      document.getElementById("ate-desc").value  = t.desc||"";
+      // Sérialiser les étapes avec img et lien
+      document.getElementById("ate-steps").value = (t.steps||[]).map(function(s){
+        let line = s.title+"|"+s.desc;
+        if (s.img)  line += "|img:"+s.img;
+        if (s.link) line += "|lien:"+s.link+"|"+(s.linkLabel||"Voir");
+        return line;
+      }).join("\n");
       document.getElementById("admin-tuto-editor").style.display = "";
       document.getElementById("btn-del-tuto").style.display = "";
     };
@@ -1024,10 +1142,10 @@ window.adminLoadTutoEditor = function() {
 
 window.adminNewTuto = function() {
   window._editingTutoId = "t_" + Date.now();
-  document.getElementById("ate-title").value = "";
-  document.getElementById("ate-icon").value  = "📖";
-  document.getElementById("ate-desc").value  = "";
-  document.getElementById("ate-steps").value = "";
+  ["ate-title","ate-icon","ate-image","ate-link","ate-link-label","ate-desc","ate-steps"].forEach(function(id){
+    const el = document.getElementById(id); if(el) el.value = "";
+  });
+  document.getElementById("ate-icon").value = "📖";
   document.getElementById("admin-tuto-editor").style.display = "";
   document.getElementById("btn-del-tuto").style.display = "none";
   document.querySelectorAll("#admin-tuto-list .admin-card-item").forEach(function(i){ i.classList.remove("selected"); });
@@ -1047,34 +1165,75 @@ window.adminDeleteTuto = async function() {
   } catch(err) { showToast("Erreur: "+err.message); }
 };
 
+/* Parseur d'étapes enrichies : Titre|Desc[|img:URL][|lien:URL|texte] */
+function parseTutoSteps(raw) {
+  return raw.trim().split("\n").filter(Boolean).map(function(line) {
+    // On split sur | mais on fait attention à récupérer les segments
+    const parts = line.split("|");
+    const step = { title: (parts[0]||"").trim(), desc: (parts[1]||"").trim() };
+    for (var i = 2; i < parts.length; i++) {
+      const seg = parts[i].trim();
+      if (seg.startsWith("img:")) {
+        step.img = seg.slice(4).trim();
+      } else if (seg.startsWith("lien:")) {
+        step.link = seg.slice(5).trim();
+        // Le label du lien est le segment suivant (si existant)
+        if (parts[i+1] !== undefined) {
+          step.linkLabel = parts[i+1].trim();
+          i++; // on saute le segment label
+        } else {
+          step.linkLabel = "Voir";
+        }
+      }
+    }
+    return step;
+  });
+}
+
 window.adminSaveTuto = async function() {
   const tid = window._editingTutoId;
   if (!tid) return;
-  const stepsRaw = document.getElementById("ate-steps").value.trim().split("\n").filter(Boolean);
-  const steps = stepsRaw.map(function(line){ const p=line.split("|"); return {title:(p[0]||"").trim(), desc:(p[1]||"").trim()}; });
+  const steps = parseTutoSteps(document.getElementById("ate-steps").value || "");
   const newTuto = {
-    id: tid,
-    icon:  document.getElementById("ate-icon").value.trim()  || "📖",
-    title: document.getElementById("ate-title").value.trim() || "Tutoriel",
-    desc:  document.getElementById("ate-desc").value.trim()  || "",
-    steps: steps,
+    id:        tid,
+    icon:      (document.getElementById("ate-icon").value||"").trim()       || "📖",
+    title:     (document.getElementById("ate-title").value||"").trim()      || "Tutoriel",
+    desc:      (document.getElementById("ate-desc").value||"").trim()       || "",
+    image:     (document.getElementById("ate-image").value||"").trim()      || "",
+    link:      (document.getElementById("ate-link").value||"").trim()       || "",
+    linkLabel: (document.getElementById("ate-link-label").value||"").trim() || "",
+    steps:     steps,
   };
+  // Nettoyer les champs vides pour ne pas stocker des strings vides inutiles
+  if (!newTuto.image)     delete newTuto.image;
+  if (!newTuto.link)      { delete newTuto.link; delete newTuto.linkLabel; }
+  if (!newTuto.linkLabel) delete newTuto.linkLabel;
+
   const idx = _tutos.findIndex(function(t){ return t.id===tid; });
   if (idx >= 0) _tutos[idx] = newTuto;
   else _tutos.push(newTuto);
+
+  const fbEl = document.getElementById("admin-tuto-feedback");
+  fbEl.textContent = "Sauvegarde…"; fbEl.className = "admin-feedback";
   try {
     await setDoc(doc(db,"sitedata","tutos"), {list:_tutos});
-    document.getElementById("admin-tuto-feedback").textContent = "✓ Tutoriel sauvegardé !";
-    document.getElementById("admin-tuto-feedback").className   = "admin-feedback ok";
+    fbEl.textContent = "✓ Tutoriel sauvegardé !";
+    fbEl.className   = "admin-feedback ok";
     renderTutos(); adminLoadTutoEditor();
     showToast("Tutoriel mis à jour !");
   } catch(err) {
-    document.getElementById("admin-tuto-feedback").textContent = "Erreur: "+err.message;
-    document.getElementById("admin-tuto-feedback").className   = "admin-feedback err";
+    fbEl.textContent = err.code === "permission-denied"
+      ? "❌ Règles Firestore insuffisantes. Vérifie la console Firebase."
+      : "Erreur: "+err.message;
+    fbEl.className = "admin-feedback err";
+    if (err.code === "permission-denied") {
+      const ra = document.getElementById("rules-alert");
+      if (ra) ra.style.display = "";
+    }
   }
 };
 
-/* ── Admin : pays ── */
+/* ════ Admin : pays ════ */
 window.adminLoadPaysEditor = function() {
   if (!_pays) return;
   const p = _pays;
@@ -1087,44 +1246,53 @@ window.adminLoadPaysEditor = function() {
   if (gouvTA && p.gouv) gouvTA.value = p.gouv.map(function(m){ return m.init+"|"+m.nom+"|"+m.role+"|"+m.badge; }).join("\n");
 };
 
-function setInputVal(id, val) { var e=document.getElementById(id); if(e) e.value=val; }
-
 window.adminSavePays = async function() {
   const gouvRaw = (document.getElementById("ape-gouv")?.value||"").trim().split("\n").filter(Boolean);
   const gouv = gouvRaw.map(function(line){ const p=line.split("|"); return {init:(p[0]||"").trim(), nom:(p[1]||"").trim(), role:(p[2]||"").trim(), badge:(p[3]||"").trim()}; });
   _pays = {
-    membres:   document.getElementById("ape-membres")?.value.trim()  || _pays.membres,
-    rang:      document.getElementById("ape-rang")?.value.trim()     || _pays.rang,
-    fondation: document.getElementById("ape-fondation")?.value.trim()|| _pays.fondation,
-    herodesc:  document.getElementById("ape-herodesc")?.value.trim() || _pays.herodesc,
-    paydesc:   document.getElementById("ape-paydesc")?.value.trim()  || _pays.paydesc,
+    membres:   (document.getElementById("ape-membres")?.value||"").trim()   || _pays.membres,
+    rang:      (document.getElementById("ape-rang")?.value||"").trim()      || _pays.rang,
+    fondation: (document.getElementById("ape-fondation")?.value||"").trim() || _pays.fondation,
+    herodesc:  (document.getElementById("ape-herodesc")?.value||"").trim()  || _pays.herodesc,
+    paydesc:   (document.getElementById("ape-paydesc")?.value||"").trim()   || _pays.paydesc,
     gouv: gouv.length ? gouv : _pays.gouv,
   };
+  const fbEl = document.getElementById("admin-pays-feedback");
+  fbEl.textContent = "Sauvegarde…"; fbEl.className = "admin-feedback";
   try {
     await setDoc(doc(db,"sitedata","pays"), _pays);
-    document.getElementById("admin-pays-feedback").textContent = "✓ Infos pays sauvegardées !";
-    document.getElementById("admin-pays-feedback").className   = "admin-feedback ok";
+    fbEl.textContent = "✓ Infos pays sauvegardées !";
+    fbEl.className   = "admin-feedback ok";
     renderPays();
     showToast("Infos pays mises à jour !");
   } catch(err) {
-    document.getElementById("admin-pays-feedback").textContent = "Erreur: "+err.message;
-    document.getElementById("admin-pays-feedback").className   = "admin-feedback err";
+    fbEl.textContent = err.code === "permission-denied"
+      ? "❌ Règles Firestore insuffisantes. Vérifie la console Firebase."
+      : "Erreur: "+err.message;
+    fbEl.className = "admin-feedback err";
+    if (err.code === "permission-denied") {
+      const ra = document.getElementById("rules-alert");
+      if (ra) ra.style.display = "";
+    }
   }
 };
 
+/* ════ Utilitaires ════ */
 function setAdminFeedback(msg, type) {
   const el = document.getElementById("admin-feedback");
   if (!el) return;
   el.textContent = msg;
   el.className = "admin-feedback" + (type ? " "+type : "");
 }
-
+function setEl(id, val) { var e = document.getElementById(id); if(e) e.textContent = val; }
+function setInputVal(id, val) { var e = document.getElementById(id); if(e) e.value = val; }
 function escHtml(str) {
-  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
 window.Timor = { loginWithDiscord, logout, handleDiscordCallback };
 
+/* ── Callback Discord code pending ── */
 (async function() {
   const code  = sessionStorage.getItem("discord_pending_code");
   const state = sessionStorage.getItem("discord_pending_state");
