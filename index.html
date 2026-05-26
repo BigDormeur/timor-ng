@@ -34,6 +34,9 @@
   --border-strong:rgba(201,168,76,0.38);
   --pending:      #e09c3a;
   --pending-dim:  rgba(224,156,58,0.14);
+  /* Wheel segments */
+  --seg1: #c9a84c; --seg2: #4a7fa5; --seg3: #52c97a; --seg4: #e05252;
+  --seg5: #a855f7; --seg6: #f97316; --seg7: #06b6d4; --seg8: #ec4899;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -46,7 +49,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Background grain + mesh ── */
 body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -62,7 +64,6 @@ body::after {
   background-size: 200px;
 }
 
-/* ══ SCROLLBAR ══ */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--dark2); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
@@ -93,6 +94,24 @@ nav {
 }
 .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
 .nav-links a.active { color: var(--gold); background: var(--gold-glow); }
+.nav-links a.spin-nav-btn {
+  color: var(--gold); background: var(--gold-glow); border: 1px solid var(--border-md);
+  position: relative;
+}
+.nav-links a.spin-nav-btn::after {
+  content: 'NEW';
+  position: absolute; top: 3px; right: 3px;
+  font-size: 0.42rem; font-weight: 800; letter-spacing: 0.06em;
+  background: var(--gold); color: var(--dark); padding: 1px 4px; border-radius: 3px;
+}
+.nav-links a.spin-nav-btn.spin-ready::before {
+  content: '';
+  position: absolute; top: 5px; left: 5px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+  animation: blink 1.5s ease-in-out infinite;
+}
 #nav-auth { display: flex; align-items: center; }
 
 /* ══ NAV USER ══ */
@@ -507,6 +526,151 @@ nav {
 .play-block h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--text); margin-bottom: 0.6rem; }
 .play-block p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.75rem; line-height: 1.7; }
 
+/* ══ SPIN WHEEL TEASER CARD ══ */
+.spin-teaser {
+  background: linear-gradient(135deg, rgba(201,168,76,0.07), rgba(168,85,247,0.05));
+  border: 1px solid var(--border-md);
+  border-radius: 20px; padding: 1.5rem 2rem; margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 1.5rem;
+  position: relative; overflow: hidden; cursor: pointer;
+  transition: all 0.25s;
+}
+.spin-teaser:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+.spin-teaser::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(201,168,76,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.spin-teaser-wheel {
+  font-size: 3.2rem; flex-shrink: 0;
+  animation: wheelSpin 8s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(201,168,76,0.4));
+}
+@keyframes wheelSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.spin-teaser-info { flex: 1; }
+.spin-teaser-title { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text); margin-bottom: 4px; }
+.spin-teaser-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+.spin-teaser-cooldown { font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
+.spin-teaser-cooldown.ready { color: var(--success); font-weight: 600; }
+.spin-teaser-cooldown.waiting { color: var(--text-dim); }
+.spin-teaser-btn {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--dark); background: var(--gold); border: none;
+  padding: 10px 22px; border-radius: 10px; cursor: pointer; white-space: nowrap;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.spin-teaser-btn:hover { background: var(--gold-light); }
+.spin-teaser-btn:disabled { opacity: 0.5; cursor: default; background: var(--gold-dim); }
+
+/* ══ SPIN WHEEL MODAL ══ */
+.spin-overlay {
+  position: fixed; inset: 0; z-index: 9997;
+  background: rgba(0,0,0,0.88); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.35s;
+}
+.spin-overlay.show { opacity: 1; pointer-events: all; }
+.spin-modal {
+  background: var(--dark2); border: 1px solid var(--border-md);
+  border-radius: 24px; padding: 2.5rem 2rem;
+  text-align: center; max-width: 540px; width: 95%;
+  transform: scale(0.88); transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 0 0 1px rgba(201,168,76,0.08), 0 40px 100px rgba(0,0,0,0.6), 0 0 80px rgba(201,168,76,0.06);
+  position: relative; overflow: hidden;
+}
+.spin-overlay.show .spin-modal { transform: scale(1); }
+.spin-modal-glow {
+  position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.spin-modal-title {
+  font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--text);
+  margin-bottom: 0.25rem;
+}
+.spin-modal-subtitle {
+  font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.75rem;
+}
+.spin-wheel-wrap {
+  position: relative; width: 320px; height: 320px;
+  margin: 0 auto 1.75rem;
+}
+.spin-pointer {
+  position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 30px solid var(--gold);
+  z-index: 10;
+  filter: drop-shadow(0 2px 6px rgba(201,168,76,0.6));
+}
+#spin-canvas {
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--dark3), 0 0 0 6px var(--border-md), 0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(201,168,76,0.08);
+  display: block;
+}
+.spin-center-btn {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 58px; height: 58px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  border: 3px solid var(--dark2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; color: var(--dark);
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.35);
+  z-index: 10; text-transform: uppercase;
+}
+.spin-center-btn:hover:not(:disabled) { background: linear-gradient(135deg, var(--gold), var(--gold-light)); transform: translate(-50%,-50%) scale(1.08); }
+.spin-center-btn:disabled { opacity: 0.4; cursor: default; }
+.spin-prizes-legend {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 1.5rem;
+}
+.spin-prize-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.68rem; font-weight: 600;
+  padding: 4px 12px; border-radius: 99px;
+  border: 1px solid;
+}
+.spin-cooldown-bar-wrap {
+  background: rgba(255,255,255,0.04); border-radius: 99px; height: 4px; margin-bottom: 0.75rem; overflow: hidden;
+}
+.spin-cooldown-bar {
+  height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  border-radius: 99px; transition: width 1s linear;
+}
+.spin-status {
+  font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;
+  min-height: 1.3em; font-family: 'JetBrains Mono', monospace;
+}
+.spin-result-banner {
+  display: none; padding: 1.25rem; border-radius: 14px; margin-bottom: 1.25rem;
+  text-align: center;
+}
+.spin-result-banner.show { display: block; animation: fadeUp 0.4s ease; }
+.spin-result-icon { font-size: 2.8rem; margin-bottom: 0.5rem; }
+.spin-result-label { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 0.3rem; }
+.spin-result-desc { font-size: 0.82rem; color: var(--text-muted); }
+.spin-close-btn {
+  font-size: 0.78rem; font-weight: 600; color: var(--text-dim);
+  background: var(--dark4); border: 1px solid var(--border-md);
+  padding: 10px 28px; border-radius: 10px; cursor: pointer; transition: all 0.2s;
+}
+.spin-close-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.spin-auth-notice {
+  background: rgba(88,101,242,0.08); border: 1px solid rgba(88,101,242,0.25);
+  border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+  font-size: 0.85rem; color: var(--text-muted);
+}
+
+/* ══ CONFETTI ══ */
+#confetti-canvas {
+  position: fixed; inset: 0; z-index: 10000;
+  pointer-events: none; opacity: 0; transition: opacity 0.3s;
+}
+#confetti-canvas.active { opacity: 1; }
+
 /* ══ ADMIN PANEL ══ */
 .admin-section {
   background: rgba(224,82,82,0.05); border: 1px solid rgba(224,82,82,0.15);
@@ -566,10 +730,7 @@ nav {
 
 /* ══ ORDERS ADMIN TAB ══ */
 .orders-list { display: flex; flex-direction: column; gap: 10px; }
-.order-card {
-  background: var(--dark4); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;
-  transition: border-color 0.2s;
-}
+.order-card { background: var(--dark4); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; transition: border-color 0.2s; }
 .order-card:hover { border-color: var(--border-md); }
 .order-card.pending { border-left: 3px solid var(--pending); background: rgba(224,156,58,0.04); }
 .order-card.fulfilled { border-left: 3px solid var(--success); background: var(--success-dim); }
@@ -602,15 +763,10 @@ nav {
 .orders-filter-tab.active, .orders-filter-tab:hover { background: rgba(224,82,82,0.12); border-color: rgba(224,82,82,0.35); }
 .orders-count-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 700; background: var(--pending); color: var(--dark); padding: 2px 8px; border-radius: 99px; }
 .orders-empty { padding: 2.5rem; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
-.orders-notify-banner {
-  background: rgba(224,156,58,0.1); border: 1px solid rgba(224,156,58,0.3);
-  border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem;
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-}
+.orders-notify-banner { background: rgba(224,156,58,0.1); border: 1px solid rgba(224,156,58,0.3); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .orders-notify-banner .notify-icon { font-size: 1.3rem; }
 .orders-notify-banner p { font-size: 0.82rem; color: var(--pending); font-weight: 600; flex: 1; margin: 0; }
 
-/* ══ NOTIFICATION DOT ══ */
 .admin-tab.has-notif { position: relative; }
 .admin-tab.has-notif::after { content: ''; position: absolute; top: 4px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--pending); border: 1px solid var(--dark3); }
 
@@ -634,11 +790,15 @@ footer a { color: var(--gold-dim); text-decoration: none; }
   .xp-control-row { flex-direction: column; align-items: flex-start; }
   .shop-grid { grid-template-columns: 1fr; }
   .order-card-body { flex-direction: column; }
+  .spin-wheel-wrap { width: 260px; height: 260px; }
+  #spin-canvas { width: 260px !important; height: 260px !important; }
+  .spin-teaser { flex-direction: column; text-align: center; }
 }
 </style>
 </head>
 <body>
 <div id="toast"></div>
+<canvas id="confetti-canvas"></canvas>
 
 <!-- ══ LEVEL UP ══ -->
 <div class="levelup-overlay" id="levelup-overlay">
@@ -664,6 +824,36 @@ footer a { color: var(--gold-dim); text-decoration: none; }
       <button class="btn-buy-cancel" onclick="closePurchaseModal()">Annuler</button>
     </div>
     <div class="purchase-modal-error" id="pm-error"></div>
+  </div>
+</div>
+
+<!-- ══ SPIN WHEEL MODAL ══ -->
+<div class="spin-overlay" id="spin-overlay">
+  <div class="spin-modal">
+    <div class="spin-modal-glow"></div>
+    <div class="spin-modal-title">🎰 Roulette Quotidienne</div>
+    <div class="spin-modal-subtitle">Tente ta chance — une fois par jour !</div>
+
+    <div id="spin-auth-notice" class="spin-auth-notice" style="display:none;">
+      ⚠ Connecte-toi avec Discord pour que ta récompense soit sauvegardée.
+    </div>
+
+    <div class="spin-result-banner" id="spin-result-banner">
+      <div class="spin-result-icon" id="spin-result-icon">🎉</div>
+      <div class="spin-result-label" id="spin-result-label">Super !</div>
+      <div class="spin-result-desc" id="spin-result-desc"></div>
+    </div>
+
+    <div class="spin-wheel-wrap">
+      <div class="spin-pointer"></div>
+      <canvas id="spin-canvas" width="320" height="320"></canvas>
+      <button class="spin-center-btn" id="spin-center-btn" onclick="doSpin()">SPIN</button>
+    </div>
+
+    <div class="spin-prizes-legend" id="spin-prizes-legend"></div>
+    <div class="spin-cooldown-bar-wrap"><div class="spin-cooldown-bar" id="spin-cooldown-bar" style="width:100%"></div></div>
+    <div class="spin-status" id="spin-status">Chargement…</div>
+    <button class="spin-close-btn" onclick="closeSpinModal()">Fermer</button>
   </div>
 </div>
 
@@ -703,6 +893,7 @@ footer a { color: var(--gold-dim); text-decoration: none; }
     <li><a onclick="showSection('pays');return false;" href="#">Le Pays</a></li>
     <li><a onclick="showSection('boutique');return false;" href="#">Boutique</a></li>
     <li><a onclick="showSection('classement');return false;" href="#">Classement</a></li>
+    <li><a class="spin-nav-btn" id="nav-spin-btn" onclick="openSpinModal();return false;" href="#">🎰 Roulette</a></li>
   </ul>
   <div id="nav-auth">
     <button class="btn-discord" disabled>
@@ -752,6 +943,17 @@ footer a { color: var(--gold-dim); text-decoration: none; }
     <div class="level-milestones" id="level-milestones"></div>
   </div>
 
+  <!-- SPIN TEASER -->
+  <div class="spin-teaser" id="spin-teaser" onclick="openSpinModal()">
+    <div class="spin-teaser-wheel">🎡</div>
+    <div class="spin-teaser-info">
+      <div class="spin-teaser-title">Roulette Quotidienne</div>
+      <div class="spin-teaser-desc">Tente ta chance chaque jour pour gagner de l'XP, des pièces ou des récompenses spéciales !</div>
+      <div class="spin-teaser-cooldown" id="spin-teaser-cooldown">Chargement…</div>
+    </div>
+    <button class="spin-teaser-btn" id="spin-teaser-btn">Tourner 🎰</button>
+  </div>
+
   <!-- ADMIN PANEL -->
   <div class="admin-section" id="admin-panel">
     <div class="admin-title">⚔ Panneau Administrateur</div>
@@ -767,6 +969,7 @@ footer a { color: var(--gold-dim); text-decoration: none; }
       <button class="admin-tab" onclick="switchAdminTab('pays-edit',this)">🏛 Pays</button>
       <button class="admin-tab" onclick="switchAdminTab('shop-edit',this)">🛒 Boutique</button>
       <button class="admin-tab" onclick="switchAdminTab('links-edit',this)">🔗 Liens</button>
+      <button class="admin-tab" onclick="switchAdminTab('spin-edit',this)">🎰 Roulette</button>
     </div>
 
     <!-- TAB JOUEURS -->
@@ -937,6 +1140,24 @@ footer a { color: var(--gold-dim); text-decoration: none; }
       <div class="admin-feedback" id="admin-links-feedback"></div>
     </div>
 
+    <!-- TAB ROULETTE ADMIN -->
+    <div class="admin-tab-panel" id="admin-tab-spin-edit">
+      <label class="admin-label">LOTS DE LA ROULETTE (un par ligne)</label>
+      <div class="admin-format-hint">
+        Format : <code>label|type|valeur|couleur|poids|icône</code><br>
+        Types : <code>xp</code>, <code>coins</code>, <code>nothing</code><br>
+        Poids : plus le nombre est élevé, plus le lot est fréquent.<br>
+        Exemple : <code>+50 XP|xp|50|#c9a84c|20|⚡</code>
+      </div>
+      <textarea class="admin-textarea" id="spin-admin-prizes" style="min-height:240px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"></textarea>
+      <div class="admin-actions" style="margin-top:8px;">
+        <button class="btn-admin" onclick="adminSaveSpinPrizes()">💾 Sauvegarder</button>
+        <button class="btn-admin" onclick="openSpinModal()">👁 Tester</button>
+        <button class="btn-admin" onclick="adminResetSpinDefault()">↺ Par défaut</button>
+      </div>
+      <div class="admin-feedback" id="admin-spin-feedback"></div>
+    </div>
+
   </div><!-- fin admin-panel -->
 
   <div class="auth-banner" id="auth-banner">
@@ -1091,6 +1312,421 @@ function checkLevelUp(oldXP,newXP){
 }
 </script>
 
+<!-- ════ SPIN WHEEL ENGINE ════ -->
+<script>
+// ── Default prizes ──
+var DEFAULT_SPIN_PRIZES = [
+  {label:"+50 XP",    type:"xp",      value:50,   color:"#c9a84c", weight:25, icon:"⚡"},
+  {label:"+100 XP",   type:"xp",      value:100,  color:"#e8c97a", weight:20, icon:"🏆"},
+  {label:"+200 XP",   type:"xp",      value:200,  color:"#f5c542", weight:12, icon:"🌟"},
+  {label:"+500 XP",   type:"xp",      value:500,  color:"#a855f7", weight:5,  icon:"💥"},
+  {label:"+1000 XP",  type:"xp",      value:1000, color:"#e05252", weight:2,  icon:"👑"},
+  {label:"+100 🪙",   type:"coins",   value:100,  color:"#4a7fa5", weight:20, icon:"🪙"},
+  {label:"+250 🪙",   type:"coins",   value:250,  color:"#06b6d4", weight:10, icon:"💰"},
+  {label:"+500 🪙",   type:"coins",   value:500,  color:"#52c97a", weight:4,  icon:"💎"},
+  {label:"Rien…",     type:"nothing", value:0,    color:"#252538", weight:15, icon:"😶"},
+];
+
+var _spinPrizes = DEFAULT_SPIN_PRIZES.slice();
+var _spinAnimating = false;
+var _spinCurrentAngle = 0;
+var _spinCooldownTimer = null;
+
+var SPIN_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h
+
+// ── Canvas draw ──
+function drawWheel(angle) {
+  var canvas = document.getElementById("spin-canvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2, r = W/2 - 4;
+  var prizes = _spinPrizes;
+  var totalWeight = prizes.reduce(function(s,p){return s+p.weight;},0);
+
+  ctx.clearRect(0,0,W,H);
+
+  var startAngle = angle;
+  prizes.forEach(function(p) {
+    var sliceAngle = (p.weight / totalWeight) * Math.PI * 2;
+    // Segment
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.3)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Inner border shine
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r-2, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.strokeStyle = "rgba(255,255,255,0.07)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Text
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(startAngle + sliceAngle / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "rgba(0,0,0,0.5)";
+    ctx.shadowBlur = 3;
+
+    // Icon
+    ctx.font = "bold "+(W < 290 ? 13 : 15)+"px Arial";
+    ctx.fillText(p.icon, r - 10, 5);
+
+    // Label
+    ctx.font = "600 "+(W < 290 ? 8 : 9.5)+"px 'Space Grotesk', sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.fillText(p.label, r - 28, 5);
+    ctx.restore();
+
+    startAngle += sliceAngle;
+  });
+
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, Math.PI*2);
+  ctx.fillStyle = "#0f0f1a";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(201,168,76,0.3)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function buildPrizeLegend() {
+  var container = document.getElementById("spin-prizes-legend");
+  if (!container) return;
+  container.innerHTML = _spinPrizes.map(function(p) {
+    return '<div class="spin-prize-pill" style="color:'+p.color+';border-color:'+p.color+'33;background:'+p.color+'11">'+p.icon+' '+escHtml(p.label)+'</div>';
+  }).join("");
+}
+
+function pickPrize() {
+  var total = _spinPrizes.reduce(function(s,p){return s+p.weight;},0);
+  var rand = Math.random() * total;
+  var cum = 0;
+  for (var i=0; i<_spinPrizes.length; i++) {
+    cum += _spinPrizes[i].weight;
+    if (rand < cum) return i;
+  }
+  return _spinPrizes.length - 1;
+}
+
+function getPrizeAngleCenter(prizeIdx) {
+  var total = _spinPrizes.reduce(function(s,p){return s+p.weight;},0);
+  var cumAngle = 0;
+  for (var i=0; i<_spinPrizes.length; i++) {
+    var sliceAngle = (_spinPrizes[i].weight / total) * Math.PI * 2;
+    if (i === prizeIdx) return cumAngle + sliceAngle / 2;
+    cumAngle += sliceAngle;
+  }
+  return 0;
+}
+
+window.openSpinModal = function() {
+  document.getElementById("spin-overlay").classList.add("show");
+  drawWheel(_spinCurrentAngle);
+  buildPrizeLegend();
+  updateSpinUI();
+};
+
+window.closeSpinModal = function() {
+  document.getElementById("spin-overlay").classList.remove("show");
+};
+
+function getLastSpinKey() {
+  return "timor_last_spin_" + (window._spinCurrentUID || "anon");
+}
+
+function getLastSpinTime() {
+  // Try Firestore-backed time first (set after spin), fallback to localStorage
+  var stored = localStorage.getItem(getLastSpinKey());
+  return stored ? parseInt(stored, 10) : 0;
+}
+
+function setLastSpinTime(ts) {
+  localStorage.setItem(getLastSpinKey(), String(ts));
+}
+
+function canSpin() {
+  var last = getLastSpinTime();
+  if (!last) return true;
+  return (Date.now() - last) >= SPIN_COOLDOWN_MS;
+}
+
+function timeUntilNextSpin() {
+  var last = getLastSpinTime();
+  if (!last) return 0;
+  var diff = SPIN_COOLDOWN_MS - (Date.now() - last);
+  return Math.max(0, diff);
+}
+
+function formatDuration(ms) {
+  var total = Math.floor(ms / 1000);
+  var h = Math.floor(total / 3600);
+  var m = Math.floor((total % 3600) / 60);
+  var s = total % 60;
+  return (h > 0 ? h+"h " : "") + (m > 0 ? m+"m " : "") + s+"s";
+}
+
+function updateSpinUI() {
+  var statusEl = document.getElementById("spin-status");
+  var centerBtn = document.getElementById("spin-center-btn");
+  var cooldownBar = document.getElementById("spin-cooldown-bar");
+  var teaserCooldown = document.getElementById("spin-teaser-cooldown");
+  var teaserBtn = document.getElementById("spin-teaser-btn");
+  var navSpinBtn = document.getElementById("nav-spin-btn");
+
+  var remaining = timeUntilNextSpin();
+  var ready = remaining <= 0;
+
+  if (cooldownBar) {
+    var pct = ready ? 100 : Math.round(((SPIN_COOLDOWN_MS - remaining) / SPIN_COOLDOWN_MS) * 100);
+    cooldownBar.style.width = pct + "%";
+  }
+
+  if (ready) {
+    if (statusEl) statusEl.textContent = "✨ Prêt ! Tourne la roulette pour gagner !";
+    if (centerBtn) { centerBtn.disabled = _spinAnimating; centerBtn.textContent = "SPIN"; }
+    if (teaserCooldown) { teaserCooldown.textContent = "✨ Disponible maintenant !"; teaserCooldown.className = "spin-teaser-cooldown ready"; }
+    if (teaserBtn) teaserBtn.disabled = false;
+    if (navSpinBtn) navSpinBtn.classList.add("spin-ready");
+  } else {
+    var fmt = formatDuration(remaining);
+    if (statusEl) statusEl.textContent = "⏳ Prochain spin dans " + fmt;
+    if (centerBtn) { centerBtn.disabled = true; centerBtn.textContent = fmt; }
+    if (teaserCooldown) { teaserCooldown.textContent = "⏳ Disponible dans " + fmt; teaserCooldown.className = "spin-teaser-cooldown waiting"; }
+    if (teaserBtn) teaserBtn.disabled = true;
+    if (navSpinBtn) navSpinBtn.classList.remove("spin-ready");
+  }
+
+  // Auth notice
+  var authNotice = document.getElementById("spin-auth-notice");
+  if (authNotice) authNotice.style.display = window._spinCurrentUID ? "none" : "";
+}
+
+function startCooldownTimer() {
+  if (_spinCooldownTimer) clearInterval(_spinCooldownTimer);
+  _spinCooldownTimer = setInterval(function() {
+    updateSpinUI();
+    if (timeUntilNextSpin() <= 0) {
+      clearInterval(_spinCooldownTimer);
+      _spinCooldownTimer = null;
+    }
+  }, 1000);
+}
+
+window.doSpin = function() {
+  if (_spinAnimating || !canSpin()) return;
+  _spinAnimating = true;
+
+  var centerBtn = document.getElementById("spin-center-btn");
+  var resultBanner = document.getElementById("spin-result-banner");
+  if (centerBtn) centerBtn.disabled = true;
+  if (resultBanner) resultBanner.classList.remove("show");
+
+  // Pick winner
+  var winnerIdx = pickPrize();
+  var winner = _spinPrizes[winnerIdx];
+
+  // Calculate target angle: pointer is at top (angle = -PI/2 from canvas perspective)
+  // We want winner segment center to end at top
+  // Canvas draws from _spinCurrentAngle, pointer is at -PI/2 (top)
+  var total = _spinPrizes.reduce(function(s,p){return s+p.weight;},0);
+  var winCenter = getPrizeAngleCenter(winnerIdx); // center of winner segment from angle 0
+  // The segment at (startAngle + winCenter) should end at pointer = -PI/2 (top of canvas)
+  // So we need: _spinCurrentAngle + winCenter = -PI/2 + k*2PI (for k large enough)
+  var extraSpins = (Math.PI * 2) * (6 + Math.floor(Math.random() * 4)); // 6-9 full spins
+  var targetAngle = -Math.PI/2 - winCenter + extraSpins;
+  // Adjust from current
+  var startA = _spinCurrentAngle;
+  var delta = targetAngle - (startA % (Math.PI*2));
+  // Make sure delta is large & positive
+  if (delta < Math.PI * 8) delta += Math.PI * 2 * Math.ceil((Math.PI*8 - delta) / (Math.PI*2));
+  var endAngle = startA + delta;
+
+  // Animation
+  var duration = 5000 + Math.random() * 1500;
+  var startTime = null;
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    var elapsed = ts - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    var eased = easeOut(progress);
+    _spinCurrentAngle = startA + delta * eased;
+    drawWheel(_spinCurrentAngle);
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      _spinCurrentAngle = endAngle % (Math.PI * 2);
+      drawWheel(_spinCurrentAngle);
+      _spinAnimating = false;
+      onSpinEnd(winner);
+    }
+  }
+  requestAnimationFrame(animate);
+};
+
+async function onSpinEnd(winner) {
+  // Mark cooldown
+  setLastSpinTime(Date.now());
+  startCooldownTimer();
+  updateSpinUI();
+
+  // Show result
+  var resultBanner = document.getElementById("spin-result-banner");
+  var resultIcon = document.getElementById("spin-result-icon");
+  var resultLabel = document.getElementById("spin-result-label");
+  var resultDesc = document.getElementById("spin-result-desc");
+
+  var bgColor, borderColor;
+  if (winner.type === "nothing") {
+    bgColor = "rgba(78,74,96,0.2)"; borderColor = "rgba(78,74,96,0.4)";
+  } else {
+    bgColor = winner.color + "18"; borderColor = winner.color + "40";
+  }
+  resultBanner.style.background = bgColor;
+  resultBanner.style.border = "1px solid " + borderColor;
+  resultBanner.style.borderRadius = "14px";
+
+  if (resultIcon) resultIcon.textContent = winner.icon;
+  if (resultLabel) resultLabel.style.color = winner.type === "nothing" ? "var(--text-muted)" : winner.color;
+
+  if (winner.type === "xp") {
+    if (resultLabel) resultLabel.textContent = "+" + winner.value + " XP !";
+    if (resultDesc) resultDesc.textContent = "Félicitations ! L'XP a été ajouté à ton profil.";
+    launchConfetti();
+    await grantSpinReward(winner);
+  } else if (winner.type === "coins") {
+    if (resultLabel) resultLabel.textContent = "+" + winner.value + " 🪙";
+    if (resultDesc) resultDesc.textContent = "Pièces ajoutées à ton portefeuille !";
+    launchConfetti();
+    await grantSpinReward(winner);
+  } else {
+    if (resultLabel) resultLabel.textContent = "Rien…";
+    if (resultDesc) resultDesc.textContent = "Pas de chance ! Reviens demain.";
+  }
+
+  if (resultBanner) resultBanner.classList.add("show");
+  showToast(winner.type === "nothing" ? "😶 Pas de chance aujourd'hui !" : winner.icon + " " + winner.label + " gagné !");
+}
+
+// This will be overwritten by the Firebase module once loaded
+window.grantSpinReward = async function(winner) {
+  // No-op by default; replaced by Firebase module
+};
+
+// ── Confetti ──
+function launchConfetti() {
+  var canvas = document.getElementById("confetti-canvas");
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  var ctx = canvas.getContext("2d");
+  canvas.classList.add("active");
+  var particles = [];
+  var colors = ["#c9a84c","#e8c97a","#52c97a","#4a7fa5","#a855f7","#e05252","#f97316","#fff"];
+  for (var i = 0; i < 140; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * 0.4 - canvas.height * 0.2,
+      vx: (Math.random() - 0.5) * 6,
+      vy: Math.random() * 4 + 2,
+      w: Math.random() * 10 + 4,
+      h: Math.random() * 6 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.2,
+      alpha: 1,
+    });
+  }
+  var startT = null, totalDur = 3200;
+  function drawConf(ts) {
+    if (!startT) startT = ts;
+    var elapsed = ts - startT;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(function(p) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.rot += p.vrot;
+      p.alpha = Math.max(0, 1 - elapsed / totalDur);
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if (elapsed < totalDur) requestAnimationFrame(drawConf);
+    else { ctx.clearRect(0,0,canvas.width,canvas.height); canvas.classList.remove("active"); }
+  }
+  requestAnimationFrame(drawConf);
+}
+
+// ── Admin spin prizes ──
+window.adminLoadSpinEditor = function() {
+  var ta = document.getElementById("spin-admin-prizes");
+  if (!ta) return;
+  ta.value = _spinPrizes.map(function(p) {
+    return p.label+"|"+p.type+"|"+p.value+"|"+p.color+"|"+p.weight+"|"+p.icon;
+  }).join("\n");
+};
+
+window.adminSaveSpinPrizes = async function() {
+  var fbEl = document.getElementById("admin-spin-feedback");
+  var raw = (document.getElementById("spin-admin-prizes")?.value || "").trim().split("\n").filter(Boolean);
+  var prizes = raw.map(function(line) {
+    var p = line.split("|");
+    return {
+      label: (p[0]||"Lot").trim(),
+      type:  (p[1]||"nothing").trim(),
+      value: parseInt(p[2]||"0",10)||0,
+      color: (p[3]||"#252538").trim(),
+      weight:parseInt(p[4]||"10",10)||10,
+      icon:  (p[5]||"🎁").trim(),
+    };
+  });
+  if (prizes.length < 2) { if(fbEl){fbEl.textContent="Minimum 2 lots requis.";fbEl.className="admin-feedback err";}return; }
+  fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
+  try {
+    // Firebase setDoc will be called from module scope
+    await window._adminSaveSpinPrizesFirebase(prizes);
+    _spinPrizes = prizes;
+    drawWheel(_spinCurrentAngle);
+    buildPrizeLegend();
+    fbEl.textContent="✓ Lots de la roulette sauvegardés !";fbEl.className="admin-feedback ok";
+    showToast("Roulette mise à jour !");
+  } catch(err) {
+    fbEl.textContent="Erreur: "+err.message;fbEl.className="admin-feedback err";
+  }
+};
+
+window.adminResetSpinDefault = function() {
+  _spinPrizes = DEFAULT_SPIN_PRIZES.slice();
+  adminLoadSpinEditor();
+  drawWheel(_spinCurrentAngle);
+  buildPrizeLegend();
+  showToast("Lots réinitialisés (non sauvegardé).");
+};
+
+// Init teaser cooldown on load
+window.addEventListener("DOMContentLoaded", function() {
+  updateSpinUI();
+  startCooldownTimer();
+  drawWheel(0);
+});
+</script>
+
 <!-- ════ FIREBASE + DISCORD ════ -->
 <script type="module">
 import { initializeApp }                                          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1130,6 +1766,85 @@ let _allOrders=[], _ordersFilter='pending';
 
 function getLevelFromXP(xp){for(let i=19;i>=0;i--){const XPS=[0,300,700,1300,2100,3200,4700,6600,9000,12000,16000,21000,27000,34500,43500,54000,66500,81000,98000,118000];if(xp>=XPS[i])return i+1;}return 1;}
 
+/* ════ SPIN — Firebase integration ════ */
+window._spinCurrentUID = null;
+
+window.grantSpinReward = async function(winner) {
+  const uid = _currentUserUID;
+  if (!uid) return; // no auth, skip saving
+  if (winner.type === "nothing") return;
+  try {
+    const ref = doc(db,"users",uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const profile = snap.data();
+    const oldXP = profile.xp || 0;
+    const oldCoins = profile.coins || 0;
+    const updData = { lastSpinAt: new Date().toISOString() };
+    if (winner.type === "xp") {
+      const newXP = oldXP + winner.value;
+      updData.xp = newXP;
+      const oldLvl = getLevelFromXP(oldXP), newLvl = getLevelFromXP(newXP);
+      let coinsBonus = 0;
+      if (newLvl > oldLvl) {
+        for (let l=oldLvl+1;l<=newLvl;l++){const ld=window.LEVELS?window.LEVELS[l-1]:null;if(ld)coinsBonus+=ld.coins;}
+        updData.coins = oldCoins + coinsBonus;
+      }
+      await updateDoc(ref, updData);
+      _currentUserXP = newXP;
+      if (coinsBonus > 0) _currentUserCoins = oldCoins + coinsBonus;
+      renderProfileLevel(_currentUserXP, _currentUserCoins);
+      if (newLvl > oldLvl) checkLevelUp(oldXP, newXP);
+      const navXpEl = document.querySelector(".nav-xp"); if(navXpEl) navXpEl.textContent = _currentUserXP.toLocaleString("fr-FR")+" XP";
+      const navLvlEl = document.querySelector(".nav-level"); if(navLvlEl) navLvlEl.textContent = "Niv. "+getLevelFromXP(_currentUserXP);
+    } else if (winner.type === "coins") {
+      const newCoins = oldCoins + winner.value;
+      updData.coins = newCoins;
+      await updateDoc(ref, updData);
+      _currentUserCoins = newCoins;
+      renderProfileLevel(_currentUserXP, _currentUserCoins);
+      const navCoinsEl = document.querySelector(".nav-coins"); if(navCoinsEl) navCoinsEl.textContent = "🪙 "+newCoins.toLocaleString("fr-FR");
+      const shopNum = document.getElementById("shop-balance-num"); if(shopNum) shopNum.textContent = newCoins.toLocaleString("fr-FR");
+    }
+    // Also save lastSpinAt to Firestore for anti-cheat check
+    // Update local spin time
+    window.setLastSpinTime(Date.now());
+    await loadLeaderboard();
+  } catch(err) {
+    console.error("Spin reward error:", err.message);
+  }
+};
+
+window._adminSaveSpinPrizesFirebase = async function(prizes) {
+  await setDoc(doc(db,"sitedata","spinprizes"), {prizes});
+};
+
+async function loadSpinPrizes() {
+  try {
+    const snap = await getDoc(doc(db,"sitedata","spinprizes"));
+    if (snap.exists() && snap.data().prizes && snap.data().prizes.length >= 2) {
+      window._spinPrizes = snap.data().prizes;
+    }
+  } catch(e) { /* use defaults */ }
+  window.drawWheel(window._spinCurrentAngle || 0);
+  window.buildPrizeLegend();
+}
+
+// Check Firestore last spin time for anti-cheat (use Firestore value if available)
+async function syncSpinCooldown(uid) {
+  try {
+    const snap = await getDoc(doc(db,"users",uid));
+    if (snap.exists() && snap.data().lastSpinAt) {
+      const fsTs = new Date(snap.data().lastSpinAt).getTime();
+      const localTs = window.getLastSpinTime ? window.getLastSpinTime() : 0;
+      // Take the most recent to prevent clearing localStorage as exploit
+      if (fsTs > localTs) window.setLastSpinTime(fsTs);
+    }
+  } catch(e) {}
+  window.updateSpinUI();
+  window.startCooldownTimer();
+}
+
 /* ════ loadSiteData ════ */
 async function loadSiteData(){
   try{
@@ -1141,6 +1856,7 @@ async function loadSiteData(){
     _quickLinks=qlS.exists()?(qlS.data().links||[]):[];
   }catch(e){console.warn(e.message);_tutos=DEFAULT_TUTOS;_pays=DEFAULT_PAYS;_discovery=DEFAULT_DISCOVERY;_shop=DEFAULT_SHOP;_quickLinks=[];}
   renderTutos();renderPays();renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
+  await loadSpinPrizes();
 }
 
 /* ════ Quick Links ════ */
@@ -1329,10 +2045,7 @@ window.adminLoadOrders=async function(){
     const pending=_allOrders.filter(o=>(o.status||"pending")==="pending");
     const countEl=document.getElementById("orders-pending-count");
     const tabBtn=document.getElementById("tab-orders-btn");
-    if(countEl){
-      countEl.textContent=pending.length;
-      countEl.style.display=pending.length>0?"":"none";
-    }
+    if(countEl){countEl.textContent=pending.length;countEl.style.display=pending.length>0?"":"none";}
     if(tabBtn)tabBtn.classList.toggle("has-notif",pending.length>0);
     const notifyBanner=document.getElementById("orders-notify-banner");
     const notifyText=document.getElementById("orders-notify-text");
@@ -1529,14 +2242,18 @@ onAuthStateChanged(auth,async function(user){
     const profile=snap.exists()?snap.data():null;
     _currentUserRole=profile?.role||"citoyen";_currentUserUID=user.uid;
     _currentUserXP=profile?.xp??0;_currentUserCoins=profile?.coins??0;
+    window._spinCurrentUID = user.uid;
     await loadUserPurchases(user.uid);
+    await syncSpinCooldown(user.uid);
     renderConnectedState(user,profile);
     renderProfileLevel(_currentUserXP,_currentUserCoins);
     renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
     await loadLeaderboard();
   }else{
     _currentUserRole=null;_currentUserUID=null;_currentUserPurchases=[];
+    window._spinCurrentUID = null;
     renderDisconnectedState();renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
+    window.updateSpinUI();
     await loadLeaderboard();
   }
 });
@@ -1552,6 +2269,7 @@ function renderConnectedState(user,profile){
     if(role==="admin"||role==="modo"){
       adminRefreshPlayers();adminLoadTutoEditor();adminLoadPaysEditor();
       adminLoadDiscoveryEditor();adminLoadShopEditor();adminLoadOrders();adminLoadLinksEditor();
+      window.adminLoadSpinEditor();
     }
   }
   let badge="";
@@ -1731,8 +2449,8 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   var t=document.getElementById(id);if(t)t.classList.add('active');
   var map={accueil:0,tutoriels:1,pays:2,boutique:3,classement:4};
-  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
-  var links=document.querySelectorAll('.nav-links a');
+  document.querySelectorAll('.nav-links a:not(.spin-nav-btn)').forEach(a=>a.classList.remove('active'));
+  var links=document.querySelectorAll('.nav-links a:not(.spin-nav-btn)');
   if(map[id]!==undefined&&links[map[id]])links[map[id]].classList.add('active');
   window.scrollTo({top:document.querySelector('nav').offsetHeight,behavior:'smooth'});
 }
@@ -1751,6 +2469,8 @@ function switchAdminTab(tabId,btn){
 function toggleQuickLinks(){document.getElementById('ql-sidebar').classList.toggle('open');}
 function closeQuickLinks(){document.getElementById('ql-sidebar').classList.remove('open');}
 document.addEventListener('click',function(e){var sb=document.getElementById('ql-sidebar');if(sb&&!sb.contains(e.target))sb.classList.remove('open');});
+// Close spin modal on overlay click
+document.getElementById('spin-overlay').addEventListener('click',function(e){if(e.target===this)closeSpinModal();});
 var _toastTimer=null;
 function showToast(msg){var el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_toastTimer);_toastTimer=setTimeout(function(){el.classList.remove('show');},3500);}
 </script>
