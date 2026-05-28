@@ -537,11 +537,16 @@ nav {
 /* ══ QUÊTES PAGE (plein écran) ══ */
 .quests-page {
   display: none;
-  position: fixed; inset: 0; z-index: 200;
+  position: fixed; inset: 0; z-index: 9500;
   background: var(--dark);
   overflow-y: auto;
+  visibility: hidden;
 }
-.quests-page.active { display: block; animation: fadeUp 0.3s ease; }
+.quests-page.active {
+  display: block;
+  visibility: visible;
+  animation: fadeUp 0.3s ease;
+}
 .quests-inner { max-width: 760px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
 
 .quests-back {
