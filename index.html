@@ -1314,11 +1314,9 @@ function checkLevelUp(oldXP,newXP){
 
 <!-- ════ SPIN WHEEL ENGINE ════ -->
 <script>
-  // ── Utilitaire global ──
 function escHtml(str){
   return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
-// ── Default prizes ──
 var DEFAULT_SPIN_PRIZES = [
   {label:"+50 XP",    type:"xp",      value:50,   color:"#c9a84c", weight:25, icon:"⚡"},
   {label:"+100 XP",   type:"xp",      value:100,  color:"#e8c97a", weight:20, icon:"🏆"},
@@ -1336,9 +1334,8 @@ var _spinAnimating = false;
 var _spinCurrentAngle = 0;
 var _spinCooldownTimer = null;
 
-var SPIN_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h
+var SPIN_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
-// ── Canvas draw ──
 function drawWheel(angle) {
   var canvas = document.getElementById("spin-canvas");
   if (!canvas) return;
@@ -1353,7 +1350,6 @@ function drawWheel(angle) {
   var startAngle = angle;
   prizes.forEach(function(p) {
     var sliceAngle = (p.weight / totalWeight) * Math.PI * 2;
-    // Segment
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
@@ -1364,7 +1360,6 @@ function drawWheel(angle) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Inner border shine
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r-2, startAngle, startAngle + sliceAngle);
@@ -1373,7 +1368,6 @@ function drawWheel(angle) {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Text
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(startAngle + sliceAngle / 2);
@@ -1382,11 +1376,9 @@ function drawWheel(angle) {
     ctx.shadowColor = "rgba(0,0,0,0.5)";
     ctx.shadowBlur = 3;
 
-    // Icon
     ctx.font = "bold "+(W < 290 ? 13 : 15)+"px Arial";
     ctx.fillText(p.icon, r - 10, 5);
 
-    // Label
     ctx.font = "600 "+(W < 290 ? 8 : 9.5)+"px 'Space Grotesk', sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.9)";
     ctx.fillText(p.label, r - 28, 5);
@@ -1395,7 +1387,6 @@ function drawWheel(angle) {
     startAngle += sliceAngle;
   });
 
-  // Center circle
   ctx.beginPath();
   ctx.arc(cx, cy, 28, 0, Math.PI*2);
   ctx.fillStyle = "#0f0f1a";
@@ -1451,7 +1442,6 @@ function getLastSpinKey() {
 }
 
 function getLastSpinTime() {
-  // Try Firestore-backed time first (set after spin), fallback to localStorage
   var stored = localStorage.getItem(getLastSpinKey());
   return stored ? parseInt(stored, 10) : 0;
 }
@@ -1512,7 +1502,6 @@ function updateSpinUI() {
     if (navSpinBtn) navSpinBtn.classList.remove("spin-ready");
   }
 
-  // Auth notice
   var authNotice = document.getElementById("spin-auth-notice");
   if (authNotice) authNotice.style.display = window._spinCurrentUID ? "none" : "";
 }
@@ -1537,27 +1526,17 @@ window.doSpin = function() {
   if (centerBtn) centerBtn.disabled = true;
   if (resultBanner) resultBanner.classList.remove("show");
 
-  // Pick winner
   var winnerIdx = pickPrize();
   var winner = _spinPrizes[winnerIdx];
 
-  // Calculate target angle: pointer is at top (angle = -PI/2 from canvas perspective)
-  // We want winner segment center to end at top
-  // Canvas draws from _spinCurrentAngle, pointer is at -PI/2 (top)
-  var total = _spinPrizes.reduce(function(s,p){return s+p.weight;},0);
-  var winCenter = getPrizeAngleCenter(winnerIdx); // center of winner segment from angle 0
-  // The segment at (startAngle + winCenter) should end at pointer = -PI/2 (top of canvas)
-  // So we need: _spinCurrentAngle + winCenter = -PI/2 + k*2PI (for k large enough)
-  var extraSpins = (Math.PI * 2) * (6 + Math.floor(Math.random() * 4)); // 6-9 full spins
+  var extraSpins = (Math.PI * 2) * (6 + Math.floor(Math.random() * 4));
+  var winCenter = getPrizeAngleCenter(winnerIdx);
   var targetAngle = -Math.PI/2 - winCenter + extraSpins;
-  // Adjust from current
   var startA = _spinCurrentAngle;
   var delta = targetAngle - (startA % (Math.PI*2));
-  // Make sure delta is large & positive
   if (delta < Math.PI * 8) delta += Math.PI * 2 * Math.ceil((Math.PI*8 - delta) / (Math.PI*2));
   var endAngle = startA + delta;
 
-  // Animation
   var duration = 5000 + Math.random() * 1500;
   var startTime = null;
   function easeOut(t) {
@@ -1583,12 +1562,10 @@ window.doSpin = function() {
 };
 
 async function onSpinEnd(winner) {
-  // Mark cooldown
   setLastSpinTime(Date.now());
   startCooldownTimer();
   updateSpinUI();
 
-  // Show result
   var resultBanner = document.getElementById("spin-result-banner");
   var resultIcon = document.getElementById("spin-result-icon");
   var resultLabel = document.getElementById("spin-result-label");
@@ -1626,12 +1603,8 @@ async function onSpinEnd(winner) {
   showToast(winner.type === "nothing" ? "😶 Pas de chance aujourd'hui !" : winner.icon + " " + winner.label + " gagné !");
 }
 
-// This will be overwritten by the Firebase module once loaded
-window.grantSpinReward = async function(winner) {
-  // No-op by default; replaced by Firebase module
-};
+window.grantSpinReward = async function(winner) {};
 
-// ── Confetti ──
 function launchConfetti() {
   var canvas = document.getElementById("confetti-canvas");
   if (!canvas) return;
@@ -1677,7 +1650,6 @@ function launchConfetti() {
   requestAnimationFrame(drawConf);
 }
 
-// ── Admin spin prizes ──
 window.adminLoadSpinEditor = function() {
   var ta = document.getElementById("spin-admin-prizes");
   if (!ta) return;
@@ -1703,7 +1675,6 @@ window.adminSaveSpinPrizes = async function() {
   if (prizes.length < 2) { if(fbEl){fbEl.textContent="Minimum 2 lots requis.";fbEl.className="admin-feedback err";}return; }
   fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
   try {
-    // Firebase setDoc will be called from module scope
     await window._adminSaveSpinPrizesFirebase(prizes);
     _spinPrizes = prizes;
     drawWheel(_spinCurrentAngle);
@@ -1723,7 +1694,6 @@ window.adminResetSpinDefault = function() {
   showToast("Lots réinitialisés (non sauvegardé).");
 };
 
-// Init teaser cooldown on load
 window.addEventListener("DOMContentLoaded", function() {
   updateSpinUI();
   startCooldownTimer();
@@ -1736,7 +1706,7 @@ window.addEventListener("DOMContentLoaded", function() {
 import { initializeApp }                                          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithCustomToken, signOut, onAuthStateChanged }
                                                                    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, orderBy, query, limit, addDoc, serverTimestamp }
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, orderBy, query, limit, addDoc, serverTimestamp, where }
                                                                    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const FIREBASE_CONFIG = {
@@ -1768,6 +1738,10 @@ let _currentUserRole=null,_currentUserUID=null,_currentUserXP=0,_currentUserCoin
 let _pendingPurchaseItem=null;
 let _allOrders=[], _ordersFilter='pending';
 
+// ── FIX 2 : Cache leaderboard (30s) ──
+let _lbCache=null, _lbTs=0;
+const LB_CACHE_TTL = 30_000;
+
 function getLevelFromXP(xp){for(let i=19;i>=0;i--){const XPS=[0,300,700,1300,2100,3200,4700,6600,9000,12000,16000,21000,27000,34500,43500,54000,66500,81000,98000,118000];if(xp>=XPS[i])return i+1;}return 1;}
 
 /* ════ SPIN — Firebase integration ════ */
@@ -1775,7 +1749,7 @@ window._spinCurrentUID = null;
 
 window.grantSpinReward = async function(winner) {
   const uid = _currentUserUID;
-  if (!uid) return; // no auth, skip saving
+  if (!uid) return;
   if (winner.type === "nothing") return;
   try {
     const ref = doc(db,"users",uid);
@@ -1810,10 +1784,8 @@ window.grantSpinReward = async function(winner) {
       const navCoinsEl = document.querySelector(".nav-coins"); if(navCoinsEl) navCoinsEl.textContent = "🪙 "+newCoins.toLocaleString("fr-FR");
       const shopNum = document.getElementById("shop-balance-num"); if(shopNum) shopNum.textContent = newCoins.toLocaleString("fr-FR");
     }
-    // Also save lastSpinAt to Firestore for anti-cheat check
-    // Update local spin time
     window.setLastSpinTime(Date.now());
-    await loadLeaderboard();
+    await loadLeaderboard(true); // force refresh after spin reward
   } catch(err) {
     console.error("Spin reward error:", err.message);
   }
@@ -1834,14 +1806,12 @@ async function loadSpinPrizes() {
   window.buildPrizeLegend();
 }
 
-// Check Firestore last spin time for anti-cheat (use Firestore value if available)
 async function syncSpinCooldown(uid) {
   try {
     const snap = await getDoc(doc(db,"users",uid));
     if (snap.exists() && snap.data().lastSpinAt) {
       const fsTs = new Date(snap.data().lastSpinAt).getTime();
       const localTs = window.getLastSpinTime ? window.getLastSpinTime() : 0;
-      // Take the most recent to prevent clearing localStorage as exploit
       if (fsTs > localTs) window.setLastSpinTime(fsTs);
     }
   } catch(e) {}
@@ -1849,8 +1819,25 @@ async function syncSpinCooldown(uid) {
   window.startCooldownTimer();
 }
 
-/* ════ loadSiteData ════ */
+/* ════ FIX 1 : loadSiteData hors onAuthStateChanged ════
+   Appelé une seule fois au chargement, avec cache sessionStorage. */
+const SITEDATA_CACHE_KEY = "timor_sitedata_v1";
+
 async function loadSiteData(){
+  // Tenter le cache sessionStorage d'abord
+  try {
+    const cached = sessionStorage.getItem(SITEDATA_CACHE_KEY);
+    if (cached) {
+      const d = JSON.parse(cached);
+      _tutos=d.tutos; _pays=d.pays; _discovery=d.discovery; _shop=d.shop; _quickLinks=d.quickLinks||[];
+      renderTutos();renderPays();renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
+      // Charger les prizes spin séparément (pas en cache pour permettre les mises à jour admin)
+      await loadSpinPrizes();
+      return;
+    }
+  } catch(e) {}
+
+  // Fetch Firestore
   try{
     const[tS,pS,dS,sS,qlS]=await Promise.all([getDoc(doc(db,"sitedata","tutos")),getDoc(doc(db,"sitedata","pays")),getDoc(doc(db,"sitedata","discovery")),getDoc(doc(db,"sitedata","shop")),getDoc(doc(db,"sitedata","quicklinks"))]);
     _tutos=tS.exists()?tS.data().list:DEFAULT_TUTOS;
@@ -1858,9 +1845,18 @@ async function loadSiteData(){
     _discovery=dS.exists()?dS.data():DEFAULT_DISCOVERY;
     _shop=sS.exists()?sS.data():DEFAULT_SHOP;
     _quickLinks=qlS.exists()?(qlS.data().links||[]):[];
+    // Mettre en cache sessionStorage
+    try {
+      sessionStorage.setItem(SITEDATA_CACHE_KEY, JSON.stringify({tutos:_tutos,pays:_pays,discovery:_discovery,shop:_shop,quickLinks:_quickLinks}));
+    } catch(e) {}
   }catch(e){console.warn(e.message);_tutos=DEFAULT_TUTOS;_pays=DEFAULT_PAYS;_discovery=DEFAULT_DISCOVERY;_shop=DEFAULT_SHOP;_quickLinks=[];}
   renderTutos();renderPays();renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
   await loadSpinPrizes();
+}
+
+// Invalider le cache sitedata après une sauvegarde admin
+function invalidateSitedataCache() {
+  try { sessionStorage.removeItem(SITEDATA_CACHE_KEY); } catch(e) {}
 }
 
 /* ════ Quick Links ════ */
@@ -1882,8 +1878,13 @@ window.adminSaveQuickLinks=async function(){
   const raw=(document.getElementById("ql-admin-links")?.value||"").trim().split("\n").filter(Boolean);
   const links=raw.map(line=>{const p=line.split("|");return{icon:(p[0]||"🔗").trim(),label:(p[1]||"Lien").trim(),url:(p[2]||"").trim(),badge:(p[3]||"").trim(),external:(p[4]||"").trim().toLowerCase()==="oui"};}).filter(l=>l.url);
   fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
-  try{await setDoc(doc(db,"sitedata","quicklinks"),{links});_quickLinks=links;fbEl.textContent="✓ Liens sauvegardés !";fbEl.className="admin-feedback ok";window.renderQuickLinks(_quickLinks);showToast("Liens rapides mis à jour !");}
-  catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore insuffisantes.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
+  try{
+    await setDoc(doc(db,"sitedata","quicklinks"),{links});
+    _quickLinks=links;
+    invalidateSitedataCache();
+    fbEl.textContent="✓ Liens sauvegardés !";fbEl.className="admin-feedback ok";
+    window.renderQuickLinks(_quickLinks);showToast("Liens rapides mis à jour !");
+  }catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore insuffisantes.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
 };
 window.adminPreviewQuickLinks=function(){
   const raw=(document.getElementById("ql-admin-links")?.value||"").trim().split("\n").filter(Boolean);
@@ -2021,24 +2022,29 @@ window.confirmPurchase=async function(){
     _currentUserPurchases.push(purchaseData);
     if(item.stock!==undefined&&item.stock!==-1){
       const shopSnap=await getDoc(doc(db,"sitedata","shop"));
-      if(shopSnap.exists()){const sd=shopSnap.data();const upd=(sd.items||[]).map(i=>i.id===item.id?{...i,stock:Math.max(0,(i.stock||0)-1)}:i);await setDoc(doc(db,"sitedata","shop"),{items:upd});_shop={items:upd};}
+      if(shopSnap.exists()){const sd=shopSnap.data();const upd=(sd.items||[]).map(i=>i.id===item.id?{...i,stock:Math.max(0,(i.stock||0)-1)}:i);await setDoc(doc(db,"sitedata","shop"),{items:upd});_shop={items:upd};invalidateSitedataCache();}
     }
     renderShop();renderProfileLevel(_currentUserXP,_currentUserCoins);
     const navC=document.querySelector(".nav-coins");if(navC)navC.textContent="🪙 "+newCoins.toLocaleString("fr-FR");
-    await loadLeaderboard();
+    await loadLeaderboard(true);
     closePurchaseModal();
     showToast("✅ "+escHtml(item.name)+" commandé ! Un admin va traiter ta commande.");
   }catch(err){console.error(err);errorEl.textContent="Erreur : "+err.message;confirmBtn.disabled=false;confirmBtn.textContent="Acheter";}
 };
+
+/* ════ FIX 3 : loadUserPurchases avec filtre where uid ════ */
 async function loadUserPurchases(uid){
-  try{const snap=await getDocs(collection(db,"purchases"));_currentUserPurchases=[];snap.forEach(ds=>{const d=ds.data();if(d.uid===uid)_currentUserPurchases.push({...d,docId:ds.id});});}
-  catch(e){_currentUserPurchases=[];}
+  try{
+    const q=query(collection(db,"purchases"),where("uid","==",uid));
+    const snap=await getDocs(q);
+    _currentUserPurchases=[];
+    snap.forEach(ds=>{_currentUserPurchases.push({...ds.data(),docId:ds.id});});
+  }catch(e){_currentUserPurchases=[];}
 }
 
 /* ════ ADMIN : ORDERS ════ */
 window.adminLoadOrders=async function(){
   const listEl=document.getElementById("orders-list");
-  const fbEl=document.getElementById("admin-orders-feedback");
   if(!listEl)return;
   listEl.innerHTML='<div class="orders-empty">Chargement…</div>';
   try{
@@ -2046,20 +2052,25 @@ window.adminLoadOrders=async function(){
     _allOrders=[];
     snap.forEach(ds=>{_allOrders.push({...ds.data(),docId:ds.id});});
     _allOrders.sort((a,b)=>b.purchasedAt>a.purchasedAt?1:-1);
-    const pending=_allOrders.filter(o=>(o.status||"pending")==="pending");
-    const countEl=document.getElementById("orders-pending-count");
-    const tabBtn=document.getElementById("tab-orders-btn");
-    if(countEl){countEl.textContent=pending.length;countEl.style.display=pending.length>0?"":"none";}
-    if(tabBtn)tabBtn.classList.toggle("has-notif",pending.length>0);
-    const notifyBanner=document.getElementById("orders-notify-banner");
-    const notifyText=document.getElementById("orders-notify-text");
-    if(notifyBanner&&notifyText){
-      if(pending.length>0){notifyBanner.style.display="";notifyText.textContent=pending.length+" commande"+(pending.length>1?"s":"")+" en attente de traitement.";}
-      else{notifyBanner.style.display="none";}
-    }
+    _updateOrdersBadge();
     renderOrdersList(_ordersFilter);
   }catch(err){listEl.innerHTML='<div class="orders-empty" style="color:var(--danger);">Erreur : '+escHtml(err.message)+'</div>';}
 };
+
+/* Mise à jour badge pending sans re-fetch */
+function _updateOrdersBadge(){
+  const pending=_allOrders.filter(o=>(o.status||"pending")==="pending");
+  const countEl=document.getElementById("orders-pending-count");
+  const tabBtn=document.getElementById("tab-orders-btn");
+  if(countEl){countEl.textContent=pending.length;countEl.style.display=pending.length>0?"":"none";}
+  if(tabBtn)tabBtn.classList.toggle("has-notif",pending.length>0);
+  const notifyBanner=document.getElementById("orders-notify-banner");
+  const notifyText=document.getElementById("orders-notify-text");
+  if(notifyBanner&&notifyText){
+    if(pending.length>0){notifyBanner.style.display="";notifyText.textContent=pending.length+" commande"+(pending.length>1?"s":"")+" en attente de traitement.";}
+    else{notifyBanner.style.display="none";}
+  }
+}
 
 function renderOrdersList(filter){
   _ordersFilter=filter;
@@ -2102,6 +2113,7 @@ window.filterOrders=function(filter,btn){
   renderOrdersList(filter);
 };
 
+/* ════ FIX 4 : fulfill/cancel — mise à jour locale, pas de re-fetch ════ */
 window.adminFulfillOrder=async function(docId){
   const btn=document.querySelector('#order-'+docId+' .btn-fulfill');
   if(btn){btn.disabled=true;btn.textContent="Validation…";}
@@ -2109,8 +2121,8 @@ window.adminFulfillOrder=async function(docId){
     await updateDoc(doc(db,"purchases",docId),{status:"fulfilled",fulfilledAt:new Date().toISOString(),fulfilledBy:_currentUserUID});
     const idx=_allOrders.findIndex(o=>o.docId===docId);
     if(idx>=0)_allOrders[idx].status="fulfilled";
-    renderOrdersList(_ordersFilter);
-    await adminLoadOrders();
+    _updateOrdersBadge();      // mise à jour badge en mémoire
+    renderOrdersList(_ordersFilter); // re-render local uniquement
     showToast("✅ Commande validée !");
     document.getElementById("admin-orders-feedback").textContent="✓ Commande marquée comme traitée.";
     document.getElementById("admin-orders-feedback").className="admin-feedback ok";
@@ -2127,8 +2139,8 @@ window.adminCancelOrder=async function(docId){
     await updateDoc(doc(db,"purchases",docId),{status:"cancelled",cancelledAt:new Date().toISOString(),cancelledBy:_currentUserUID});
     const idx=_allOrders.findIndex(o=>o.docId===docId);
     if(idx>=0)_allOrders[idx].status="cancelled";
-    renderOrdersList(_ordersFilter);
-    await adminLoadOrders();
+    _updateOrdersBadge();      // mise à jour badge en mémoire
+    renderOrdersList(_ordersFilter); // re-render local uniquement
     showToast("Commande annulée.");
   }catch(err){showToast("Erreur : "+err.message);}
 };
@@ -2192,7 +2204,7 @@ window.onDiscStepConfirm=async function(stepIdx,xpAmount){
         _currentUserXP=newXP;if(coinsBonus>0)_currentUserCoins=(profile.coins||0)+coinsBonus;
         renderProfileLevel(_currentUserXP,_currentUserCoins);
         if(newLvl>oldLvl)checkLevelUp(oldXP,newXP);
-        await loadLeaderboard();
+        await loadLeaderboard(true);
         const navXpEl=document.querySelector(".nav-xp");if(navXpEl)navXpEl.textContent=newXP.toLocaleString("fr-FR")+" XP";
         const navLvlEl=document.querySelector(".nav-level");if(navLvlEl)navLvlEl.textContent="Niv. "+newLvl;
         const navCoinsEl=document.querySelector(".nav-coins");if(navCoinsEl)navCoinsEl.textContent="🪙 "+_currentUserCoins.toLocaleString("fr-FR");
@@ -2239,8 +2251,11 @@ async function upsertUserProfile(uid,d,token){
 }
 async function logout(){await signOut(auth);document.body.classList.remove("is-admin","is-modo");showToast("Déconnecté.");}
 
+/* ════ FIX 1 (suite) : onAuthStateChanged — loadSiteData appelé une seule fois avant ════ */
+// On lance loadSiteData immédiatement, indépendamment de l'auth
+loadSiteData();
+
 onAuthStateChanged(auth,async function(user){
-  await loadSiteData();
   if(user){
     const snap=await getDoc(doc(db,"users",user.uid));
     const profile=snap.exists()?snap.data():null;
@@ -2304,25 +2319,38 @@ function renderDisconnectedState(){
   }
 }
 
-/* ════ Leaderboard ════ */
-async function loadLeaderboard(){
+/* ════ FIX 2 : Leaderboard avec cache 30s ════ */
+async function loadLeaderboard(force=false){
   const lbEl=document.getElementById("leaderboard-dynamic");if(!lbEl)return;
+  // Utiliser le cache si non expiré et pas de force refresh
+  if(!force && _lbCache && (Date.now()-_lbTs)<LB_CACHE_TTL){
+    _renderLeaderboard(_lbCache);
+    return;
+  }
   try{
     const q=query(collection(db,"users"),orderBy("xp","desc"),limit(10));
     const snap=await getDocs(q);
-    if(snap.empty){lbEl.innerHTML='<div style="padding:2rem;text-align:center;color:var(--text-dim);">Aucun joueur classé.</div>';return;}
-    const medals=["🥇","🥈","🥉"],topCls=["top1","top2","top3"],rkCls=["rank-1","rank-2","rank-3"];
-    lbEl.innerHTML="";let i=0;
-    snap.forEach(ds=>{
-      const p=ds.data(),name=escHtml(p.globalName||p.username||"Inconnu");
-      const xp=p.xp??0,coins=p.coins??0,lvl=getLevelFromXP(xp),init=name.slice(0,2).toUpperCase();
-      const avt=p.avatar?'<div class="lb-avatar"><img src="'+p.avatar+'" alt="" onerror="this.parentNode.textContent=\''+init+'\'"></div>':'<div class="lb-avatar">'+init+'</div>';
-      lbEl.innerHTML+='<div class="lb-row '+(i<3?topCls[i]:'')+'">'+'<div class="lb-rank '+(i<3?rkCls[i]:'rank-other')+'">'+(i<3?medals[i]:i+1)+'</div>'+avt+
-        '<div class="lb-info"><div class="lb-name">'+name+'</div><div class="lb-detail">Niveau '+lvl+' · 🪙 '+coins.toLocaleString('fr-FR')+'</div></div>'+
-        '<div style="text-align:right;"><div class="lb-xp">'+xp.toLocaleString('fr-FR')+' XP</div><div class="lb-level-badge">Niv. '+lvl+'</div></div></div>';
-      i++;
-    });
+    const rows=[];
+    snap.forEach(ds=>{rows.push({id:ds.id,...ds.data()});});
+    _lbCache=rows;_lbTs=Date.now();
+    _renderLeaderboard(rows);
   }catch(err){console.warn("LB error:",err.message);}
+}
+
+function _renderLeaderboard(rows){
+  const lbEl=document.getElementById("leaderboard-dynamic");if(!lbEl)return;
+  if(!rows||rows.length===0){lbEl.innerHTML='<div style="padding:2rem;text-align:center;color:var(--text-dim);">Aucun joueur classé.</div>';return;}
+  const medals=["🥇","🥈","🥉"],topCls=["top1","top2","top3"],rkCls=["rank-1","rank-2","rank-3"];
+  lbEl.innerHTML="";let i=0;
+  rows.forEach(p=>{
+    const name=escHtml(p.globalName||p.username||"Inconnu");
+    const xp=p.xp??0,coins=p.coins??0,lvl=getLevelFromXP(xp),init=name.slice(0,2).toUpperCase();
+    const avt=p.avatar?'<div class="lb-avatar"><img src="'+p.avatar+'" alt="" onerror="this.parentNode.textContent=\''+init+'\'"></div>':'<div class="lb-avatar">'+init+'</div>';
+    lbEl.innerHTML+='<div class="lb-row '+(i<3?topCls[i]:'')+'">'+'<div class="lb-rank '+(i<3?rkCls[i]:'rank-other')+'">'+(i<3?medals[i]:i+1)+'</div>'+avt+
+      '<div class="lb-info"><div class="lb-name">'+name+'</div><div class="lb-detail">Niveau '+lvl+' · 🪙 '+coins.toLocaleString('fr-FR')+'</div></div>'+
+      '<div style="text-align:right;"><div class="lb-xp">'+xp.toLocaleString('fr-FR')+' XP</div><div class="lb-level-badge">Niv. '+lvl+'</div></div></div>';
+    i++;
+  });
 }
 
 /* ════ Admin : joueurs ════ */
@@ -2374,7 +2402,7 @@ window.adminModifyXP=async function(sign){
     setAdminFeedback("✓ "+pn+" : "+label+" XP → "+newXP+(coinsBonus>0?" | Niv. "+newLvl+" 🪙 +"+coinsBonus:""),"ok");
     showToast("✓ "+pn+" — "+label+" XP");
     if(targetUid===_currentUserUID){_currentUserXP=newXP;if(coinsBonus>0)_currentUserCoins=(profile.coins||0)+coinsBonus;renderProfileLevel(_currentUserXP,_currentUserCoins);}
-    await adminRefreshPlayers();await loadLeaderboard();
+    await adminRefreshPlayers();await loadLeaderboard(true);
   }catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
 };
 window.adminModifyCoins=async function(sign){
@@ -2388,7 +2416,7 @@ window.adminModifyCoins=async function(sign){
     const pn=profile.globalName||profile.username||"Joueur";const label=delta>=0?"+"+delta:String(delta);
     setAdminFeedback("✓ "+pn+" : "+label+" pièces → "+newCoins,"ok");showToast("✓ "+pn+" — "+label+" pièces");
     if(targetUid===_currentUserUID){_currentUserCoins=newCoins;renderProfileLevel(_currentUserXP,_currentUserCoins);}
-    await adminRefreshPlayers();await loadLeaderboard();
+    await adminRefreshPlayers();await loadLeaderboard(true);
   }catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
 };
 
@@ -2405,8 +2433,13 @@ window.adminSaveDiscovery=async function(){
   const steps=stepsRaw.map(line=>{const p=line.split("|");return{title:(p[0]||"").trim(),desc:(p[1]||"").trim(),xp:parseInt(p[2]||"0",10)||0,url:(p[3]||"").trim(),urlLabel:(p[4]||"").trim()};});
   const newDiscovery={title:(document.getElementById("disc-flow-title")?.value||"").trim()||_discovery.title,desc:(document.getElementById("disc-flow-desc")?.value||"").trim()||_discovery.desc,note:(document.getElementById("disc-flow-note")?.value||"").trim()||_discovery.note,steps};
   const fbEl=document.getElementById("admin-disc-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
-  try{await setDoc(doc(db,"sitedata","discovery"),newDiscovery);_discovery=newDiscovery;fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderDiscovery();showToast("Flow mis à jour !");}
-  catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
+  try{
+    await setDoc(doc(db,"sitedata","discovery"),newDiscovery);
+    _discovery=newDiscovery;
+    invalidateSitedataCache();
+    fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";
+    renderDiscovery();showToast("Flow mis à jour !");
+  }catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
 };
 
 /* ════ Admin : tutoriels ════ */
@@ -2417,20 +2450,20 @@ window.adminLoadTutoEditor=function(){
     item.onclick=function(){document.querySelectorAll("#admin-tuto-list .admin-card-item").forEach(i=>i.classList.remove("selected"));item.classList.add("selected");window._editingTutoId=t.id;document.getElementById("ate-title").value=t.title||"";document.getElementById("ate-icon").value=t.icon||"📖";document.getElementById("ate-image").value=t.image||"";document.getElementById("ate-link").value=t.link||"";document.getElementById("ate-link-label").value=t.linkLabel||"";document.getElementById("ate-desc").value=t.desc||"";document.getElementById("ate-steps").value=(t.steps||[]).map(s=>{let l=s.title+"|"+s.desc;if(s.img)l+="|img:"+s.img;if(s.link)l+="|lien:"+s.link+"|"+(s.linkLabel||"Voir");return l;}).join("\n");document.getElementById("admin-tuto-editor").style.display="";document.getElementById("btn-del-tuto").style.display="";};list.appendChild(item);});
 };
 window.adminNewTuto=function(){window._editingTutoId="t_"+Date.now();["ate-title","ate-icon","ate-image","ate-link","ate-link-label","ate-desc","ate-steps"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});document.getElementById("ate-icon").value="📖";document.getElementById("admin-tuto-editor").style.display="";document.getElementById("btn-del-tuto").style.display="none";document.querySelectorAll("#admin-tuto-list .admin-card-item").forEach(i=>i.classList.remove("selected"));};
-window.adminDeleteTuto=async function(){const tid=window._editingTutoId;if(!tid)return;if(!confirm("Supprimer ?"))return;_tutos=_tutos.filter(t=>t.id!==tid);try{await setDoc(doc(db,"sitedata","tutos"),{list:_tutos});document.getElementById("admin-tuto-editor").style.display="none";document.getElementById("btn-del-tuto").style.display="none";renderTutos();adminLoadTutoEditor();showToast("Tutoriel supprimé.");}catch(err){showToast("Erreur: "+err.message);}};
+window.adminDeleteTuto=async function(){const tid=window._editingTutoId;if(!tid)return;if(!confirm("Supprimer ?"))return;_tutos=_tutos.filter(t=>t.id!==tid);try{await setDoc(doc(db,"sitedata","tutos"),{list:_tutos});invalidateSitedataCache();document.getElementById("admin-tuto-editor").style.display="none";document.getElementById("btn-del-tuto").style.display="none";renderTutos();adminLoadTutoEditor();showToast("Tutoriel supprimé.");}catch(err){showToast("Erreur: "+err.message);}};
 function parseTutoSteps(raw){return raw.trim().split("\n").filter(Boolean).map(line=>{const parts=line.split("|");const step={title:(parts[0]||"").trim(),desc:(parts[1]||"").trim()};for(let i=2;i<parts.length;i++){const seg=parts[i].trim();if(seg.startsWith("img:"))step.img=seg.slice(4).trim();else if(seg.startsWith("lien:")){step.link=seg.slice(5).trim();if(parts[i+1]!==undefined){step.linkLabel=parts[i+1].trim();i++;}else step.linkLabel="Voir";}}return step;});}
-window.adminSaveTuto=async function(){const tid=window._editingTutoId;if(!tid)return;const steps=parseTutoSteps(document.getElementById("ate-steps").value||"");const newTuto={id:tid,icon:(document.getElementById("ate-icon").value||"").trim()||"📖",title:(document.getElementById("ate-title").value||"").trim()||"Tutoriel",desc:(document.getElementById("ate-desc").value||"").trim()||"",image:(document.getElementById("ate-image").value||"").trim()||"",link:(document.getElementById("ate-link").value||"").trim()||"",linkLabel:(document.getElementById("ate-link-label").value||"").trim()||"",steps};if(!newTuto.image)delete newTuto.image;if(!newTuto.link){delete newTuto.link;delete newTuto.linkLabel;}if(!newTuto.linkLabel)delete newTuto.linkLabel;const idx=_tutos.findIndex(t=>t.id===tid);if(idx>=0)_tutos[idx]=newTuto;else _tutos.push(newTuto);const fbEl=document.getElementById("admin-tuto-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","tutos"),{list:_tutos});fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderTutos();adminLoadTutoEditor();showToast("Tutoriel mis à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
+window.adminSaveTuto=async function(){const tid=window._editingTutoId;if(!tid)return;const steps=parseTutoSteps(document.getElementById("ate-steps").value||"");const newTuto={id:tid,icon:(document.getElementById("ate-icon").value||"").trim()||"📖",title:(document.getElementById("ate-title").value||"").trim()||"Tutoriel",desc:(document.getElementById("ate-desc").value||"").trim()||"",image:(document.getElementById("ate-image").value||"").trim()||"",link:(document.getElementById("ate-link").value||"").trim()||"",linkLabel:(document.getElementById("ate-link-label").value||"").trim()||"",steps};if(!newTuto.image)delete newTuto.image;if(!newTuto.link){delete newTuto.link;delete newTuto.linkLabel;}if(!newTuto.linkLabel)delete newTuto.linkLabel;const idx=_tutos.findIndex(t=>t.id===tid);if(idx>=0)_tutos[idx]=newTuto;else _tutos.push(newTuto);const fbEl=document.getElementById("admin-tuto-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","tutos"),{list:_tutos});invalidateSitedataCache();fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderTutos();adminLoadTutoEditor();showToast("Tutoriel mis à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
 
 /* ════ Admin : pays ════ */
 window.adminLoadPaysEditor=function(){if(!_pays)return;setInputVal("ape-membres",_pays.membres||"");setInputVal("ape-rang",_pays.rang||"");setInputVal("ape-fondation",_pays.fondation||"");setInputVal("ape-herodesc",_pays.herodesc||"");setInputVal("ape-paydesc",_pays.paydesc||"");const gouvTA=document.getElementById("ape-gouv");if(gouvTA&&_pays.gouv)gouvTA.value=_pays.gouv.map(m=>m.init+"|"+m.nom+"|"+m.role+"|"+m.badge).join("\n");};
-window.adminSavePays=async function(){const gouvRaw=(document.getElementById("ape-gouv")?.value||"").trim().split("\n").filter(Boolean);const gouv=gouvRaw.map(line=>{const p=line.split("|");return{init:(p[0]||"").trim(),nom:(p[1]||"").trim(),role:(p[2]||"").trim(),badge:(p[3]||"").trim()};});_pays={membres:(document.getElementById("ape-membres")?.value||"").trim()||_pays.membres,rang:(document.getElementById("ape-rang")?.value||"").trim()||_pays.rang,fondation:(document.getElementById("ape-fondation")?.value||"").trim()||_pays.fondation,herodesc:(document.getElementById("ape-herodesc")?.value||"").trim()||_pays.herodesc,paydesc:(document.getElementById("ape-paydesc")?.value||"").trim()||_pays.paydesc,gouv:gouv.length?gouv:_pays.gouv};const fbEl=document.getElementById("admin-pays-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","pays"),_pays);fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderPays();showToast("Infos pays mises à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
+window.adminSavePays=async function(){const gouvRaw=(document.getElementById("ape-gouv")?.value||"").trim().split("\n").filter(Boolean);const gouv=gouvRaw.map(line=>{const p=line.split("|");return{init:(p[0]||"").trim(),nom:(p[1]||"").trim(),role:(p[2]||"").trim(),badge:(p[3]||"").trim()};});_pays={membres:(document.getElementById("ape-membres")?.value||"").trim()||_pays.membres,rang:(document.getElementById("ape-rang")?.value||"").trim()||_pays.rang,fondation:(document.getElementById("ape-fondation")?.value||"").trim()||_pays.fondation,herodesc:(document.getElementById("ape-herodesc")?.value||"").trim()||_pays.herodesc,paydesc:(document.getElementById("ape-paydesc")?.value||"").trim()||_pays.paydesc,gouv:gouv.length?gouv:_pays.gouv};const fbEl=document.getElementById("admin-pays-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","pays"),_pays);invalidateSitedataCache();fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderPays();showToast("Infos pays mises à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
 
 /* ════ Admin : boutique ════ */
 window._editingShopItemId=null;
 window.adminLoadShopEditor=function(){if(!_shop)return;const list=document.getElementById("admin-shop-list");if(!list)return;list.innerHTML="";(_shop.items||[]).forEach(item=>{const el=document.createElement("div");el.className="admin-card-item";el.innerHTML='<span style="font-size:1.1rem;">'+(item.icon||'🛒')+'</span><span class="admin-card-item-name">'+escHtml(item.name||'Article')+'</span><span class="admin-card-item-xp">🪙 '+(item.price||0)+'</span>';el.onclick=function(){document.querySelectorAll("#admin-shop-list .admin-card-item").forEach(i=>i.classList.remove("selected"));el.classList.add("selected");window._editingShopItemId=item.id;document.getElementById("ase-name").value=item.name||"";document.getElementById("ase-icon").value=item.icon||"🛒";document.getElementById("ase-cat").value=item.cat||"";document.getElementById("ase-price").value=item.price!==undefined?item.price:"";document.getElementById("ase-stock").value=item.stock!==undefined?item.stock:-1;document.getElementById("ase-image").value=item.image||"";document.getElementById("ase-unique").value=item.unique?"true":"false";document.getElementById("ase-limited").value=item.limited?"true":"false";document.getElementById("ase-desc").value=item.desc||"";document.getElementById("ase-instructions").value=item.instructions||"";document.getElementById("admin-shop-editor").style.display="";document.getElementById("btn-del-shop").style.display="";};list.appendChild(el);});};
 window.adminNewShopItem=function(){window._editingShopItemId="shop_"+Date.now();["ase-name","ase-icon","ase-cat","ase-price","ase-image","ase-desc","ase-instructions"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});document.getElementById("ase-icon").value="🛒";document.getElementById("ase-stock").value="-1";document.getElementById("ase-unique").value="false";document.getElementById("ase-limited").value="false";document.getElementById("admin-shop-editor").style.display="";document.getElementById("btn-del-shop").style.display="none";document.querySelectorAll("#admin-shop-list .admin-card-item").forEach(i=>i.classList.remove("selected"));};
-window.adminDeleteShopItem=async function(){const id=window._editingShopItemId;if(!id)return;if(!confirm("Supprimer ?"))return;_shop.items=(_shop.items||[]).filter(i=>i.id!==id);try{await setDoc(doc(db,"sitedata","shop"),_shop);document.getElementById("admin-shop-editor").style.display="none";document.getElementById("btn-del-shop").style.display="none";renderShop();adminLoadShopEditor();showToast("Article supprimé.");}catch(err){showToast("Erreur: "+err.message);}};
-window.adminSaveShopItem=async function(){const id=window._editingShopItemId;if(!id)return;const price=parseInt(document.getElementById("ase-price").value||"0",10);const stock=parseInt(document.getElementById("ase-stock").value||"-1",10);const newItem={id,name:(document.getElementById("ase-name").value||"").trim()||"Article",icon:(document.getElementById("ase-icon").value||"").trim()||"🛒",cat:(document.getElementById("ase-cat").value||"").trim()||"Général",price:isNaN(price)?0:Math.max(0,price),stock:isNaN(stock)?-1:stock,image:(document.getElementById("ase-image").value||"").trim()||"",unique:document.getElementById("ase-unique").value==="true",limited:document.getElementById("ase-limited").value==="true",desc:(document.getElementById("ase-desc").value||"").trim()||"",instructions:(document.getElementById("ase-instructions").value||"").trim()||""};if(!newItem.image)delete newItem.image;if(!newItem.instructions)delete newItem.instructions;if(!_shop)_shop={items:[]};if(!_shop.items)_shop.items=[];const idx=_shop.items.findIndex(i=>i.id===id);if(idx>=0)_shop.items[idx]=newItem;else _shop.items.push(newItem);const fbEl=document.getElementById("admin-shop-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","shop"),_shop);fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderShop();adminLoadShopEditor();showToast("Article mis à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
+window.adminDeleteShopItem=async function(){const id=window._editingShopItemId;if(!id)return;if(!confirm("Supprimer ?"))return;_shop.items=(_shop.items||[]).filter(i=>i.id!==id);try{await setDoc(doc(db,"sitedata","shop"),_shop);invalidateSitedataCache();document.getElementById("admin-shop-editor").style.display="none";document.getElementById("btn-del-shop").style.display="none";renderShop();adminLoadShopEditor();showToast("Article supprimé.");}catch(err){showToast("Erreur: "+err.message);}};
+window.adminSaveShopItem=async function(){const id=window._editingShopItemId;if(!id)return;const price=parseInt(document.getElementById("ase-price").value||"0",10);const stock=parseInt(document.getElementById("ase-stock").value||"-1",10);const newItem={id,name:(document.getElementById("ase-name").value||"").trim()||"Article",icon:(document.getElementById("ase-icon").value||"").trim()||"🛒",cat:(document.getElementById("ase-cat").value||"").trim()||"Général",price:isNaN(price)?0:Math.max(0,price),stock:isNaN(stock)?-1:stock,image:(document.getElementById("ase-image").value||"").trim()||"",unique:document.getElementById("ase-unique").value==="true",limited:document.getElementById("ase-limited").value==="true",desc:(document.getElementById("ase-desc").value||"").trim()||"",instructions:(document.getElementById("ase-instructions").value||"").trim()||""};if(!newItem.image)delete newItem.image;if(!newItem.instructions)delete newItem.instructions;if(!_shop)_shop={items:[]};if(!_shop.items)_shop.items=[];const idx=_shop.items.findIndex(i=>i.id===id);if(idx>=0)_shop.items[idx]=newItem;else _shop.items.push(newItem);const fbEl=document.getElementById("admin-shop-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","shop"),_shop);invalidateSitedataCache();fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderShop();adminLoadShopEditor();showToast("Article mis à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
 
 /* ════ Utilitaires ════ */
 function setAdminFeedback(msg,type){const el=document.getElementById("admin-feedback");if(!el)return;el.textContent=msg;el.className="admin-feedback"+(type?" "+type:"");}
@@ -2473,7 +2506,6 @@ function switchAdminTab(tabId,btn){
 function toggleQuickLinks(){document.getElementById('ql-sidebar').classList.toggle('open');}
 function closeQuickLinks(){document.getElementById('ql-sidebar').classList.remove('open');}
 document.addEventListener('click',function(e){var sb=document.getElementById('ql-sidebar');if(sb&&!sb.contains(e.target))sb.classList.remove('open');});
-// Close spin modal on overlay click
 document.getElementById('spin-overlay').addEventListener('click',function(e){if(e.target===this)closeSpinModal();});
 var _toastTimer=null;
 function showToast(msg){var el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_toastTimer);_toastTimer=setTimeout(function(){el.classList.remove('show');},3500);}
