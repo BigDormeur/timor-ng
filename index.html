@@ -735,6 +735,14 @@ function renderQuests(){
   renderQuestsList(quests,"Toutes",done);
 }
 
+function linkifyDesc(text) {
+  const escaped = escHtml(text);
+  return escaped.replace(
+    /(https?:\/\/[^\s&]+)/g,
+    '<a href="$1" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="quest-desc-link">$1</a>'
+  );
+
+}
 function renderQuestsList(quests,cat,done){
   const container=document.getElementById("quests-list");if(!container)return;
   const filtered=cat==="Toutes"?quests:quests.filter(q=>(q.cat||"Générale")===cat);
@@ -754,7 +762,7 @@ function renderQuestsList(quests,cat,done){
           '<span class="quest-card-title">'+escHtml(q.title)+'</span>'+
           '<span class="quest-cat-badge" style="background:'+col+'22;color:'+col+'">'+escHtml(q.cat||'Générale')+'</span>'+
         '</div>'+
-        '<div class="quest-card-desc">'+escHtml(q.desc)+'</div>'+
+        '<div class="quest-card-desc">'+linkifyDesc(q.desc)+'</div>'+
         '<div class="quest-card-footer">'+
           '<div class="quest-rewards"><span class="quest-reward-xp">⚡ +'+q.xp+' XP</span>'+rewardCoins+'</div>'+
           actionHtml+
