@@ -45,23 +45,19 @@
     <div class="spin-modal-glow"></div>
     <div class="spin-modal-title">🎰 Roulette Quotidienne</div>
     <div class="spin-modal-subtitle">Tente ta chance — une fois par jour !</div>
-
     <div id="spin-auth-notice" class="spin-auth-notice" style="display:none;">
       ⚠ Connecte-toi avec Discord pour que ta récompense soit sauvegardée.
     </div>
-
     <div class="spin-result-banner" id="spin-result-banner">
       <div class="spin-result-icon" id="spin-result-icon">🎉</div>
       <div class="spin-result-label" id="spin-result-label">Super !</div>
       <div class="spin-result-desc" id="spin-result-desc"></div>
     </div>
-
     <div class="spin-wheel-wrap">
       <div class="spin-pointer"></div>
       <canvas id="spin-canvas" width="320" height="320"></canvas>
       <button class="spin-center-btn" id="spin-center-btn" onclick="doSpin()">SPIN</button>
     </div>
-
     <div class="spin-prizes-legend" id="spin-prizes-legend"></div>
     <div class="spin-cooldown-bar-wrap"><div class="spin-cooldown-bar" id="spin-cooldown-bar" style="width:100%"></div></div>
     <div class="spin-status" id="spin-status">Chargement…</div>
@@ -69,16 +65,21 @@
   </div>
 </div>
 
-<!-- ══ DISCOVERY ══ -->
-<div class="discovery-page" id="discovery-page">
-  <div class="discovery-inner">
-    <button class="discovery-back" onclick="closeDiscovery()">← Retour à l'accueil</button>
-    <div class="discovery-title" id="disc-main-title">🗺️ Commencer à jouer</div>
-    <div class="discovery-subtitle" id="disc-subtitle">Accomplis les étapes ci-dessous pour découvrir NationsGlory.</div>
-    <div class="discovery-progress-bar"><div class="discovery-progress-fill" id="disc-progress-fill" style="width:0%"></div></div>
-    <div class="disc-auth-notice" id="disc-auth-notice">⚠ Connecte-toi avec Discord pour recevoir l'XP automatiquement.</div>
-    <div class="discovery-steps" id="disc-steps"></div>
-    <div class="discovery-note" id="disc-note">L'XP est attribué automatiquement dès que tu confirmes une étape.</div>
+<!-- ══ QUÊTES PAGE ══ -->
+<div class="quests-page" id="quests-page">
+  <div class="quests-inner">
+    <button class="quests-back" onclick="closeQuests()">← Retour à l'accueil</button>
+    <div class="quests-header">
+      <div class="quests-title" id="quests-main-title">⚔️ Quêtes</div>
+      <div class="quests-subtitle" id="quests-subtitle">Accomplis des missions pour gagner de l'XP et des récompenses.</div>
+    </div>
+    <div class="quests-progress-wrap">
+      <div class="quests-progress-bar"><div class="quests-progress-fill" id="quests-progress-fill" style="width:0%"></div></div>
+      <div class="quests-progress-label" id="quests-progress-label">0 / 0 quêtes accomplies</div>
+    </div>
+    <div class="quests-auth-notice" id="quests-auth-notice">⚠ Connecte-toi avec Discord pour recevoir l'XP automatiquement.</div>
+    <div class="quests-categories" id="quests-categories"></div>
+    <div class="quests-list" id="quests-list"></div>
   </div>
 </div>
 
@@ -125,7 +126,7 @@
     <div class="hero-stat"><span class="num" id="stat-rang">#3</span><span class="lbl">Rang mondial</span></div>
   </div>
   <div class="hero-btns">
-    <a href="#" class="btn-primary" onclick="openDiscovery();return false;">Commencer à jouer</a>
+    <a href="#" class="btn-primary" onclick="openQuests();return false;">⚔️ Voir les quêtes</a>
     <a href="#" class="btn-outline" onclick="showSection('pays');return false;">Découvrir Timor</a>
   </div>
 </div>
@@ -166,6 +167,17 @@
     <button class="spin-teaser-btn" id="spin-teaser-btn">Tourner 🎰</button>
   </div>
 
+  <!-- QUÊTES TEASER -->
+  <div class="quests-teaser" id="quests-teaser" onclick="openQuests()">
+    <div class="quests-teaser-icon">⚔️</div>
+    <div class="quests-teaser-info">
+      <div class="quests-teaser-title">Quêtes</div>
+      <div class="quests-teaser-desc">Accomplis des missions pour gagner de l'XP et des récompenses exclusives.</div>
+      <div class="quests-teaser-stats" id="quests-teaser-stats">Chargement…</div>
+    </div>
+    <button class="quests-teaser-btn">Voir les quêtes ⚔️</button>
+  </div>
+
   <!-- ADMIN PANEL -->
   <div class="admin-section" id="admin-panel">
     <div class="admin-title">⚔ Panneau Administrateur</div>
@@ -176,7 +188,7 @@
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="switchAdminTab('joueurs',this)">👤 Joueurs</button>
       <button class="admin-tab has-notif" id="tab-orders-btn" onclick="switchAdminTab('orders',this)">📦 Commandes <span class="orders-count-badge" id="orders-pending-count" style="display:none;">0</span></button>
-      <button class="admin-tab" onclick="switchAdminTab('decouverte',this)">🗺️ Découverte</button>
+      <button class="admin-tab" onclick="switchAdminTab('quetes-edit',this)">⚔️ Quêtes</button>
       <button class="admin-tab" onclick="switchAdminTab('tutos-edit',this)">📖 Tutoriels</button>
       <button class="admin-tab" onclick="switchAdminTab('pays-edit',this)">🏛 Pays</button>
       <button class="admin-tab" onclick="switchAdminTab('shop-edit',this)">🛒 Boutique</button>
@@ -242,22 +254,25 @@
       <div class="admin-feedback" id="admin-orders-feedback"></div>
     </div>
 
-    <!-- TAB DÉCOUVERTE -->
-    <div class="admin-tab-panel" id="admin-tab-decouverte">
-      <label class="admin-label">TITRE DU FLOW</label>
-      <input class="admin-input" id="disc-flow-title" placeholder="Titre affiché">
+    <!-- TAB QUÊTES ADMIN -->
+    <div class="admin-tab-panel" id="admin-tab-quetes-edit">
+      <label class="admin-label">TITRE DE LA PAGE</label>
+      <input class="admin-input" id="quest-page-title" placeholder="⚔️ Quêtes">
       <label class="admin-label">DESCRIPTION</label>
-      <textarea class="admin-textarea" id="disc-flow-desc" placeholder="Texte d'introduction…"></textarea>
-      <label class="admin-label">NOTE DE BAS</label>
-      <textarea class="admin-textarea" id="disc-flow-note" placeholder="Message affiché en bas…"></textarea>
-      <label class="admin-label">ÉTAPES (une par ligne)</label>
-      <div class="admin-format-hint">Format : <code>Titre|Description|XP|https://lien.com|Texte du bouton</code></div>
-      <textarea class="admin-textarea" id="disc-flow-steps" style="min-height:160px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"></textarea>
-      <div class="admin-actions" style="margin-top:8px;">
-        <button class="btn-admin" onclick="adminSaveDiscovery()">💾 Sauvegarder</button>
-        <button class="btn-admin" onclick="openDiscovery()">👁 Aperçu</button>
+      <textarea class="admin-textarea" id="quest-page-desc" placeholder="Texte d'introduction…"></textarea>
+      <label class="admin-label">QUÊTES (une par ligne)</label>
+      <div class="admin-format-hint">
+        Format : <code>Titre|Description|XP|Pièces|Catégorie|Icône</code><br>
+        Catégories : <code>Débutant</code>, <code>Intermédiaire</code>, <code>Avancé</code>, <code>Spéciale</code><br>
+        Exemple : <code>Rejoindre le Discord|Rejoins notre serveur Discord|100|50|Débutant|💬</code>
       </div>
-      <div class="admin-feedback" id="admin-disc-feedback"></div>
+      <textarea class="admin-textarea" id="quest-admin-list" style="min-height:240px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"></textarea>
+      <div class="admin-actions" style="margin-top:8px;">
+        <button class="btn-admin" onclick="adminSaveQuests()">💾 Sauvegarder</button>
+        <button class="btn-admin" onclick="openQuests()">👁 Aperçu</button>
+        <button class="btn-admin" onclick="adminResetQuestsDefault()">↺ Exemples</button>
+      </div>
+      <div class="admin-feedback" id="admin-quests-feedback"></div>
     </div>
 
     <!-- TAB TUTORIELS -->
@@ -358,7 +373,6 @@
       <div class="admin-format-hint">
         Format : <code>label|type|valeur|couleur|poids|icône</code><br>
         Types : <code>xp</code>, <code>coins</code>, <code>nothing</code><br>
-        Poids : plus le nombre est élevé, plus le lot est fréquent.<br>
         Exemple : <code>+50 XP|xp|50|#c9a84c|20|⚡</code>
       </div>
       <textarea class="admin-textarea" id="spin-admin-prizes" style="min-height:240px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"></textarea>
@@ -378,12 +392,6 @@
       <svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.42,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       Se connecter avec Discord
     </button>
-  </div>
-
-  <div class="play-block">
-    <h3>Prêt à rejoindre Timor ?</h3>
-    <p>Découvre NationsGlory étape par étape et gagne de l'XP instantanément.</p>
-    <button class="btn-primary" onclick="openDiscovery()">🗺️ Commencer à jouer</button>
   </div>
 </div>
 
@@ -444,7 +452,7 @@
     <div style="padding:2rem;text-align:center;color:var(--text-dim);font-size:0.9rem;">Chargement…</div>
   </div>
   <div style="margin-top:1.5rem;" class="card">
-    <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;">Le classement est mis à jour en temps réel. Accomplis les quêtes de découverte pour gagner de l'XP !</p>
+    <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;">Le classement est mis à jour en temps réel. Accomplis des quêtes pour gagner de l'XP !</p>
   </div>
 </div>
 
@@ -477,626 +485,367 @@ var LEVELS = [
   {level:19, name:"Héros de Timor",   xpMin:98000, xpMax:118000, coins:3000},
   {level:20, name:"Gloire Éternelle", xpMin:118000,xpMax:118000, coins:5000},
 ];
-function getLevelData(xp) { for(var i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xpMin)return LEVELS[i];}return LEVELS[0]; }
-function getLevelFromXP(xp) { for(var i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xpMin)return LEVELS[i].level;}return 1; }
+function getLevelData(xp){for(var i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xpMin)return LEVELS[i];}return LEVELS[0];}
+function getLevelFromXP(xp){for(var i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xpMin)return LEVELS[i].level;}return 1;}
 
-function renderProfileLevel(xp, coins) {
-  var card = document.getElementById("profile-level-card");
-  if (!card) return;
-  card.style.display = "";
-  var lvl = getLevelData(xp);
-  var lvlIdx = lvl.level - 1;
-  var nextLvl = LEVELS[Math.min(lvlIdx+1, LEVELS.length-1)];
-  var pct = lvl.level>=20 ? 100 : Math.round(((xp-lvl.xpMin)/(nextLvl.xpMin-lvl.xpMin))*100);
-  document.getElementById("level-badge-num").textContent = lvl.level;
-  document.getElementById("level-name-display").textContent = lvl.name;
-  document.getElementById("level-coins-display").textContent = "🪙 "+(coins||0).toLocaleString("fr-FR")+" pièces";
-  if(lvl.level>=20){
-    document.getElementById("level-xp-label").textContent = "Niveau maximum — "+xp.toLocaleString("fr-FR")+" XP";
-  } else {
-    document.getElementById("level-xp-label").textContent = xp.toLocaleString("fr-FR")+" / "+nextLvl.xpMin.toLocaleString("fr-FR")+" XP pour "+nextLvl.name;
-  }
-  document.getElementById("xp-bar-fill").style.width = pct+"%";
-  document.getElementById("xp-bar-min").textContent = lvl.xpMin.toLocaleString("fr-FR")+" XP";
-  document.getElementById("xp-bar-max").textContent = lvl.level>=20?"":nextLvl.xpMin.toLocaleString("fr-FR")+" XP";
-  var ms = document.getElementById("level-milestones");
-  if(ms){
-    ms.innerHTML="";
-    LEVELS.forEach(function(l){
-      var dot=document.createElement("div");
-      dot.className="milestone"+(l.level<lvl.level?" reached":"")+(l.level===lvl.level?" current":"");
-      dot.innerHTML=l.level+'<div class="milestone-tooltip">Niv. '+l.level+' — '+l.name+(l.coins?'<br>🪙 +'+l.coins:'')+'</div>';
-      ms.appendChild(dot);
-    });
-  }
+function renderProfileLevel(xp,coins){
+  var card=document.getElementById("profile-level-card");if(!card)return;
+  card.style.display="";
+  var lvl=getLevelData(xp);var lvlIdx=lvl.level-1;
+  var nextLvl=LEVELS[Math.min(lvlIdx+1,LEVELS.length-1)];
+  var pct=lvl.level>=20?100:Math.round(((xp-lvl.xpMin)/(nextLvl.xpMin-lvl.xpMin))*100);
+  document.getElementById("level-badge-num").textContent=lvl.level;
+  document.getElementById("level-name-display").textContent=lvl.name;
+  document.getElementById("level-coins-display").textContent="🪙 "+(coins||0).toLocaleString("fr-FR")+" pièces";
+  if(lvl.level>=20){document.getElementById("level-xp-label").textContent="Niveau maximum — "+xp.toLocaleString("fr-FR")+" XP";}
+  else{document.getElementById("level-xp-label").textContent=xp.toLocaleString("fr-FR")+" / "+nextLvl.xpMin.toLocaleString("fr-FR")+" XP pour "+nextLvl.name;}
+  document.getElementById("xp-bar-fill").style.width=pct+"%";
+  document.getElementById("xp-bar-min").textContent=lvl.xpMin.toLocaleString("fr-FR")+" XP";
+  document.getElementById("xp-bar-max").textContent=lvl.level>=20?"":nextLvl.xpMin.toLocaleString("fr-FR")+" XP";
+  var ms=document.getElementById("level-milestones");
+  if(ms){ms.innerHTML="";LEVELS.forEach(function(l){var dot=document.createElement("div");dot.className="milestone"+(l.level<lvl.level?" reached":"")+(l.level===lvl.level?" current":"");dot.innerHTML=l.level+'<div class="milestone-tooltip">Niv. '+l.level+' — '+l.name+(l.coins?'<br>🪙 +'+l.coins:'')+'</div>';ms.appendChild(dot);});}
 }
 window.closeLevelUp=function(){document.getElementById("levelup-overlay").classList.remove("show");};
 function checkLevelUp(oldXP,newXP){
-  var oldLvl=getLevelFromXP(oldXP), newLvl=getLevelFromXP(newXP);
-  if(newLvl>oldLvl){
-    var lvlData=LEVELS[newLvl-1];
-    document.getElementById("levelup-title").textContent="NIVEAU "+newLvl;
-    document.getElementById("levelup-coins").textContent="🪙 +"+lvlData.coins.toLocaleString("fr-FR")+" pièces !";
-    document.getElementById("levelup-overlay").classList.add("show");
-    return lvlData.coins;
-  }
+  var oldLvl=getLevelFromXP(oldXP),newLvl=getLevelFromXP(newXP);
+  if(newLvl>oldLvl){var lvlData=LEVELS[newLvl-1];document.getElementById("levelup-title").textContent="NIVEAU "+newLvl;document.getElementById("levelup-coins").textContent="🪙 +"+lvlData.coins.toLocaleString("fr-FR")+" pièces !";document.getElementById("levelup-overlay").classList.add("show");return lvlData.coins;}
   return 0;
 }
 </script>
 
 <!-- ════ SPIN WHEEL ENGINE ════ -->
 <script>
-function escHtml(str){
-  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-var DEFAULT_SPIN_PRIZES = [
-  {label:"+50 XP",    type:"xp",      value:50,   color:"#c9a84c", weight:25, icon:"⚡"},
-  {label:"+100 XP",   type:"xp",      value:100,  color:"#e8c97a", weight:20, icon:"🏆"},
-  {label:"+200 XP",   type:"xp",      value:200,  color:"#f5c542", weight:12, icon:"🌟"},
-  {label:"+500 XP",   type:"xp",      value:500,  color:"#a855f7", weight:5,  icon:"💥"},
-  {label:"+1000 XP",  type:"xp",      value:1000, color:"#e05252", weight:2,  icon:"👑"},
-  {label:"+100 🪙",   type:"coins",   value:100,  color:"#4a7fa5", weight:20, icon:"🪙"},
-  {label:"+250 🪙",   type:"coins",   value:250,  color:"#06b6d4", weight:10, icon:"💰"},
-  {label:"+500 🪙",   type:"coins",   value:500,  color:"#52c97a", weight:4,  icon:"💎"},
-  {label:"Rien…",     type:"nothing", value:0,    color:"#252538", weight:15, icon:"😶"},
+function escHtml(str){return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+var DEFAULT_SPIN_PRIZES=[
+  {label:"+50 XP",type:"xp",value:50,color:"#c9a84c",weight:25,icon:"⚡"},
+  {label:"+100 XP",type:"xp",value:100,color:"#e8c97a",weight:20,icon:"🏆"},
+  {label:"+200 XP",type:"xp",value:200,color:"#f5c542",weight:12,icon:"🌟"},
+  {label:"+500 XP",type:"xp",value:500,color:"#a855f7",weight:5,icon:"💥"},
+  {label:"+1000 XP",type:"xp",value:1000,color:"#e05252",weight:2,icon:"👑"},
+  {label:"+100 🪙",type:"coins",value:100,color:"#4a7fa5",weight:20,icon:"🪙"},
+  {label:"+250 🪙",type:"coins",value:250,color:"#06b6d4",weight:10,icon:"💰"},
+  {label:"+500 🪙",type:"coins",value:500,color:"#52c97a",weight:4,icon:"💎"},
+  {label:"Rien…",type:"nothing",value:0,color:"#252538",weight:15,icon:"😶"},
 ];
+var _spinPrizes=DEFAULT_SPIN_PRIZES.slice();
+var _spinAnimating=false,_spinCurrentAngle=0,_spinCooldownTimer=null;
+var SPIN_COOLDOWN_MS=24*60*60*1000;
 
-var _spinPrizes = DEFAULT_SPIN_PRIZES.slice();
-var _spinAnimating = false;
-var _spinCurrentAngle = 0;
-var _spinCooldownTimer = null;
-
-var SPIN_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-
-function drawWheel(angle) {
-  var canvas = document.getElementById("spin-canvas");
-  if (!canvas) return;
-  var ctx = canvas.getContext("2d");
-  var W = canvas.width, H = canvas.height;
-  var cx = W/2, cy = H/2, r = W/2 - 4;
-  var prizes = _spinPrizes;
-  var totalWeight = prizes.reduce(function(s,p){return s+p.weight;},0);
-
+function drawWheel(angle){
+  var canvas=document.getElementById("spin-canvas");if(!canvas)return;
+  var ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=W/2-4;
+  var prizes=_spinPrizes,totalWeight=prizes.reduce(function(s,p){return s+p.weight;},0);
   ctx.clearRect(0,0,W,H);
-
-  var startAngle = angle;
-  prizes.forEach(function(p) {
-    var sliceAngle = (p.weight / totalWeight) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
-    ctx.closePath();
-    ctx.fillStyle = p.color;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(0,0,0,0.3)";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r-2, startAngle, startAngle + sliceAngle);
-    ctx.closePath();
-    ctx.strokeStyle = "rgba(255,255,255,0.07)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(startAngle + sliceAngle / 2);
-    ctx.textAlign = "right";
-    ctx.fillStyle = "#fff";
-    ctx.shadowColor = "rgba(0,0,0,0.5)";
-    ctx.shadowBlur = 3;
-
-    ctx.font = "bold "+(W < 290 ? 13 : 15)+"px Arial";
-    ctx.fillText(p.icon, r - 10, 5);
-
-    ctx.font = "600 "+(W < 290 ? 8 : 9.5)+"px 'Space Grotesk', sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.fillText(p.label, r - 28, 5);
-    ctx.restore();
-
-    startAngle += sliceAngle;
+  var startAngle=angle;
+  prizes.forEach(function(p){
+    var sliceAngle=(p.weight/totalWeight)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,startAngle,startAngle+sliceAngle);ctx.closePath();ctx.fillStyle=p.color;ctx.fill();ctx.strokeStyle="rgba(0,0,0,0.3)";ctx.lineWidth=1.5;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(startAngle+sliceAngle/2);ctx.textAlign="right";ctx.fillStyle="#fff";ctx.shadowColor="rgba(0,0,0,0.5)";ctx.shadowBlur=3;
+    ctx.font="bold "+(W<290?13:15)+"px Arial";ctx.fillText(p.icon,r-10,5);
+    ctx.font="600 "+(W<290?8:9.5)+"px 'Space Grotesk',sans-serif";ctx.fillStyle="rgba(255,255,255,0.9)";ctx.fillText(p.label,r-28,5);
+    ctx.restore();startAngle+=sliceAngle;
   });
-
-  ctx.beginPath();
-  ctx.arc(cx, cy, 28, 0, Math.PI*2);
-  ctx.fillStyle = "#0f0f1a";
-  ctx.fill();
-  ctx.strokeStyle = "rgba(201,168,76,0.3)";
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,28,0,Math.PI*2);ctx.fillStyle="#0f0f1a";ctx.fill();ctx.strokeStyle="rgba(201,168,76,0.3)";ctx.lineWidth=2;ctx.stroke();
 }
-
-function buildPrizeLegend() {
-  var container = document.getElementById("spin-prizes-legend");
-  if (!container) return;
-  container.innerHTML = _spinPrizes.map(function(p) {
-    return '<div class="spin-prize-pill" style="color:'+p.color+';border-color:'+p.color+'33;background:'+p.color+'11">'+p.icon+' '+escHtml(p.label)+'</div>';
-  }).join("");
+function buildPrizeLegend(){var container=document.getElementById("spin-prizes-legend");if(!container)return;container.innerHTML=_spinPrizes.map(function(p){return'<div class="spin-prize-pill" style="color:'+p.color+';border-color:'+p.color+'33;background:'+p.color+'11">'+p.icon+' '+escHtml(p.label)+'</div>';}).join("");}
+function pickPrize(){var total=_spinPrizes.reduce(function(s,p){return s+p.weight;},0),rand=Math.random()*total,cum=0;for(var i=0;i<_spinPrizes.length;i++){cum+=_spinPrizes[i].weight;if(rand<cum)return i;}return _spinPrizes.length-1;}
+function getPrizeAngleCenter(prizeIdx){var total=_spinPrizes.reduce(function(s,p){return s+p.weight;},0),cumAngle=0;for(var i=0;i<_spinPrizes.length;i++){var sliceAngle=(_spinPrizes[i].weight/total)*Math.PI*2;if(i===prizeIdx)return cumAngle+sliceAngle/2;cumAngle+=sliceAngle;}return 0;}
+window.openSpinModal=function(){document.getElementById("spin-overlay").classList.add("show");drawWheel(_spinCurrentAngle);buildPrizeLegend();updateSpinUI();};
+window.closeSpinModal=function(){document.getElementById("spin-overlay").classList.remove("show");};
+function getLastSpinKey(){return"timor_last_spin_"+(window._spinCurrentUID||"anon");}
+function getLastSpinTime(){var stored=localStorage.getItem(getLastSpinKey());return stored?parseInt(stored,10):0;}
+function setLastSpinTime(ts){localStorage.setItem(getLastSpinKey(),String(ts));}
+function canSpin(){var last=getLastSpinTime();if(!last)return true;return(Date.now()-last)>=SPIN_COOLDOWN_MS;}
+function timeUntilNextSpin(){var last=getLastSpinTime();if(!last)return 0;var diff=SPIN_COOLDOWN_MS-(Date.now()-last);return Math.max(0,diff);}
+function formatDuration(ms){var total=Math.floor(ms/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),s=total%60;return(h>0?h+"h ":"")+(m>0?m+"m ":"")+s+"s";}
+function updateSpinUI(){
+  var statusEl=document.getElementById("spin-status"),centerBtn=document.getElementById("spin-center-btn"),cooldownBar=document.getElementById("spin-cooldown-bar"),teaserCooldown=document.getElementById("spin-teaser-cooldown"),teaserBtn=document.getElementById("spin-teaser-btn"),navSpinBtn=document.getElementById("nav-spin-btn");
+  var remaining=timeUntilNextSpin(),ready=remaining<=0;
+  if(cooldownBar){var pct=ready?100:Math.round(((SPIN_COOLDOWN_MS-remaining)/SPIN_COOLDOWN_MS)*100);cooldownBar.style.width=pct+"%";}
+  if(ready){if(statusEl)statusEl.textContent="✨ Prêt ! Tourne la roulette pour gagner !";if(centerBtn){centerBtn.disabled=_spinAnimating;centerBtn.textContent="SPIN";}if(teaserCooldown){teaserCooldown.textContent="✨ Disponible maintenant !";teaserCooldown.className="spin-teaser-cooldown ready";}if(teaserBtn)teaserBtn.disabled=false;if(navSpinBtn)navSpinBtn.classList.add("spin-ready");}
+  else{var fmt=formatDuration(remaining);if(statusEl)statusEl.textContent="⏳ Prochain spin dans "+fmt;if(centerBtn){centerBtn.disabled=true;centerBtn.textContent=fmt;}if(teaserCooldown){teaserCooldown.textContent="⏳ Disponible dans "+fmt;teaserCooldown.className="spin-teaser-cooldown waiting";}if(teaserBtn)teaserBtn.disabled=true;if(navSpinBtn)navSpinBtn.classList.remove("spin-ready");}
+  var authNotice=document.getElementById("spin-auth-notice");if(authNotice)authNotice.style.display=window._spinCurrentUID?"none":"";
 }
-
-function pickPrize() {
-  var total = _spinPrizes.reduce(function(s,p){return s+p.weight;},0);
-  var rand = Math.random() * total;
-  var cum = 0;
-  for (var i=0; i<_spinPrizes.length; i++) {
-    cum += _spinPrizes[i].weight;
-    if (rand < cum) return i;
-  }
-  return _spinPrizes.length - 1;
-}
-
-function getPrizeAngleCenter(prizeIdx) {
-  var total = _spinPrizes.reduce(function(s,p){return s+p.weight;},0);
-  var cumAngle = 0;
-  for (var i=0; i<_spinPrizes.length; i++) {
-    var sliceAngle = (_spinPrizes[i].weight / total) * Math.PI * 2;
-    if (i === prizeIdx) return cumAngle + sliceAngle / 2;
-    cumAngle += sliceAngle;
-  }
-  return 0;
-}
-
-window.openSpinModal = function() {
-  document.getElementById("spin-overlay").classList.add("show");
-  drawWheel(_spinCurrentAngle);
-  buildPrizeLegend();
-  updateSpinUI();
-};
-
-window.closeSpinModal = function() {
-  document.getElementById("spin-overlay").classList.remove("show");
-};
-
-function getLastSpinKey() {
-  return "timor_last_spin_" + (window._spinCurrentUID || "anon");
-}
-
-function getLastSpinTime() {
-  var stored = localStorage.getItem(getLastSpinKey());
-  return stored ? parseInt(stored, 10) : 0;
-}
-
-function setLastSpinTime(ts) {
-  localStorage.setItem(getLastSpinKey(), String(ts));
-}
-
-function canSpin() {
-  var last = getLastSpinTime();
-  if (!last) return true;
-  return (Date.now() - last) >= SPIN_COOLDOWN_MS;
-}
-
-function timeUntilNextSpin() {
-  var last = getLastSpinTime();
-  if (!last) return 0;
-  var diff = SPIN_COOLDOWN_MS - (Date.now() - last);
-  return Math.max(0, diff);
-}
-
-function formatDuration(ms) {
-  var total = Math.floor(ms / 1000);
-  var h = Math.floor(total / 3600);
-  var m = Math.floor((total % 3600) / 60);
-  var s = total % 60;
-  return (h > 0 ? h+"h " : "") + (m > 0 ? m+"m " : "") + s+"s";
-}
-
-function updateSpinUI() {
-  var statusEl = document.getElementById("spin-status");
-  var centerBtn = document.getElementById("spin-center-btn");
-  var cooldownBar = document.getElementById("spin-cooldown-bar");
-  var teaserCooldown = document.getElementById("spin-teaser-cooldown");
-  var teaserBtn = document.getElementById("spin-teaser-btn");
-  var navSpinBtn = document.getElementById("nav-spin-btn");
-
-  var remaining = timeUntilNextSpin();
-  var ready = remaining <= 0;
-
-  if (cooldownBar) {
-    var pct = ready ? 100 : Math.round(((SPIN_COOLDOWN_MS - remaining) / SPIN_COOLDOWN_MS) * 100);
-    cooldownBar.style.width = pct + "%";
-  }
-
-  if (ready) {
-    if (statusEl) statusEl.textContent = "✨ Prêt ! Tourne la roulette pour gagner !";
-    if (centerBtn) { centerBtn.disabled = _spinAnimating; centerBtn.textContent = "SPIN"; }
-    if (teaserCooldown) { teaserCooldown.textContent = "✨ Disponible maintenant !"; teaserCooldown.className = "spin-teaser-cooldown ready"; }
-    if (teaserBtn) teaserBtn.disabled = false;
-    if (navSpinBtn) navSpinBtn.classList.add("spin-ready");
-  } else {
-    var fmt = formatDuration(remaining);
-    if (statusEl) statusEl.textContent = "⏳ Prochain spin dans " + fmt;
-    if (centerBtn) { centerBtn.disabled = true; centerBtn.textContent = fmt; }
-    if (teaserCooldown) { teaserCooldown.textContent = "⏳ Disponible dans " + fmt; teaserCooldown.className = "spin-teaser-cooldown waiting"; }
-    if (teaserBtn) teaserBtn.disabled = true;
-    if (navSpinBtn) navSpinBtn.classList.remove("spin-ready");
-  }
-
-  var authNotice = document.getElementById("spin-auth-notice");
-  if (authNotice) authNotice.style.display = window._spinCurrentUID ? "none" : "";
-}
-
-function startCooldownTimer() {
-  if (_spinCooldownTimer) clearInterval(_spinCooldownTimer);
-  _spinCooldownTimer = setInterval(function() {
-    updateSpinUI();
-    if (timeUntilNextSpin() <= 0) {
-      clearInterval(_spinCooldownTimer);
-      _spinCooldownTimer = null;
-    }
-  }, 1000);
-}
-
-window.doSpin = function() {
-  if (_spinAnimating || !canSpin()) return;
-  _spinAnimating = true;
-
-  var centerBtn = document.getElementById("spin-center-btn");
-  var resultBanner = document.getElementById("spin-result-banner");
-  if (centerBtn) centerBtn.disabled = true;
-  if (resultBanner) resultBanner.classList.remove("show");
-
-  var winnerIdx = pickPrize();
-  var winner = _spinPrizes[winnerIdx];
-
-  var extraSpins = (Math.PI * 2) * (6 + Math.floor(Math.random() * 4));
-  var winCenter = getPrizeAngleCenter(winnerIdx);
-  var targetAngle = -Math.PI/2 - winCenter + extraSpins;
-  var startA = _spinCurrentAngle;
-  var delta = targetAngle - (startA % (Math.PI*2));
-  if (delta < Math.PI * 8) delta += Math.PI * 2 * Math.ceil((Math.PI*8 - delta) / (Math.PI*2));
-  var endAngle = startA + delta;
-
-  var duration = 5000 + Math.random() * 1500;
-  var startTime = null;
-  function easeOut(t) {
-    return 1 - Math.pow(1 - t, 4);
-  }
-  function animate(ts) {
-    if (!startTime) startTime = ts;
-    var elapsed = ts - startTime;
-    var progress = Math.min(elapsed / duration, 1);
-    var eased = easeOut(progress);
-    _spinCurrentAngle = startA + delta * eased;
-    drawWheel(_spinCurrentAngle);
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      _spinCurrentAngle = endAngle % (Math.PI * 2);
-      drawWheel(_spinCurrentAngle);
-      _spinAnimating = false;
-      onSpinEnd(winner);
-    }
-  }
+function startCooldownTimer(){if(_spinCooldownTimer)clearInterval(_spinCooldownTimer);_spinCooldownTimer=setInterval(function(){updateSpinUI();if(timeUntilNextSpin()<=0){clearInterval(_spinCooldownTimer);_spinCooldownTimer=null;}},1000);}
+window.doSpin=function(){
+  if(_spinAnimating||!canSpin())return;_spinAnimating=true;
+  var centerBtn=document.getElementById("spin-center-btn"),resultBanner=document.getElementById("spin-result-banner");
+  if(centerBtn)centerBtn.disabled=true;if(resultBanner)resultBanner.classList.remove("show");
+  var winnerIdx=pickPrize(),winner=_spinPrizes[winnerIdx];
+  var extraSpins=(Math.PI*2)*(6+Math.floor(Math.random()*4)),winCenter=getPrizeAngleCenter(winnerIdx);
+  var targetAngle=-Math.PI/2-winCenter+extraSpins,startA=_spinCurrentAngle,delta=targetAngle-(startA%(Math.PI*2));
+  if(delta<Math.PI*8)delta+=Math.PI*2*Math.ceil((Math.PI*8-delta)/(Math.PI*2));
+  var endAngle=startA+delta,duration=5000+Math.random()*1500,startTime=null;
+  function easeOut(t){return 1-Math.pow(1-t,4);}
+  function animate(ts){if(!startTime)startTime=ts;var elapsed=ts-startTime,progress=Math.min(elapsed/duration,1),eased=easeOut(progress);_spinCurrentAngle=startA+delta*eased;drawWheel(_spinCurrentAngle);if(progress<1){requestAnimationFrame(animate);}else{_spinCurrentAngle=endAngle%(Math.PI*2);drawWheel(_spinCurrentAngle);_spinAnimating=false;onSpinEnd(winner);}}
   requestAnimationFrame(animate);
 };
-
-async function onSpinEnd(winner) {
-  setLastSpinTime(Date.now());
-  startCooldownTimer();
-  updateSpinUI();
-
-  var resultBanner = document.getElementById("spin-result-banner");
-  var resultIcon = document.getElementById("spin-result-icon");
-  var resultLabel = document.getElementById("spin-result-label");
-  var resultDesc = document.getElementById("spin-result-desc");
-
-  var bgColor, borderColor;
-  if (winner.type === "nothing") {
-    bgColor = "rgba(78,74,96,0.2)"; borderColor = "rgba(78,74,96,0.4)";
-  } else {
-    bgColor = winner.color + "18"; borderColor = winner.color + "40";
-  }
-  resultBanner.style.background = bgColor;
-  resultBanner.style.border = "1px solid " + borderColor;
-  resultBanner.style.borderRadius = "14px";
-
-  if (resultIcon) resultIcon.textContent = winner.icon;
-  if (resultLabel) resultLabel.style.color = winner.type === "nothing" ? "var(--text-muted)" : winner.color;
-
-  if (winner.type === "xp") {
-    if (resultLabel) resultLabel.textContent = "+" + winner.value + " XP !";
-    if (resultDesc) resultDesc.textContent = "Félicitations ! L'XP a été ajouté à ton profil.";
-    launchConfetti();
-    await grantSpinReward(winner);
-  } else if (winner.type === "coins") {
-    if (resultLabel) resultLabel.textContent = "+" + winner.value + " 🪙";
-    if (resultDesc) resultDesc.textContent = "Pièces ajoutées à ton portefeuille !";
-    launchConfetti();
-    await grantSpinReward(winner);
-  } else {
-    if (resultLabel) resultLabel.textContent = "Rien…";
-    if (resultDesc) resultDesc.textContent = "Pas de chance ! Reviens demain.";
-  }
-
-  if (resultBanner) resultBanner.classList.add("show");
-  showToast(winner.type === "nothing" ? "😶 Pas de chance aujourd'hui !" : winner.icon + " " + winner.label + " gagné !");
+async function onSpinEnd(winner){
+  setLastSpinTime(Date.now());startCooldownTimer();updateSpinUI();
+  var resultBanner=document.getElementById("spin-result-banner"),resultIcon=document.getElementById("spin-result-icon"),resultLabel=document.getElementById("spin-result-label"),resultDesc=document.getElementById("spin-result-desc");
+  var bgColor,borderColor;
+  if(winner.type==="nothing"){bgColor="rgba(78,74,96,0.2)";borderColor="rgba(78,74,96,0.4)";}else{bgColor=winner.color+"18";borderColor=winner.color+"40";}
+  resultBanner.style.background=bgColor;resultBanner.style.border="1px solid "+borderColor;resultBanner.style.borderRadius="14px";
+  if(resultIcon)resultIcon.textContent=winner.icon;if(resultLabel)resultLabel.style.color=winner.type==="nothing"?"var(--text-muted)":winner.color;
+  if(winner.type==="xp"){if(resultLabel)resultLabel.textContent="+"+winner.value+" XP !";if(resultDesc)resultDesc.textContent="Félicitations ! L'XP a été ajouté à ton profil.";launchConfetti();await grantSpinReward(winner);}
+  else if(winner.type==="coins"){if(resultLabel)resultLabel.textContent="+"+winner.value+" 🪙";if(resultDesc)resultDesc.textContent="Pièces ajoutées à ton portefeuille !";launchConfetti();await grantSpinReward(winner);}
+  else{if(resultLabel)resultLabel.textContent="Rien…";if(resultDesc)resultDesc.textContent="Pas de chance ! Reviens demain.";}
+  if(resultBanner)resultBanner.classList.add("show");
+  showToast(winner.type==="nothing"?"😶 Pas de chance aujourd'hui !":winner.icon+" "+winner.label+" gagné !");
 }
-
-window.grantSpinReward = async function(winner) {};
-
-function launchConfetti() {
-  var canvas = document.getElementById("confetti-canvas");
-  if (!canvas) return;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  var ctx = canvas.getContext("2d");
-  canvas.classList.add("active");
-  var particles = [];
-  var colors = ["#c9a84c","#e8c97a","#52c97a","#4a7fa5","#a855f7","#e05252","#f97316","#fff"];
-  for (var i = 0; i < 140; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height * 0.4 - canvas.height * 0.2,
-      vx: (Math.random() - 0.5) * 6,
-      vy: Math.random() * 4 + 2,
-      w: Math.random() * 10 + 4,
-      h: Math.random() * 6 + 3,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      rot: Math.random() * Math.PI * 2,
-      vrot: (Math.random() - 0.5) * 0.2,
-      alpha: 1,
-    });
-  }
-  var startT = null, totalDur = 3200;
-  function drawConf(ts) {
-    if (!startT) startT = ts;
-    var elapsed = ts - startT;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(function(p) {
-      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.rot += p.vrot;
-      p.alpha = Math.max(0, 1 - elapsed / totalDur);
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-      ctx.restore();
-    });
-    if (elapsed < totalDur) requestAnimationFrame(drawConf);
-    else { ctx.clearRect(0,0,canvas.width,canvas.height); canvas.classList.remove("active"); }
-  }
+window.grantSpinReward=async function(winner){};
+function launchConfetti(){
+  var canvas=document.getElementById("confetti-canvas");if(!canvas)return;
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  var ctx=canvas.getContext("2d");canvas.classList.add("active");
+  var particles=[],colors=["#c9a84c","#e8c97a","#52c97a","#4a7fa5","#a855f7","#e05252","#f97316","#fff"];
+  for(var i=0;i<140;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height*0.4-canvas.height*0.2,vx:(Math.random()-0.5)*6,vy:Math.random()*4+2,w:Math.random()*10+4,h:Math.random()*6+3,color:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*Math.PI*2,vrot:(Math.random()-0.5)*0.2,alpha:1});
+  var startT=null,totalDur=3200;
+  function drawConf(ts){if(!startT)startT=ts;var elapsed=ts-startT;ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.rot+=p.vrot;p.alpha=Math.max(0,1-elapsed/totalDur);ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});if(elapsed<totalDur)requestAnimationFrame(drawConf);else{ctx.clearRect(0,0,canvas.width,canvas.height);canvas.classList.remove("active");}}
   requestAnimationFrame(drawConf);
 }
-
-window.adminLoadSpinEditor = function() {
-  var ta = document.getElementById("spin-admin-prizes");
-  if (!ta) return;
-  ta.value = _spinPrizes.map(function(p) {
-    return p.label+"|"+p.type+"|"+p.value+"|"+p.color+"|"+p.weight+"|"+p.icon;
-  }).join("\n");
-};
-
-window.adminSaveSpinPrizes = async function() {
-  var fbEl = document.getElementById("admin-spin-feedback");
-  var raw = (document.getElementById("spin-admin-prizes")?.value || "").trim().split("\n").filter(Boolean);
-  var prizes = raw.map(function(line) {
-    var p = line.split("|");
-    return {
-      label: (p[0]||"Lot").trim(),
-      type:  (p[1]||"nothing").trim(),
-      value: parseInt(p[2]||"0",10)||0,
-      color: (p[3]||"#252538").trim(),
-      weight:parseInt(p[4]||"10",10)||10,
-      icon:  (p[5]||"🎁").trim(),
-    };
-  });
-  if (prizes.length < 2) { if(fbEl){fbEl.textContent="Minimum 2 lots requis.";fbEl.className="admin-feedback err";}return; }
+window.adminLoadSpinEditor=function(){var ta=document.getElementById("spin-admin-prizes");if(!ta)return;ta.value=_spinPrizes.map(function(p){return p.label+"|"+p.type+"|"+p.value+"|"+p.color+"|"+p.weight+"|"+p.icon;}).join("\n");};
+window.adminSaveSpinPrizes=async function(){
+  var fbEl=document.getElementById("admin-spin-feedback"),raw=(document.getElementById("spin-admin-prizes")?.value||"").trim().split("\n").filter(Boolean);
+  var prizes=raw.map(function(line){var p=line.split("|");return{label:(p[0]||"Lot").trim(),type:(p[1]||"nothing").trim(),value:parseInt(p[2]||"0",10)||0,color:(p[3]||"#252538").trim(),weight:parseInt(p[4]||"10",10)||10,icon:(p[5]||"🎁").trim()};});
+  if(prizes.length<2){if(fbEl){fbEl.textContent="Minimum 2 lots requis.";fbEl.className="admin-feedback err";}return;}
   fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
-  try {
-    await window._adminSaveSpinPrizesFirebase(prizes);
-    _spinPrizes = prizes;
-    drawWheel(_spinCurrentAngle);
-    buildPrizeLegend();
-    fbEl.textContent="✓ Lots de la roulette sauvegardés !";fbEl.className="admin-feedback ok";
-    showToast("Roulette mise à jour !");
-  } catch(err) {
-    fbEl.textContent="Erreur: "+err.message;fbEl.className="admin-feedback err";
-  }
+  try{await window._adminSaveSpinPrizesFirebase(prizes);_spinPrizes=prizes;drawWheel(_spinCurrentAngle);buildPrizeLegend();fbEl.textContent="✓ Lots sauvegardés !";fbEl.className="admin-feedback ok";showToast("Roulette mise à jour !");}
+  catch(err){fbEl.textContent="Erreur: "+err.message;fbEl.className="admin-feedback err";}
 };
-
-window.adminResetSpinDefault = function() {
-  _spinPrizes = DEFAULT_SPIN_PRIZES.slice();
-  adminLoadSpinEditor();
-  drawWheel(_spinCurrentAngle);
-  buildPrizeLegend();
-  showToast("Lots réinitialisés (non sauvegardé).");
-};
-
-window.addEventListener("DOMContentLoaded", function() {
-  updateSpinUI();
-  startCooldownTimer();
-  drawWheel(0);
-});
+window.adminResetSpinDefault=function(){_spinPrizes=DEFAULT_SPIN_PRIZES.slice();adminLoadSpinEditor();drawWheel(_spinCurrentAngle);buildPrizeLegend();showToast("Lots réinitialisés (non sauvegardé).");};
+window.addEventListener("DOMContentLoaded",function(){updateSpinUI();startCooldownTimer();drawWheel(0);});
 </script>
 
 <!-- ════ FIREBASE + DISCORD ════ -->
 <script type="module">
-import { initializeApp }                                          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithCustomToken, signOut, onAuthStateChanged }
-                                                                   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, orderBy, query, limit, addDoc, serverTimestamp, where }
-                                                                   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, orderBy, query, limit, addDoc, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const FIREBASE_CONFIG = {
-  apiKey:"AIzaSyCuJB4TvWad3_7hpKHpIYAlcjYKrNdt49U",
-  authDomain:"timor-ng-5f6f7.firebaseapp.com",
-  projectId:"timor-ng-5f6f7",
-  storageBucket:"timor-ng-5f6f7.firebasestorage.app",
-  messagingSenderId:"827878800488",
-  appId:"1:827878800488:web:bebd23cc03139bfd0ecfdd"
-};
-const DISCORD_CLIENT_ID    = "1508123459782443260";
-const DISCORD_REDIRECT_URI = "https://yanisss908.github.io/timor-ng/discord-callback.html";
-const DISCORD_SCOPES       = "identify guilds.members.read";
-const EXCHANGE_URL         = "https://timor-discord-auth.yanismanca66.workers.dev/";
-const ADMIN_IDS = new Set(["1407099669271810159"]);
-const MODO_IDS  = new Set([]);
+const FIREBASE_CONFIG={apiKey:"AIzaSyCuJB4TvWad3_7hpKHpIYAlcjYKrNdt49U",authDomain:"timor-ng-5f6f7.firebaseapp.com",projectId:"timor-ng-5f6f7",storageBucket:"timor-ng-5f6f7.firebasestorage.app",messagingSenderId:"827878800488",appId:"1:827878800488:web:bebd23cc03139bfd0ecfdd"};
+const DISCORD_CLIENT_ID="1508123459782443260";
+const DISCORD_REDIRECT_URI="https://yanisss908.github.io/timor-ng/discord-callback.html";
+const DISCORD_SCOPES="identify guilds.members.read";
+const EXCHANGE_URL="https://timor-discord-auth.yanismanca66.workers.dev/";
+const ADMIN_IDS=new Set(["1407099669271810159"]);
+const MODO_IDS=new Set([]);
 
-const app  = initializeApp(FIREBASE_CONFIG);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const app=initializeApp(FIREBASE_CONFIG);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-const DEFAULT_TUTOS     = [];
-const DEFAULT_DISCOVERY = {title:"🗺️ Commencer à jouer",desc:"Accomplis les étapes ci-dessous pour découvrir NationsGlory et Timor.",note:"L'XP est attribué automatiquement dès que tu confirmes une étape.",steps:[]};
-const DEFAULT_PAYS = {membres:"142",rang:"#3",fondation:"[Année]",herodesc:"Nation fondée sur la discipline, le commerce et la solidarité.",paydesc:"Timor est une nation bâtie sur trois piliers : la discipline, le commerce et la fraternité.",gouv:[{init:"PR",nom:"[Président]",role:"Président de Timor",badge:"Chef d'État"},{init:"VP",nom:"[Vice-Président]",role:"Vice-Président",badge:"Gouvernement"}]};
-const DEFAULT_SHOP = {items:[]};
+const DEFAULT_TUTOS=[];
+const DEFAULT_PAYS={membres:"142",rang:"#3",fondation:"[Année]",herodesc:"Nation fondée sur la discipline, le commerce et la solidarité.",paydesc:"Timor est une nation bâtie sur trois piliers : la discipline, le commerce et la fraternité.",gouv:[{init:"PR",nom:"[Président]",role:"Président de Timor",badge:"Chef d'État"},{init:"VP",nom:"[Vice-Président]",role:"Vice-Président",badge:"Gouvernement"}]};
+const DEFAULT_SHOP={items:[]};
+const DEFAULT_QUESTS={title:"⚔️ Quêtes",desc:"Accomplis des missions pour gagner de l'XP et des récompenses.",quests:[]};
+const DEFAULT_QUESTS_EXAMPLES=[
+  "Rejoindre le Discord|Rejoins le serveur Discord officiel de Timor|100|50|Débutant|💬",
+  "Se présenter|Présente-toi dans le canal #présentations|150|75|Débutant|📝",
+  "Premier achat|Achète un article dans la boutique|200|100|Intermédiaire|🛒",
+  "Atteindre le niveau 5|Monte jusqu'au rang Vétéran|500|250|Intermédiaire|⭐",
+  "Participer à une guerre|Rejoins une guerre du pays|750|400|Avancé|⚔️",
+  "Recruter un membre|Amène un nouveau joueur à rejoindre Timor|1000|500|Avancé|🤝",
+];
 
-let _tutos=null,_pays=null,_discovery=null,_shop=null,_quickLinks=null;
+let _tutos=null,_pays=null,_quests=null,_shop=null,_quickLinks=null;
 let _currentUserRole=null,_currentUserUID=null,_currentUserXP=0,_currentUserCoins=0,_currentUserPurchases=[];
 let _pendingPurchaseItem=null;
-let _allOrders=[], _ordersFilter='pending';
-
-// ── FIX 2 : Cache leaderboard (30s) ──
-let _lbCache=null, _lbTs=0;
-const LB_CACHE_TTL = 30_000;
+let _allOrders=[],_ordersFilter='pending';
+let _lbCache=null,_lbTs=0;
+const LB_CACHE_TTL=30_000;
 
 function getLevelFromXP(xp){for(let i=19;i>=0;i--){const XPS=[0,300,700,1300,2100,3200,4700,6600,9000,12000,16000,21000,27000,34500,43500,54000,66500,81000,98000,118000];if(xp>=XPS[i])return i+1;}return 1;}
 
-/* ════ SPIN — Firebase integration ════ */
-window._spinCurrentUID = null;
-
-window.grantSpinReward = async function(winner) {
-  const uid = _currentUserUID;
-  if (!uid) return;
-  if (winner.type === "nothing") return;
-  try {
-    const ref = doc(db,"users",uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const profile = snap.data();
-    const oldXP = profile.xp || 0;
-    const oldCoins = profile.coins || 0;
-    const updData = { lastSpinAt: new Date().toISOString() };
-    if (winner.type === "xp") {
-      const newXP = oldXP + winner.value;
-      updData.xp = newXP;
-      const oldLvl = getLevelFromXP(oldXP), newLvl = getLevelFromXP(newXP);
-      let coinsBonus = 0;
-      if (newLvl > oldLvl) {
-        for (let l=oldLvl+1;l<=newLvl;l++){const ld=window.LEVELS?window.LEVELS[l-1]:null;if(ld)coinsBonus+=ld.coins;}
-        updData.coins = oldCoins + coinsBonus;
-      }
-      await updateDoc(ref, updData);
-      _currentUserXP = newXP;
-      if (coinsBonus > 0) _currentUserCoins = oldCoins + coinsBonus;
-      renderProfileLevel(_currentUserXP, _currentUserCoins);
-      if (newLvl > oldLvl) checkLevelUp(oldXP, newXP);
-      const navXpEl = document.querySelector(".nav-xp"); if(navXpEl) navXpEl.textContent = _currentUserXP.toLocaleString("fr-FR")+" XP";
-      const navLvlEl = document.querySelector(".nav-level"); if(navLvlEl) navLvlEl.textContent = "Niv. "+getLevelFromXP(_currentUserXP);
-    } else if (winner.type === "coins") {
-      const newCoins = oldCoins + winner.value;
-      updData.coins = newCoins;
-      await updateDoc(ref, updData);
-      _currentUserCoins = newCoins;
-      renderProfileLevel(_currentUserXP, _currentUserCoins);
-      const navCoinsEl = document.querySelector(".nav-coins"); if(navCoinsEl) navCoinsEl.textContent = "🪙 "+newCoins.toLocaleString("fr-FR");
-      const shopNum = document.getElementById("shop-balance-num"); if(shopNum) shopNum.textContent = newCoins.toLocaleString("fr-FR");
-    }
-    window.setLastSpinTime(Date.now());
-    await loadLeaderboard(true); // force refresh after spin reward
-  } catch(err) {
-    console.error("Spin reward error:", err.message);
-  }
-};
-
-window._adminSaveSpinPrizesFirebase = async function(prizes) {
-  await setDoc(doc(db,"sitedata","spinprizes"), {prizes});
-};
-
-async function loadSpinPrizes() {
-  try {
-    const snap = await getDoc(doc(db,"sitedata","spinprizes"));
-    if (snap.exists() && snap.data().prizes && snap.data().prizes.length >= 2) {
-      window._spinPrizes = snap.data().prizes;
-    }
-  } catch(e) { /* use defaults */ }
-  window.drawWheel(window._spinCurrentAngle || 0);
-  window.buildPrizeLegend();
-}
-
-async function syncSpinCooldown(uid) {
-  try {
-    const snap = await getDoc(doc(db,"users",uid));
-    if (snap.exists() && snap.data().lastSpinAt) {
-      const fsTs = new Date(snap.data().lastSpinAt).getTime();
-      const localTs = window.getLastSpinTime ? window.getLastSpinTime() : 0;
-      if (fsTs > localTs) window.setLastSpinTime(fsTs);
-    }
-  } catch(e) {}
-  window.updateSpinUI();
-  window.startCooldownTimer();
-}
-
-/* ════ FIX 1 : loadSiteData hors onAuthStateChanged ════
-   Appelé une seule fois au chargement, avec cache sessionStorage. */
-const SITEDATA_CACHE_KEY = "timor_sitedata_v1";
-
-async function loadSiteData(){
-  // Tenter le cache sessionStorage d'abord
-  try {
-    const cached = sessionStorage.getItem(SITEDATA_CACHE_KEY);
-    if (cached) {
-      const d = JSON.parse(cached);
-      _tutos=d.tutos; _pays=d.pays; _discovery=d.discovery; _shop=d.shop; _quickLinks=d.quickLinks||[];
-      renderTutos();renderPays();renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
-      // Charger les prizes spin séparément (pas en cache pour permettre les mises à jour admin)
-      await loadSpinPrizes();
-      return;
-    }
-  } catch(e) {}
-
-  // Fetch Firestore
+/* ════ SPIN Firebase ════ */
+window._spinCurrentUID=null;
+window.grantSpinReward=async function(winner){
+  const uid=_currentUserUID;if(!uid||winner.type==="nothing")return;
   try{
-    const[tS,pS,dS,sS,qlS]=await Promise.all([getDoc(doc(db,"sitedata","tutos")),getDoc(doc(db,"sitedata","pays")),getDoc(doc(db,"sitedata","discovery")),getDoc(doc(db,"sitedata","shop")),getDoc(doc(db,"sitedata","quicklinks"))]);
+    const ref=doc(db,"users",uid),snap=await getDoc(ref);if(!snap.exists())return;
+    const profile=snap.data(),oldXP=profile.xp||0,oldCoins=profile.coins||0;
+    const updData={lastSpinAt:new Date().toISOString()};
+    if(winner.type==="xp"){
+      const newXP=oldXP+winner.value;updData.xp=newXP;
+      const oldLvl=getLevelFromXP(oldXP),newLvl=getLevelFromXP(newXP);
+      let coinsBonus=0;if(newLvl>oldLvl){for(let l=oldLvl+1;l<=newLvl;l++){const ld=window.LEVELS?window.LEVELS[l-1]:null;if(ld)coinsBonus+=ld.coins;}updData.coins=oldCoins+coinsBonus;}
+      await updateDoc(ref,updData);_currentUserXP=newXP;if(coinsBonus>0)_currentUserCoins=oldCoins+coinsBonus;
+      renderProfileLevel(_currentUserXP,_currentUserCoins);if(newLvl>oldLvl)checkLevelUp(oldXP,newXP);
+      const navXpEl=document.querySelector(".nav-xp");if(navXpEl)navXpEl.textContent=_currentUserXP.toLocaleString("fr-FR")+" XP";
+      const navLvlEl=document.querySelector(".nav-level");if(navLvlEl)navLvlEl.textContent="Niv. "+getLevelFromXP(_currentUserXP);
+    }else if(winner.type==="coins"){
+      const newCoins=oldCoins+winner.value;updData.coins=newCoins;await updateDoc(ref,updData);_currentUserCoins=newCoins;
+      renderProfileLevel(_currentUserXP,_currentUserCoins);
+      const navCoinsEl=document.querySelector(".nav-coins");if(navCoinsEl)navCoinsEl.textContent="🪙 "+newCoins.toLocaleString("fr-FR");
+      const shopNum=document.getElementById("shop-balance-num");if(shopNum)shopNum.textContent=newCoins.toLocaleString("fr-FR");
+    }
+    window.setLastSpinTime(Date.now());await loadLeaderboard(true);
+  }catch(err){console.error("Spin reward error:",err.message);}
+};
+window._adminSaveSpinPrizesFirebase=async function(prizes){await setDoc(doc(db,"sitedata","spinprizes"),{prizes});};
+async function loadSpinPrizes(){try{const snap=await getDoc(doc(db,"sitedata","spinprizes"));if(snap.exists()&&snap.data().prizes&&snap.data().prizes.length>=2)window._spinPrizes=snap.data().prizes;}catch(e){}window.drawWheel(window._spinCurrentAngle||0);window.buildPrizeLegend();}
+async function syncSpinCooldown(uid){try{const snap=await getDoc(doc(db,"users",uid));if(snap.exists()&&snap.data().lastSpinAt){const fsTs=new Date(snap.data().lastSpinAt).getTime(),localTs=window.getLastSpinTime?window.getLastSpinTime():0;if(fsTs>localTs)window.setLastSpinTime(fsTs);}}catch(e){}window.updateSpinUI();window.startCooldownTimer();}
+
+/* ════ Cache sitedata ════ */
+const SITEDATA_CACHE_KEY="timor_sitedata_v2";
+async function loadSiteData(){
+  try{const cached=sessionStorage.getItem(SITEDATA_CACHE_KEY);if(cached){const d=JSON.parse(cached);_tutos=d.tutos;_pays=d.pays;_quests=d.quests;_shop=d.shop;_quickLinks=d.quickLinks||[];renderTutos();renderPays();renderQuests();renderShop();renderQuickLinks(_quickLinks);await loadSpinPrizes();return;}}catch(e){}
+  try{
+    const[tS,pS,qS,sS,qlS]=await Promise.all([getDoc(doc(db,"sitedata","tutos")),getDoc(doc(db,"sitedata","pays")),getDoc(doc(db,"sitedata","quests")),getDoc(doc(db,"sitedata","shop")),getDoc(doc(db,"sitedata","quicklinks"))]);
     _tutos=tS.exists()?tS.data().list:DEFAULT_TUTOS;
     _pays=pS.exists()?pS.data():DEFAULT_PAYS;
-    _discovery=dS.exists()?dS.data():DEFAULT_DISCOVERY;
+    _quests=qS.exists()?qS.data():DEFAULT_QUESTS;
     _shop=sS.exists()?sS.data():DEFAULT_SHOP;
     _quickLinks=qlS.exists()?(qlS.data().links||[]):[];
-    // Mettre en cache sessionStorage
-    try {
-      sessionStorage.setItem(SITEDATA_CACHE_KEY, JSON.stringify({tutos:_tutos,pays:_pays,discovery:_discovery,shop:_shop,quickLinks:_quickLinks}));
-    } catch(e) {}
-  }catch(e){console.warn(e.message);_tutos=DEFAULT_TUTOS;_pays=DEFAULT_PAYS;_discovery=DEFAULT_DISCOVERY;_shop=DEFAULT_SHOP;_quickLinks=[];}
-  renderTutos();renderPays();renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
+    try{sessionStorage.setItem(SITEDATA_CACHE_KEY,JSON.stringify({tutos:_tutos,pays:_pays,quests:_quests,shop:_shop,quickLinks:_quickLinks}));}catch(e){}
+  }catch(e){console.warn(e.message);_tutos=DEFAULT_TUTOS;_pays=DEFAULT_PAYS;_quests=DEFAULT_QUESTS;_shop=DEFAULT_SHOP;_quickLinks=[];}
+  renderTutos();renderPays();renderQuests();renderShop();renderQuickLinks(_quickLinks);
   await loadSpinPrizes();
 }
+function invalidateSitedataCache(){try{sessionStorage.removeItem(SITEDATA_CACHE_KEY);}catch(e){}}
 
-// Invalider le cache sitedata après une sauvegarde admin
-function invalidateSitedataCache() {
-  try { sessionStorage.removeItem(SITEDATA_CACHE_KEY); } catch(e) {}
+/* ════ QUÊTES ════ */
+function getQuestStorageKey(){return"timor_quests_done_"+(_currentUserUID||"anon");}
+function loadQuestsDone(){try{return JSON.parse(localStorage.getItem(getQuestStorageKey())||"[]");}catch(e){return[];}}
+function saveQuestsDone(arr){try{localStorage.setItem(getQuestStorageKey(),JSON.stringify(arr));}catch(e){}}
+
+function renderQuests(){
+  if(!_quests)return;
+  const d=_quests;
+  setEl("quests-main-title",d.title||DEFAULT_QUESTS.title);
+  setEl("quests-subtitle",d.desc||DEFAULT_QUESTS.desc);
+  const authNotice=document.getElementById("quests-auth-notice");
+  if(authNotice)authNotice.classList.toggle("visible",!_currentUserUID);
+  const quests=d.quests||[];
+  const done=loadQuestsDone();
+  const doneCount=quests.filter(q=>done.includes(q.id)).length;
+  const pct=quests.length>0?Math.round((doneCount/quests.length)*100):0;
+  const fillEl=document.getElementById("quests-progress-fill");if(fillEl)fillEl.style.width=pct+"%";
+  const labelEl=document.getElementById("quests-progress-label");if(labelEl)labelEl.textContent=doneCount+" / "+quests.length+" quêtes accomplies";
+  // Teaser stats
+  const teaserStats=document.getElementById("quests-teaser-stats");
+  if(teaserStats)teaserStats.textContent=doneCount+" / "+quests.length+" accomplies · "+pct+"% complété";
+  // Categories
+  const cats=[...new Set(quests.map(q=>q.cat||"Générale"))];
+  const catsEl=document.getElementById("quests-categories");
+  if(catsEl){
+    catsEl.innerHTML='<button class="quest-cat-btn active" onclick="filterQuestsCat(\'Toutes\',this)">Toutes</button>'+
+      cats.map(c=>'<button class="quest-cat-btn" onclick="filterQuestsCat(\''+escHtml(c)+'\',this)">'+escHtml(c)+'</button>').join("");
+  }
+  renderQuestsList(quests,"Toutes",done);
 }
+
+function renderQuestsList(quests,cat,done){
+  const container=document.getElementById("quests-list");if(!container)return;
+  const filtered=cat==="Toutes"?quests:quests.filter(q=>(q.cat||"Générale")===cat);
+  if(filtered.length===0){container.innerHTML='<div class="quests-empty">Aucune quête dans cette catégorie.</div>';return;}
+  const catColors={"Débutant":"#52c97a","Intermédiaire":"#c9a84c","Avancé":"#e05252","Spéciale":"#a855f7","Générale":"#4a7fa5"};
+  container.innerHTML=filtered.map(q=>{
+    const isDone=done.includes(q.id);
+    const col=catColors[q.cat||"Générale"]||"#4a7fa5";
+    const rewardCoins=q.coins>0?'<span class="quest-reward-coins">🪙 +'+q.coins+'</span>':'';
+    const actionHtml=isDone
+      ?'<div class="quest-done-badge">✅ Accomplie</div>'
+      :'<button class="quest-claim-btn" onclick="claimQuest(\''+escHtml(q.id)+'\','+parseInt(q.xp||0)+','+parseInt(q.coins||0)+')">Réclamer +'+q.xp+' XP</button>';
+    return'<div class="quest-card'+(isDone?' done':'')+'">'+
+      '<div class="quest-card-icon" style="background:'+col+'22;color:'+col+'">'+escHtml(q.icon||'⚔️')+'</div>'+
+      '<div class="quest-card-body">'+
+        '<div class="quest-card-header">'+
+          '<span class="quest-card-title">'+escHtml(q.title)+'</span>'+
+          '<span class="quest-cat-badge" style="background:'+col+'22;color:'+col+'">'+escHtml(q.cat||'Générale')+'</span>'+
+        '</div>'+
+        '<div class="quest-card-desc">'+escHtml(q.desc)+'</div>'+
+        '<div class="quest-card-footer">'+
+          '<div class="quest-rewards"><span class="quest-reward-xp">⚡ +'+q.xp+' XP</span>'+rewardCoins+'</div>'+
+          actionHtml+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join("");
+}
+
+window.filterQuestsCat=function(cat,btn){
+  document.querySelectorAll(".quest-cat-btn").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  const quests=_quests?_quests.quests||[]:[];
+  const done=loadQuestsDone();
+  renderQuestsList(quests,cat,done);
+};
+
+window.claimQuest=async function(questId,xpAmount,coinsAmount){
+  const done=loadQuestsDone();if(done.includes(questId))return;
+  const btn=document.querySelector('[onclick*="\''+questId+'\'"]');
+  if(btn){btn.disabled=true;btn.textContent="Attribution…";}
+  if(_currentUserUID&&(xpAmount>0||coinsAmount>0)){
+    try{
+      const ref=doc(db,"users",_currentUserUID),snap=await getDoc(ref);
+      if(snap.exists()){
+        const profile=snap.data(),oldXP=profile.xp||0,newXP=oldXP+(xpAmount||0);
+        const oldLvl=getLevelFromXP(oldXP),newLvl=getLevelFromXP(newXP);
+        let bonusCoins=coinsAmount||0;
+        if(newLvl>oldLvl){for(let l=oldLvl+1;l<=newLvl;l++){const ld=window.LEVELS?window.LEVELS[l-1]:null;if(ld)bonusCoins+=ld.coins;}}
+        const updData={xp:newXP};
+        if(bonusCoins>0)updData.coins=Math.max(0,(profile.coins||0)+bonusCoins);
+        await updateDoc(ref,updData);
+        _currentUserXP=newXP;if(bonusCoins>0)_currentUserCoins=(profile.coins||0)+bonusCoins;
+        renderProfileLevel(_currentUserXP,_currentUserCoins);
+        if(newLvl>oldLvl)checkLevelUp(oldXP,newXP);
+        await loadLeaderboard(true);
+        const navXpEl=document.querySelector(".nav-xp");if(navXpEl)navXpEl.textContent=newXP.toLocaleString("fr-FR")+" XP";
+        const navLvlEl=document.querySelector(".nav-level");if(navLvlEl)navLvlEl.textContent="Niv. "+newLvl;
+        const navCoinsEl=document.querySelector(".nav-coins");if(navCoinsEl)navCoinsEl.textContent="🪙 "+_currentUserCoins.toLocaleString("fr-FR");
+        const shopNum=document.getElementById("shop-balance-num");if(shopNum)shopNum.textContent=_currentUserCoins.toLocaleString("fr-FR");
+        launchConfetti();
+        showToast("⚔️ Quête accomplie ! +"+xpAmount+" XP"+(coinsAmount>0?" · 🪙 +"+coinsAmount:""));
+      }
+    }catch(err){console.error(err);showToast("⚠ Erreur lors de l'attribution.");if(btn){btn.disabled=false;btn.textContent="Réclamer +"+xpAmount+" XP";}return;}
+  }else if(!_currentUserUID){showToast("⚠ Connecte-toi pour recevoir les récompenses !");}
+  else{showToast("⚔️ Quête marquée comme accomplie !");}
+  done.push(questId);saveQuestsDone(done);renderQuests();
+};
+
+window.openQuests=function(){document.getElementById("quests-page").classList.add("active");window.scrollTo(0,0);};
+window.closeQuests=function(){document.getElementById("quests-page").classList.remove("active");};
+
+/* ════ Admin : Quêtes ════ */
+window.adminLoadQuestsEditor=function(){
+  if(!_quests)return;
+  setInputVal("quest-page-title",_quests.title||"");
+  setInputVal("quest-page-desc",_quests.desc||"");
+  const ta=document.getElementById("quest-admin-list");
+  if(ta&&_quests.quests)ta.value=_quests.quests.map(q=>q.title+"|"+q.desc+"|"+(q.xp||0)+"|"+(q.coins||0)+"|"+(q.cat||"Débutant")+"|"+(q.icon||"⚔️")).join("\n");
+};
+window.adminSaveQuests=async function(){
+  const fbEl=document.getElementById("admin-quests-feedback");
+  const raw=(document.getElementById("quest-admin-list")?.value||"").trim().split("\n").filter(Boolean);
+  const quests=raw.map((line,i)=>{const p=line.split("|");return{id:"q_"+i+"_"+Date.now()%10000,title:(p[0]||"").trim(),desc:(p[1]||"").trim(),xp:parseInt(p[2]||"0",10)||0,coins:parseInt(p[3]||"0",10)||0,cat:(p[4]||"Débutant").trim(),icon:(p[5]||"⚔️").trim()};});
+  const newQuests={title:(document.getElementById("quest-page-title")?.value||"").trim()||_quests.title,desc:(document.getElementById("quest-page-desc")?.value||"").trim()||_quests.desc,quests};
+  fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
+  try{
+    await setDoc(doc(db,"sitedata","quests"),newQuests);
+    _quests=newQuests;invalidateSitedataCache();
+    fbEl.textContent="✓ Quêtes sauvegardées !";fbEl.className="admin-feedback ok";
+    renderQuests();showToast("Quêtes mises à jour !");
+  }catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
+};
+window.adminResetQuestsDefault=function(){
+  const ta=document.getElementById("quest-admin-list");if(ta)ta.value=DEFAULT_QUESTS_EXAMPLES.join("\n");
+  showToast("Exemples chargés (non sauvegardé).");
+};
 
 /* ════ Quick Links ════ */
 window.renderQuickLinks=function(links){
   const c=document.getElementById('ql-links-container');if(!c)return;
   if(!links||links.length===0){c.innerHTML='<div class="ql-empty">Aucun lien disponible.</div>';return;}
-  c.innerHTML=links.map(l=>{
-    const b=l.badge?'<span class="ql-item-badge">'+escHtml(l.badge)+'</span>':'';
-    if(l.external)return'<a class="ql-item" href="'+escHtml(l.url)+'" target="_blank" rel="noopener"><span class="ql-item-icon">'+escHtml(l.icon||'🔗')+'</span><span class="ql-item-label">'+escHtml(l.label)+'</span>'+b+'</a>';
-    return'<button class="ql-item" onclick="showSection(\''+escHtml(l.url)+'\');closeQuickLinks()"><span class="ql-item-icon">'+escHtml(l.icon||'🔗')+'</span><span class="ql-item-label">'+escHtml(l.label)+'</span>'+b+'</button>';
-  }).join('');
+  c.innerHTML=links.map(l=>{const b=l.badge?'<span class="ql-item-badge">'+escHtml(l.badge)+'</span>':'';if(l.external)return'<a class="ql-item" href="'+escHtml(l.url)+'" target="_blank" rel="noopener"><span class="ql-item-icon">'+escHtml(l.icon||'🔗')+'</span><span class="ql-item-label">'+escHtml(l.label)+'</span>'+b+'</a>';return'<button class="ql-item" onclick="showSection(\''+escHtml(l.url)+'\');closeQuickLinks()"><span class="ql-item-icon">'+escHtml(l.icon||'🔗')+'</span><span class="ql-item-label">'+escHtml(l.label)+'</span>'+b+'</button>';}).join('');
 };
-window.adminLoadLinksEditor=function(){
-  const ta=document.getElementById("ql-admin-links");if(!ta||!_quickLinks)return;
-  ta.value=_quickLinks.map(l=>(l.icon||'🔗')+'|'+(l.label||'')+'|'+(l.url||'')+'|'+(l.badge||'')+'|'+(l.external?'oui':'non')).join('\n');
-};
+window.adminLoadLinksEditor=function(){const ta=document.getElementById("ql-admin-links");if(!ta||!_quickLinks)return;ta.value=_quickLinks.map(l=>(l.icon||'🔗')+'|'+(l.label||'')+'|'+(l.url||'')+'|'+(l.badge||'')+'|'+(l.external?'oui':'non')).join('\n');};
 window.adminSaveQuickLinks=async function(){
-  const fbEl=document.getElementById("admin-links-feedback");
-  const raw=(document.getElementById("ql-admin-links")?.value||"").trim().split("\n").filter(Boolean);
+  const fbEl=document.getElementById("admin-links-feedback"),raw=(document.getElementById("ql-admin-links")?.value||"").trim().split("\n").filter(Boolean);
   const links=raw.map(line=>{const p=line.split("|");return{icon:(p[0]||"🔗").trim(),label:(p[1]||"Lien").trim(),url:(p[2]||"").trim(),badge:(p[3]||"").trim(),external:(p[4]||"").trim().toLowerCase()==="oui"};}).filter(l=>l.url);
   fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
-  try{
-    await setDoc(doc(db,"sitedata","quicklinks"),{links});
-    _quickLinks=links;
-    invalidateSitedataCache();
-    fbEl.textContent="✓ Liens sauvegardés !";fbEl.className="admin-feedback ok";
-    window.renderQuickLinks(_quickLinks);showToast("Liens rapides mis à jour !");
-  }catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore insuffisantes.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
+  try{await setDoc(doc(db,"sitedata","quicklinks"),{links});_quickLinks=links;invalidateSitedataCache();fbEl.textContent="✓ Liens sauvegardés !";fbEl.className="admin-feedback ok";window.renderQuickLinks(_quickLinks);showToast("Liens rapides mis à jour !");}
+  catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore insuffisantes.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
 };
 window.adminPreviewQuickLinks=function(){
   const raw=(document.getElementById("ql-admin-links")?.value||"").trim().split("\n").filter(Boolean);
@@ -1107,23 +856,15 @@ window.adminPreviewQuickLinks=function(){
 /* ════ Tutoriels ════ */
 function linkIcon(){return'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';}
 function renderTutos(){
-  if(!_tutos)return;
-  const grid=document.getElementById("tuto-grid");if(!grid)return;
+  if(!_tutos)return;const grid=document.getElementById("tuto-grid");if(!grid)return;
   const empty=document.getElementById("tuto-empty");
-  if(_tutos.length===0){if(empty)empty.style.display="";return;}
-  if(empty)empty.style.display="none";
+  if(_tutos.length===0){if(empty)empty.style.display="";return;}if(empty)empty.style.display="none";
   Array.from(grid.children).forEach(c=>{if(c.id!=="tuto-empty")c.remove();});
   _tutos.forEach(t=>{
     const bannerHtml=t.image?'<img class="tuto-banner" src="'+escHtml(t.image)+'" alt="" onerror="this.style.display=\'none\'">':'';
     const tutoLinkHtml=t.link?'<a class="tuto-link" href="'+escHtml(t.link)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+linkIcon()+escHtml(t.linkLabel||'Voir le lien')+'</a>':'';
-    let stepsHtml=(t.steps||[]).map((s,i)=>{
-      const imgHtml=s.img?'<img class="step-img" src="'+escHtml(s.img)+'" alt="">':'';
-      const lnkHtml=s.link?'<a class="step-link" href="'+escHtml(s.link)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+linkIcon()+escHtml(s.linkLabel||'Voir')+'</a>':'';
-      return'<div class="tuto-step"><div class="step-n">'+(i+1)+'</div><div class="step-body"><div class="step-text"><strong>'+escHtml(s.title)+'</strong>'+escHtml(s.desc)+'</div>'+imgHtml+lnkHtml+'</div></div>';
-    }).join("");
-    const card=document.createElement("div");
-    card.className="tuto-card";
-    card.onclick=function(){toggleTuto(card);};
+    let stepsHtml=(t.steps||[]).map((s,i)=>{const imgHtml=s.img?'<img class="step-img" src="'+escHtml(s.img)+'" alt="">':'';const lnkHtml=s.link?'<a class="step-link" href="'+escHtml(s.link)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+linkIcon()+escHtml(s.linkLabel||'Voir')+'</a>':'';return'<div class="tuto-step"><div class="step-n">'+(i+1)+'</div><div class="step-body"><div class="step-text"><strong>'+escHtml(s.title)+'</strong>'+escHtml(s.desc)+'</div>'+imgHtml+lnkHtml+'</div></div>';}).join("");
+    const card=document.createElement("div");card.className="tuto-card";card.onclick=function(){toggleTuto(card);};
     card.innerHTML=bannerHtml+'<div class="tuto-icon">'+(t.icon||'📖')+'</div><div class="tuto-title">'+escHtml(t.title)+'</div><div class="tuto-desc">'+escHtml(t.desc)+'</div>'+tutoLinkHtml+'<div class="tuto-toggle">Voir le guide ▾</div><div class="tuto-steps">'+stepsHtml+'</div>';
     grid.appendChild(card);
   });
@@ -1131,37 +872,22 @@ function renderTutos(){
 
 /* ════ Pays ════ */
 function renderPays(){
-  if(!_pays)return;
-  const p=_pays;
-  setEl("pays-fondation",p.fondation||"[Année]");setEl("pays-membres",p.membres||"142");
-  setEl("pays-rang",p.rang||"#3");setEl("stat-membres",p.membres||"142");setEl("stat-rang",p.rang||"#3");
-  setEl("pays-desc",p.paydesc||"");setEl("hero-desc",p.herodesc||"");
-  const govGrid=document.getElementById("gov-grid");
-  if(govGrid&&p.gouv)govGrid.innerHTML=p.gouv.map(m=>'<div class="gov-member"><div class="gov-avatar">'+escHtml(m.init)+'</div><div><div class="gov-name">'+escHtml(m.nom)+'</div><div class="gov-role">'+escHtml(m.role)+'</div></div><span class="gov-badge">'+escHtml(m.badge)+'</span></div>').join("");
+  if(!_pays)return;const p=_pays;
+  setEl("pays-fondation",p.fondation||"[Année]");setEl("pays-membres",p.membres||"142");setEl("pays-rang",p.rang||"#3");setEl("stat-membres",p.membres||"142");setEl("stat-rang",p.rang||"#3");setEl("pays-desc",p.paydesc||"");setEl("hero-desc",p.herodesc||"");
+  const govGrid=document.getElementById("gov-grid");if(govGrid&&p.gouv)govGrid.innerHTML=p.gouv.map(m=>'<div class="gov-member"><div class="gov-avatar">'+escHtml(m.init)+'</div><div><div class="gov-name">'+escHtml(m.nom)+'</div><div class="gov-role">'+escHtml(m.role)+'</div></div><span class="gov-badge">'+escHtml(m.badge)+'</span></div>').join("");
 }
 
-/* ════ BOUTIQUE ════ */
+/* ════ Boutique ════ */
 function renderShop(){
-  if(!_shop)return;
-  const items=_shop.items||[];
-  const grid=document.getElementById("shop-grid"),catsEl=document.getElementById("shop-cats");if(!grid)return;
+  if(!_shop)return;const items=_shop.items||[];const grid=document.getElementById("shop-grid"),catsEl=document.getElementById("shop-cats");if(!grid)return;
   const cats=["Tous",...new Set(items.map(i=>i.cat||"Général"))];
   if(catsEl)catsEl.innerHTML=cats.map((c,idx)=>'<button class="shop-cat-btn'+(idx===0?' active':'')+'" onclick="filterShop(\''+escHtml(c)+'\', this)">'+escHtml(c)+'</button>').join("");
-  renderShopGrid(items,"Tous");
-  updateShopInventoryDisplay();
+  renderShopGrid(items,"Tous");updateShopInventoryDisplay();
   const balanceEl=document.getElementById("shop-balance-display"),shopBanner=document.getElementById("shop-auth-banner");
-  if(balanceEl&&shopBanner){
-    if(_currentUserUID){balanceEl.style.display="";shopBanner.style.display="none";document.getElementById("shop-balance-num").textContent=_currentUserCoins.toLocaleString("fr-FR");}
-    else{balanceEl.style.display="none";shopBanner.style.display="";}
-  }
+  if(balanceEl&&shopBanner){if(_currentUserUID){balanceEl.style.display="";shopBanner.style.display="none";document.getElementById("shop-balance-num").textContent=_currentUserCoins.toLocaleString("fr-FR");}else{balanceEl.style.display="none";shopBanner.style.display="";}}
 }
 window._currentShopFilter="Tous";
-window.filterShop=function(cat,btn){
-  window._currentShopFilter=cat;
-  document.querySelectorAll(".shop-cat-btn").forEach(b=>b.classList.remove("active"));
-  if(btn)btn.classList.add("active");
-  renderShopGrid(_shop?_shop.items||[]:[], cat);
-};
+window.filterShop=function(cat,btn){window._currentShopFilter=cat;document.querySelectorAll(".shop-cat-btn").forEach(b=>b.classList.remove("active"));if(btn)btn.classList.add("active");renderShopGrid(_shop?_shop.items||[]:[],cat);};
 function renderShopGrid(items,cat){
   const grid=document.getElementById("shop-grid");if(!grid)return;
   const filtered=cat==="Tous"?items:items.filter(i=>(i.cat||"Général")===cat);
@@ -1170,7 +896,7 @@ function renderShopGrid(items,cat){
   filtered.forEach(item=>{
     const isOwned=_currentUserUID&&_currentUserPurchases.some(p=>p.itemId===item.id&&item.unique);
     const isSoldOut=item.stock!==undefined&&item.stock!==-1&&item.stock<=0;
-    const price=item.price||0, affordable=_currentUserCoins>=price;
+    const price=item.price||0,affordable=_currentUserCoins>=price;
     let cardClass="shop-card";if(isOwned)cardClass+=" owned";if(isSoldOut)cardClass+=" sold-out";
     const imgHtml=item.image?'<img class="shop-card-img" src="'+escHtml(item.image)+'" alt="" onerror="this.parentNode.innerHTML=\'<div class=shop-card-img-placeholder>'+escHtml(item.icon||'🛒')+'</div>\'">'
       :'<div class="shop-card-img-placeholder">'+(item.icon||'🛒')+'</div>';
@@ -1188,23 +914,13 @@ function renderShopGrid(items,cat){
 function updateShopInventoryDisplay(){
   const section=document.getElementById("shop-inventory-section"),grid=document.getElementById("shop-inventory-grid");if(!section||!grid)return;
   if(!_currentUserUID||_currentUserPurchases.length===0){section.style.display="none";return;}
-  section.style.display="";
-  grid.innerHTML=_currentUserPurchases.map(p=>'<div class="shop-inv-item"><span>'+(p.itemIcon||'🛒')+'</span>'+escHtml(p.itemName||p.itemId)+'</div>').join("");
+  section.style.display="";grid.innerHTML=_currentUserPurchases.map(p=>'<div class="shop-inv-item"><span>'+(p.itemIcon||'🛒')+'</span>'+escHtml(p.itemName||p.itemId)+'</div>').join("");
 }
 
 /* ════ Purchase modal ════ */
 window.openPurchaseModal=function(itemId){
-  if(!_shop||!_currentUserUID)return;
-  const item=(_shop.items||[]).find(i=>i.id===itemId);if(!item)return;
-  _pendingPurchaseItem=item;
-  document.getElementById("pm-icon").textContent=item.icon||'🛒';
-  document.getElementById("pm-title").textContent=item.name||'Article';
-  document.getElementById("pm-desc").textContent=item.desc||'';
-  document.getElementById("pm-price").textContent=item.price===0?'🆓 Gratuit':'🪙 '+(item.price||0).toLocaleString('fr-FR')+' pièces';
-  document.getElementById("pm-balance").textContent='Ton solde : 🪙 '+_currentUserCoins.toLocaleString('fr-FR')+' pièces';
-  document.getElementById("pm-error").textContent='';
-  document.getElementById("pm-confirm-btn").disabled=_currentUserCoins<(item.price||0);
-  document.getElementById("purchase-overlay").classList.add("show");
+  if(!_shop||!_currentUserUID)return;const item=(_shop.items||[]).find(i=>i.id===itemId);if(!item)return;
+  _pendingPurchaseItem=item;document.getElementById("pm-icon").textContent=item.icon||'🛒';document.getElementById("pm-title").textContent=item.name||'Article';document.getElementById("pm-desc").textContent=item.desc||'';document.getElementById("pm-price").textContent=item.price===0?'🆓 Gratuit':'🪙 '+(item.price||0).toLocaleString('fr-FR')+' pièces';document.getElementById("pm-balance").textContent='Ton solde : 🪙 '+_currentUserCoins.toLocaleString('fr-FR')+' pièces';document.getElementById("pm-error").textContent='';document.getElementById("pm-confirm-btn").disabled=_currentUserCoins<(item.price||0);document.getElementById("purchase-overlay").classList.add("show");
 };
 window.closePurchaseModal=function(){document.getElementById("purchase-overlay").classList.remove("show");_pendingPurchaseItem=null;};
 window.confirmPurchase=async function(){
@@ -1212,280 +928,77 @@ window.confirmPurchase=async function(){
   const confirmBtn=document.getElementById("pm-confirm-btn"),errorEl=document.getElementById("pm-error");
   confirmBtn.disabled=true;confirmBtn.textContent="Traitement…";errorEl.textContent="";
   try{
-    const ref=doc(db,"users",_currentUserUID),snap=await getDoc(ref);
-    if(!snap.exists())throw new Error("Profil introuvable.");
+    const ref=doc(db,"users",_currentUserUID),snap=await getDoc(ref);if(!snap.exists())throw new Error("Profil introuvable.");
     const profile=snap.data(),currentCoins=profile.coins||0,price=item.price||0;
     if(currentCoins<price){errorEl.textContent="Pièces insuffisantes.";confirmBtn.disabled=false;confirmBtn.textContent="Acheter";return;}
     if(item.unique){const already=_currentUserPurchases.some(p=>p.itemId===item.id);if(already){errorEl.textContent="Tu possèdes déjà cet article.";confirmBtn.disabled=false;confirmBtn.textContent="Acheter";return;}}
     if(item.stock!==undefined&&item.stock!==-1&&item.stock<=0){errorEl.textContent="Article épuisé.";confirmBtn.disabled=false;confirmBtn.textContent="Acheter";return;}
-    const newCoins=currentCoins-price;
-    await updateDoc(ref,{coins:newCoins});
-    _currentUserCoins=newCoins;
-    const purchaseData={
-      uid:_currentUserUID,
-      username:profile.globalName||profile.username||"Inconnu",
-      itemId:item.id,itemName:item.name||"Article",itemIcon:item.icon||"🛒",itemCat:item.cat||"Général",
-      price:price,
-      instructions:item.instructions||"",
-      status:"pending",
-      purchasedAt:new Date().toISOString(),
-    };
-    await addDoc(collection(db,"purchases"),purchaseData);
-    _currentUserPurchases.push(purchaseData);
-    if(item.stock!==undefined&&item.stock!==-1){
-      const shopSnap=await getDoc(doc(db,"sitedata","shop"));
-      if(shopSnap.exists()){const sd=shopSnap.data();const upd=(sd.items||[]).map(i=>i.id===item.id?{...i,stock:Math.max(0,(i.stock||0)-1)}:i);await setDoc(doc(db,"sitedata","shop"),{items:upd});_shop={items:upd};invalidateSitedataCache();}
-    }
-    renderShop();renderProfileLevel(_currentUserXP,_currentUserCoins);
-    const navC=document.querySelector(".nav-coins");if(navC)navC.textContent="🪙 "+newCoins.toLocaleString("fr-FR");
-    await loadLeaderboard(true);
-    closePurchaseModal();
-    showToast("✅ "+escHtml(item.name)+" commandé ! Un admin va traiter ta commande.");
+    const newCoins=currentCoins-price;await updateDoc(ref,{coins:newCoins});_currentUserCoins=newCoins;
+    const purchaseData={uid:_currentUserUID,username:profile.globalName||profile.username||"Inconnu",itemId:item.id,itemName:item.name||"Article",itemIcon:item.icon||"🛒",itemCat:item.cat||"Général",price,instructions:item.instructions||"",status:"pending",purchasedAt:new Date().toISOString()};
+    await addDoc(collection(db,"purchases"),purchaseData);_currentUserPurchases.push(purchaseData);
+    if(item.stock!==undefined&&item.stock!==-1){const shopSnap=await getDoc(doc(db,"sitedata","shop"));if(shopSnap.exists()){const sd=shopSnap.data();const upd=(sd.items||[]).map(i=>i.id===item.id?{...i,stock:Math.max(0,(i.stock||0)-1)}:i);await setDoc(doc(db,"sitedata","shop"),{items:upd});_shop={items:upd};invalidateSitedataCache();}}
+    renderShop();renderProfileLevel(_currentUserXP,_currentUserCoins);const navC=document.querySelector(".nav-coins");if(navC)navC.textContent="🪙 "+newCoins.toLocaleString("fr-FR");await loadLeaderboard(true);closePurchaseModal();showToast("✅ "+escHtml(item.name)+" commandé !");
   }catch(err){console.error(err);errorEl.textContent="Erreur : "+err.message;confirmBtn.disabled=false;confirmBtn.textContent="Acheter";}
 };
+async function loadUserPurchases(uid){try{const q=query(collection(db,"purchases"),where("uid","==",uid));const snap=await getDocs(q);_currentUserPurchases=[];snap.forEach(ds=>{_currentUserPurchases.push({...ds.data(),docId:ds.id});});}catch(e){_currentUserPurchases=[];}}
 
-/* ════ FIX 3 : loadUserPurchases avec filtre where uid ════ */
-async function loadUserPurchases(uid){
-  try{
-    const q=query(collection(db,"purchases"),where("uid","==",uid));
-    const snap=await getDocs(q);
-    _currentUserPurchases=[];
-    snap.forEach(ds=>{_currentUserPurchases.push({...ds.data(),docId:ds.id});});
-  }catch(e){_currentUserPurchases=[];}
-}
-
-/* ════ ADMIN : ORDERS ════ */
+/* ════ ADMIN ORDERS ════ */
 window.adminLoadOrders=async function(){
-  const listEl=document.getElementById("orders-list");
-  if(!listEl)return;
-  listEl.innerHTML='<div class="orders-empty">Chargement…</div>';
-  try{
-    const snap=await getDocs(collection(db,"purchases"));
-    _allOrders=[];
-    snap.forEach(ds=>{_allOrders.push({...ds.data(),docId:ds.id});});
-    _allOrders.sort((a,b)=>b.purchasedAt>a.purchasedAt?1:-1);
-    _updateOrdersBadge();
-    renderOrdersList(_ordersFilter);
-  }catch(err){listEl.innerHTML='<div class="orders-empty" style="color:var(--danger);">Erreur : '+escHtml(err.message)+'</div>';}
+  const listEl=document.getElementById("orders-list");if(!listEl)return;listEl.innerHTML='<div class="orders-empty">Chargement…</div>';
+  try{const snap=await getDocs(collection(db,"purchases"));_allOrders=[];snap.forEach(ds=>{_allOrders.push({...ds.data(),docId:ds.id});});_allOrders.sort((a,b)=>b.purchasedAt>a.purchasedAt?1:-1);_updateOrdersBadge();renderOrdersList(_ordersFilter);}
+  catch(err){listEl.innerHTML='<div class="orders-empty" style="color:var(--danger);">Erreur : '+escHtml(err.message)+'</div>';}
 };
-
-/* Mise à jour badge pending sans re-fetch */
 function _updateOrdersBadge(){
-  const pending=_allOrders.filter(o=>(o.status||"pending")==="pending");
-  const countEl=document.getElementById("orders-pending-count");
-  const tabBtn=document.getElementById("tab-orders-btn");
-  if(countEl){countEl.textContent=pending.length;countEl.style.display=pending.length>0?"":"none";}
-  if(tabBtn)tabBtn.classList.toggle("has-notif",pending.length>0);
-  const notifyBanner=document.getElementById("orders-notify-banner");
-  const notifyText=document.getElementById("orders-notify-text");
-  if(notifyBanner&&notifyText){
-    if(pending.length>0){notifyBanner.style.display="";notifyText.textContent=pending.length+" commande"+(pending.length>1?"s":"")+" en attente de traitement.";}
-    else{notifyBanner.style.display="none";}
-  }
+  const pending=_allOrders.filter(o=>(o.status||"pending")==="pending");const countEl=document.getElementById("orders-pending-count"),tabBtn=document.getElementById("tab-orders-btn");
+  if(countEl){countEl.textContent=pending.length;countEl.style.display=pending.length>0?"":"none";}if(tabBtn)tabBtn.classList.toggle("has-notif",pending.length>0);
+  const notifyBanner=document.getElementById("orders-notify-banner"),notifyText=document.getElementById("orders-notify-text");
+  if(notifyBanner&&notifyText){if(pending.length>0){notifyBanner.style.display="";notifyText.textContent=pending.length+" commande"+(pending.length>1?"s":"")+" en attente.";}else{notifyBanner.style.display="none";}}
 }
-
 function renderOrdersList(filter){
-  _ordersFilter=filter;
-  const listEl=document.getElementById("orders-list");if(!listEl)return;
-  let filtered=_allOrders;
-  if(filter!=="all")filtered=_allOrders.filter(o=>(o.status||"pending")===filter);
+  _ordersFilter=filter;const listEl=document.getElementById("orders-list");if(!listEl)return;
+  let filtered=_allOrders;if(filter!=="all")filtered=_allOrders.filter(o=>(o.status||"pending")===filter);
   if(filtered.length===0){listEl.innerHTML='<div class="orders-empty">Aucune commande dans cette catégorie.</div>';return;}
   listEl.innerHTML=filtered.map(o=>{
-    const status=o.status||"pending";
-    const date=o.purchasedAt?new Date(o.purchasedAt).toLocaleString("fr-FR"):"—";
+    const status=o.status||"pending",date=o.purchasedAt?new Date(o.purchasedAt).toLocaleString("fr-FR"):"—";
     let statusLabel="",statusClass="";
-    if(status==="pending"){statusLabel="⏳ En attente";statusClass="status-pending";}
-    else if(status==="fulfilled"){statusLabel="✅ Traité";statusClass="status-fulfilled";}
-    else{statusLabel="✕ Annulé";statusClass="status-cancelled";}
+    if(status==="pending"){statusLabel="⏳ En attente";statusClass="status-pending";}else if(status==="fulfilled"){statusLabel="✅ Traité";statusClass="status-fulfilled";}else{statusLabel="✕ Annulé";statusClass="status-cancelled";}
     const instructionsHtml=o.instructions?'<div class="order-instructions"><strong>📋 Instructions</strong>'+escHtml(o.instructions)+'</div>':'';
-    const actionsHtml=status==="pending"?
-      '<div class="order-actions"><button class="btn-fulfill" onclick="adminFulfillOrder(\''+o.docId+'\')">✅ Valider</button><button class="btn-cancel-order" onclick="adminCancelOrder(\''+o.docId+'\')">✕</button></div>':
-      '<div class="order-actions" style="font-size:0.72rem;color:var(--text-dim);">'+statusLabel+'</div>';
-    return'<div class="order-card '+status+'" id="order-'+o.docId+'">'+
-      '<div class="order-card-header">'+
-        '<span class="order-icon">'+(o.itemIcon||'🛒')+'</span>'+
-        '<span class="order-item-name">'+escHtml(o.itemName||o.itemId)+'</span>'+
-        '<span class="order-price">🪙 '+((o.price||0).toLocaleString('fr-FR'))+'</span>'+
-        '<span class="order-status-badge '+statusClass+'">'+statusLabel+'</span>'+
-      '</div>'+
-      '<div class="order-card-body">'+
-        '<div class="order-info">'+
-          '<div class="order-buyer">Acheteur : <span>'+escHtml(o.username||"?")+'</span></div>'+
-          '<div class="order-date">'+date+'</div>'+
-        '</div>'+
-        instructionsHtml+
-        actionsHtml+
-      '</div></div>';
+    const actionsHtml=status==="pending"?'<div class="order-actions"><button class="btn-fulfill" onclick="adminFulfillOrder(\''+o.docId+'\')">✅ Valider</button><button class="btn-cancel-order" onclick="adminCancelOrder(\''+o.docId+'\')">✕</button></div>':'<div class="order-actions" style="font-size:0.72rem;color:var(--text-dim);">'+statusLabel+'</div>';
+    return'<div class="order-card '+status+'" id="order-'+o.docId+'"><div class="order-card-header"><span class="order-icon">'+(o.itemIcon||'🛒')+'</span><span class="order-item-name">'+escHtml(o.itemName||o.itemId)+'</span><span class="order-price">🪙 '+((o.price||0).toLocaleString('fr-FR'))+'</span><span class="order-status-badge '+statusClass+'">'+statusLabel+'</span></div><div class="order-card-body"><div class="order-info"><div class="order-buyer">Acheteur : <span>'+escHtml(o.username||"?")+'</span></div><div class="order-date">'+date+'</div></div>'+instructionsHtml+actionsHtml+'</div></div>';
   }).join("");
 }
-
-window.filterOrders=function(filter,btn){
-  document.querySelectorAll(".orders-filter-tab").forEach(b=>b.classList.remove("active"));
-  if(btn)btn.classList.add("active");
-  renderOrdersList(filter);
-};
-
-/* ════ FIX 4 : fulfill/cancel — mise à jour locale, pas de re-fetch ════ */
+window.filterOrders=function(filter,btn){document.querySelectorAll(".orders-filter-tab").forEach(b=>b.classList.remove("active"));if(btn)btn.classList.add("active");renderOrdersList(filter);};
 window.adminFulfillOrder=async function(docId){
-  const btn=document.querySelector('#order-'+docId+' .btn-fulfill');
-  if(btn){btn.disabled=true;btn.textContent="Validation…";}
-  try{
-    await updateDoc(doc(db,"purchases",docId),{status:"fulfilled",fulfilledAt:new Date().toISOString(),fulfilledBy:_currentUserUID});
-    const idx=_allOrders.findIndex(o=>o.docId===docId);
-    if(idx>=0)_allOrders[idx].status="fulfilled";
-    _updateOrdersBadge();      // mise à jour badge en mémoire
-    renderOrdersList(_ordersFilter); // re-render local uniquement
-    showToast("✅ Commande validée !");
-    document.getElementById("admin-orders-feedback").textContent="✓ Commande marquée comme traitée.";
-    document.getElementById("admin-orders-feedback").className="admin-feedback ok";
-  }catch(err){
-    if(btn){btn.disabled=false;btn.textContent="✅ Valider";}
-    document.getElementById("admin-orders-feedback").textContent="Erreur : "+err.message;
-    document.getElementById("admin-orders-feedback").className="admin-feedback err";
-  }
+  const btn=document.querySelector('#order-'+docId+' .btn-fulfill');if(btn){btn.disabled=true;btn.textContent="Validation…";}
+  try{await updateDoc(doc(db,"purchases",docId),{status:"fulfilled",fulfilledAt:new Date().toISOString(),fulfilledBy:_currentUserUID});const idx=_allOrders.findIndex(o=>o.docId===docId);if(idx>=0)_allOrders[idx].status="fulfilled";_updateOrdersBadge();renderOrdersList(_ordersFilter);showToast("✅ Commande validée !");document.getElementById("admin-orders-feedback").textContent="✓ Traitée.";document.getElementById("admin-orders-feedback").className="admin-feedback ok";}
+  catch(err){if(btn){btn.disabled=false;btn.textContent="✅ Valider";}document.getElementById("admin-orders-feedback").textContent="Erreur : "+err.message;document.getElementById("admin-orders-feedback").className="admin-feedback err";}
 };
-
 window.adminCancelOrder=async function(docId){
   if(!confirm("Annuler cette commande ?"))return;
-  try{
-    await updateDoc(doc(db,"purchases",docId),{status:"cancelled",cancelledAt:new Date().toISOString(),cancelledBy:_currentUserUID});
-    const idx=_allOrders.findIndex(o=>o.docId===docId);
-    if(idx>=0)_allOrders[idx].status="cancelled";
-    _updateOrdersBadge();      // mise à jour badge en mémoire
-    renderOrdersList(_ordersFilter); // re-render local uniquement
-    showToast("Commande annulée.");
-  }catch(err){showToast("Erreur : "+err.message);}
+  try{await updateDoc(doc(db,"purchases",docId),{status:"cancelled",cancelledAt:new Date().toISOString(),cancelledBy:_currentUserUID});const idx=_allOrders.findIndex(o=>o.docId===docId);if(idx>=0)_allOrders[idx].status="cancelled";_updateOrdersBadge();renderOrdersList(_ordersFilter);showToast("Commande annulée.");}
+  catch(err){showToast("Erreur : "+err.message);}
 };
-
-/* ════ Discovery ════ */
-function getDiscStorageKey(){return"timor_disc_links_"+(_currentUserUID||"anon");}
-function loadDiscLinkClicks(){try{return JSON.parse(localStorage.getItem(getDiscStorageKey())||"{}");}catch(e){return{};}}
-function saveDiscLinkClicks(obj){try{localStorage.setItem(getDiscStorageKey(),JSON.stringify(obj));}catch(e){}}
-function renderDiscovery(){
-  if(!_discovery)return;
-  const d=_discovery;
-  setEl("disc-subtitle",d.desc||DEFAULT_DISCOVERY.desc);
-  setEl("disc-main-title",d.title||DEFAULT_DISCOVERY.title);
-  const noteEl=document.getElementById("disc-note");
-  if(noteEl)noteEl.innerHTML=escHtml(d.note||DEFAULT_DISCOVERY.note).replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--gold);font-style:normal;">$1</strong>');
-  const authNotice=document.getElementById("disc-auth-notice");
-  if(authNotice)authNotice.classList.toggle("visible",!_currentUserUID);
-  const container=document.getElementById("disc-steps");if(!container)return;
-  if(!d.steps||d.steps.length===0){container.innerHTML='<div class="discovery-empty">Aucune étape configurée.</div>';document.getElementById("disc-progress-fill").style.width="0%";return;}
-  const clicks=loadDiscLinkClicks();container.innerHTML="";
-  d.steps.forEach((s,i)=>{
-    const isClicked=!!clicks[i],isDone=clicks[i]==="done";
-    const firstIncomplete=d.steps.findIndex((_,idx)=>clicks[idx]!=="done");
-    const isCurrent=i===firstIncomplete,isLocked=i>firstIncomplete;
-    let stateClass="discovery-step";
-    if(isDone)stateClass+=" done";else if(isCurrent)stateClass+=" current";else if(isLocked)stateClass+=" locked";
-    const xpAmount=s.xp||0;
-    const doneBadgeText=xpAmount>0?"✅ Accompli — +"+xpAmount+" XP reçus !":"✅ Accompli !";
-    let actionHtml="";
-    if(!isDone){
-      let btnContent=s.url?'<a class="disc-link-btn'+(isClicked&&!isDone?' clicked':'')+'" href="'+escHtml(s.url)+'" target="_blank" rel="noopener" id="disc-link-'+i+'" onclick="onDiscLinkClick('+i+')">'+linkIcon()+' '+escHtml(s.urlLabel||'Ouvrir le lien')+'</a>'
-        :'<button class="disc-link-btn'+(isClicked?' clicked':'')+'" id="disc-link-'+i+'" onclick="onDiscLinkClick('+i+')">✓ Marquer comme cliqué</button>';
-      let confirmVisible=isClicked?" visible":"";
-      let confirmLabel=xpAmount>0?"✅ J'ai accompli cette étape (+ "+xpAmount+" XP)":"✅ J'ai accompli cette étape";
-      actionHtml='<div class="discovery-step-action">'+btnContent+'<div class="disc-confirm-row"><button class="disc-confirm-btn'+confirmVisible+'" id="disc-confirm-'+i+'" onclick="onDiscStepConfirm('+i+', '+xpAmount+')">'+confirmLabel+'</button></div></div>';
-    }
-    container.innerHTML+='<div class="'+stateClass+'" id="dstep-'+i+'">'+(isLocked?'<div class="discovery-step-lock">🔒 Étape précédente requise</div>':'')+
-      '<div class="discovery-step-num">'+(isDone?'✓':(i+1))+'</div>'+
-      '<div class="discovery-step-body"><div class="discovery-step-title">'+escHtml(s.title)+'</div><div class="discovery-step-desc">'+escHtml(s.desc)+'</div>'+
-      '<div class="discovery-step-xp">🏆 +'+xpAmount+' XP</div>'+actionHtml+
-      '<div class="discovery-step-done-badge">'+doneBadgeText+'</div></div></div>';
-  });
-  const done=d.steps.filter((_,i)=>clicks[i]==="done").length;
-  document.getElementById("disc-progress-fill").style.width=(d.steps.length>0?Math.round((done/d.steps.length)*100):0)+"%";
-}
-window.onDiscLinkClick=function(stepIdx){const clicks=loadDiscLinkClicks();if(clicks[stepIdx]==="done")return;clicks[stepIdx]="clicked";saveDiscLinkClicks(clicks);const c=document.getElementById("disc-confirm-"+stepIdx);if(c)c.classList.add("visible");const l=document.getElementById("disc-link-"+stepIdx);if(l)l.classList.add("clicked");};
-window.onDiscStepConfirm=async function(stepIdx,xpAmount){
-  const clicks=loadDiscLinkClicks();if(clicks[stepIdx]==="done")return;
-  const confirmBtn=document.getElementById("disc-confirm-"+stepIdx);
-  if(confirmBtn){confirmBtn.classList.add("loading");confirmBtn.textContent="Attribution de l'XP…";}
-  if(_currentUserUID&&xpAmount>0){
-    try{
-      const ref=doc(db,"users",_currentUserUID),snap=await getDoc(ref);
-      if(snap.exists()){
-        const profile=snap.data(),oldXP=profile.xp||0,newXP=oldXP+xpAmount;
-        const oldLvl=getLevelFromXP(oldXP),newLvl=getLevelFromXP(newXP);
-        let coinsBonus=0;
-        if(newLvl>oldLvl){for(let l=oldLvl+1;l<=newLvl;l++){const ld=window.LEVELS?window.LEVELS[l-1]:null;if(ld)coinsBonus+=ld.coins;}}
-        const updData={xp:newXP};if(coinsBonus>0)updData.coins=Math.max(0,(profile.coins||0)+coinsBonus);
-        await updateDoc(ref,updData);
-        _currentUserXP=newXP;if(coinsBonus>0)_currentUserCoins=(profile.coins||0)+coinsBonus;
-        renderProfileLevel(_currentUserXP,_currentUserCoins);
-        if(newLvl>oldLvl)checkLevelUp(oldXP,newXP);
-        await loadLeaderboard(true);
-        const navXpEl=document.querySelector(".nav-xp");if(navXpEl)navXpEl.textContent=newXP.toLocaleString("fr-FR")+" XP";
-        const navLvlEl=document.querySelector(".nav-level");if(navLvlEl)navLvlEl.textContent="Niv. "+newLvl;
-        const navCoinsEl=document.querySelector(".nav-coins");if(navCoinsEl)navCoinsEl.textContent="🪙 "+_currentUserCoins.toLocaleString("fr-FR");
-        showToast("🏆 +"+xpAmount+" XP reçus !"+(coinsBonus>0?" 🪙 +"+coinsBonus+" pièces !":""));
-      }
-    }catch(err){console.error(err);showToast("⚠ XP non enregistré.");if(confirmBtn){confirmBtn.classList.remove("loading");confirmBtn.textContent="✅ J'ai accompli cette étape";}return;}
-  }else if(!_currentUserUID){showToast("⚠ Connecte-toi avec Discord pour recevoir l'XP !");}
-  else{showToast("✅ Étape accomplie !");}
-  clicks[stepIdx]="done";saveDiscLinkClicks(clicks);renderDiscovery();
-};
-window.openDiscovery=function(){document.getElementById("discovery-page").classList.add("active");window.scrollTo(0,0);};
-window.closeDiscovery=function(){document.getElementById("discovery-page").classList.remove("active");};
 
 /* ════ Discord OAuth ════ */
-function loginWithDiscord(){
-  const state=crypto.randomUUID();sessionStorage.setItem("discord_oauth_state",state);
-  const url=new URL("https://discord.com/oauth2/authorize");
-  url.searchParams.set("client_id",DISCORD_CLIENT_ID);url.searchParams.set("redirect_uri",DISCORD_REDIRECT_URI);
-  url.searchParams.set("response_type","code");url.searchParams.set("scope",DISCORD_SCOPES);url.searchParams.set("state",state);
-  window.location.href=url.toString();
-}
-async function handleDiscordCallback(code,returnedState){
-  const savedState=sessionStorage.getItem("discord_oauth_state");
-  if(savedState&&returnedState&&returnedState!==savedState){showToast("Erreur de sécurité OAuth.");return null;}
-  sessionStorage.removeItem("discord_oauth_state");
-  try{
-    const res=await fetch(EXCHANGE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,redirect_uri:DISCORD_REDIRECT_URI})});
-    if(!res.ok)throw new Error("Token exchange failed: "+res.status);
-    const{access_token,firebase_token}=await res.json();
-    const userCred=await signInWithCustomToken(auth,firebase_token);
-    const discordUser=await fetchDiscordUser(access_token);
-    await upsertUserProfile(userCred.user.uid,discordUser,access_token);
-    showToast("Bienvenue, "+(discordUser.global_name||discordUser.username)+" !");
-    return userCred.user;
-  }catch(err){console.error(err);showToast("Erreur Discord.");return null;}
-}
+function loginWithDiscord(){const state=crypto.randomUUID();sessionStorage.setItem("discord_oauth_state",state);const url=new URL("https://discord.com/oauth2/authorize");url.searchParams.set("client_id",DISCORD_CLIENT_ID);url.searchParams.set("redirect_uri",DISCORD_REDIRECT_URI);url.searchParams.set("response_type","code");url.searchParams.set("scope",DISCORD_SCOPES);url.searchParams.set("state",state);window.location.href=url.toString();}
+async function handleDiscordCallback(code,returnedState){const savedState=sessionStorage.getItem("discord_oauth_state");if(savedState&&returnedState&&returnedState!==savedState){showToast("Erreur de sécurité OAuth.");return null;}sessionStorage.removeItem("discord_oauth_state");try{const res=await fetch(EXCHANGE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,redirect_uri:DISCORD_REDIRECT_URI})});if(!res.ok)throw new Error("Token exchange failed: "+res.status);const{access_token,firebase_token}=await res.json();const userCred=await signInWithCustomToken(auth,firebase_token);const discordUser=await fetchDiscordUser(access_token);await upsertUserProfile(userCred.user.uid,discordUser,access_token);showToast("Bienvenue, "+(discordUser.global_name||discordUser.username)+" !");return userCred.user;}catch(err){console.error(err);showToast("Erreur Discord.");return null;}}
 async function fetchDiscordUser(t){const r=await fetch("https://discord.com/api/users/@me",{headers:{Authorization:"Bearer "+t}});if(!r.ok)throw new Error("Discord API: "+r.status);return r.json();}
-async function upsertUserProfile(uid,d,token){
-  const ref=doc(db,"users",uid),snap=await getDoc(ref);
-  const avatar=d.avatar?"https://cdn.discordapp.com/avatars/"+d.id+"/"+d.avatar+".png?size=128":"https://cdn.discordapp.com/embed/avatars/"+(Number(d.discriminator||0)%5)+".png";
-  const base={discordId:d.id,username:d.username,discriminator:d.discriminator||"0",globalName:d.global_name||d.username,avatar,discordToken:token,updatedAt:new Date().toISOString()};
-  if(!snap.exists()){await setDoc(ref,{...base,xp:0,coins:0,role:ADMIN_IDS.has(d.id)?"admin":MODO_IDS.has(d.id)?"modo":"citoyen",joinedAt:new Date().toISOString()});}
-  else{const upd={...base};if(ADMIN_IDS.has(d.id))upd.role="admin";else if(MODO_IDS.has(d.id)&&snap.data().role!=="admin")upd.role="modo";await updateDoc(ref,upd);}
-}
+async function upsertUserProfile(uid,d,token){const ref=doc(db,"users",uid),snap=await getDoc(ref);const avatar=d.avatar?"https://cdn.discordapp.com/avatars/"+d.id+"/"+d.avatar+".png?size=128":"https://cdn.discordapp.com/embed/avatars/"+(Number(d.discriminator||0)%5)+".png";const base={discordId:d.id,username:d.username,discriminator:d.discriminator||"0",globalName:d.global_name||d.username,avatar,discordToken:token,updatedAt:new Date().toISOString()};if(!snap.exists()){await setDoc(ref,{...base,xp:0,coins:0,role:ADMIN_IDS.has(d.id)?"admin":MODO_IDS.has(d.id)?"modo":"citoyen",joinedAt:new Date().toISOString()});}else{const upd={...base};if(ADMIN_IDS.has(d.id))upd.role="admin";else if(MODO_IDS.has(d.id)&&snap.data().role!=="admin")upd.role="modo";await updateDoc(ref,upd);}}
 async function logout(){await signOut(auth);document.body.classList.remove("is-admin","is-modo");showToast("Déconnecté.");}
 
-/* ════ FIX 1 (suite) : onAuthStateChanged — loadSiteData appelé une seule fois avant ════ */
-// On lance loadSiteData immédiatement, indépendamment de l'auth
 loadSiteData();
 
 onAuthStateChanged(auth,async function(user){
   if(user){
-    const snap=await getDoc(doc(db,"users",user.uid));
-    const profile=snap.exists()?snap.data():null;
-    _currentUserRole=profile?.role||"citoyen";_currentUserUID=user.uid;
-    _currentUserXP=profile?.xp??0;_currentUserCoins=profile?.coins??0;
-    window._spinCurrentUID = user.uid;
-    await loadUserPurchases(user.uid);
-    await syncSpinCooldown(user.uid);
-    renderConnectedState(user,profile);
-    renderProfileLevel(_currentUserXP,_currentUserCoins);
-    renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
-    await loadLeaderboard();
+    const snap=await getDoc(doc(db,"users",user.uid));const profile=snap.exists()?snap.data():null;
+    _currentUserRole=profile?.role||"citoyen";_currentUserUID=user.uid;_currentUserXP=profile?.xp??0;_currentUserCoins=profile?.coins??0;
+    window._spinCurrentUID=user.uid;
+    await loadUserPurchases(user.uid);await syncSpinCooldown(user.uid);
+    renderConnectedState(user,profile);renderProfileLevel(_currentUserXP,_currentUserCoins);
+    renderQuests();renderShop();renderQuickLinks(_quickLinks);await loadLeaderboard();
   }else{
-    _currentUserRole=null;_currentUserUID=null;_currentUserPurchases=[];
-    window._spinCurrentUID = null;
-    renderDisconnectedState();renderDiscovery();renderShop();renderQuickLinks(_quickLinks);
-    window.updateSpinUI();
-    await loadLeaderboard();
+    _currentUserRole=null;_currentUserUID=null;_currentUserPurchases=[];window._spinCurrentUID=null;
+    renderDisconnectedState();renderQuests();renderShop();renderQuickLinks(_quickLinks);window.updateSpinUI();await loadLeaderboard();
   }
 });
 
@@ -1495,182 +1008,82 @@ function renderConnectedState(user,profile){
   const xp=profile?.xp??0,coins=profile?.coins??0,role=profile?.role||"citoyen",lvl=getLevelFromXP(xp);
   document.body.classList.toggle("is-admin",role==="admin");document.body.classList.toggle("is-modo",role==="modo");
   const adminPanel=document.getElementById("admin-panel");
-  if(adminPanel){
-    adminPanel.classList.toggle("visible",role==="admin"||role==="modo");
-    if(role==="admin"||role==="modo"){
-      adminRefreshPlayers();adminLoadTutoEditor();adminLoadPaysEditor();
-      adminLoadDiscoveryEditor();adminLoadShopEditor();adminLoadOrders();adminLoadLinksEditor();
-      window.adminLoadSpinEditor();
-    }
-  }
-  let badge="";
-  if(role==="admin")badge='<span class="nav-role-badge role-admin">Admin</span>';
-  else if(role==="modo")badge='<span class="nav-role-badge role-modo">Modo</span>';
+  if(adminPanel){adminPanel.classList.toggle("visible",role==="admin"||role==="modo");if(role==="admin"||role==="modo"){adminRefreshPlayers();adminLoadTutoEditor();adminLoadPaysEditor();adminLoadQuestsEditor();adminLoadShopEditor();adminLoadOrders();adminLoadLinksEditor();window.adminLoadSpinEditor();}}
+  let badge="";if(role==="admin")badge='<span class="nav-role-badge role-admin">Admin</span>';else if(role==="modo")badge='<span class="nav-role-badge role-modo">Modo</span>';
   const navAuth=document.getElementById("nav-auth");
-  if(navAuth){
-    navAuth.innerHTML='<div class="nav-user">'+(profile?.avatar?'<img src="'+profile.avatar+'" class="nav-avatar" alt="" onerror="this.style.display=\'none\'">':"")+
-      '<span class="nav-username">'+name+'</span>'+badge+
-      '<span class="nav-pill nav-level">Niv. '+lvl+'</span>'+
-      '<span class="nav-pill nav-xp">'+xp.toLocaleString("fr-FR")+' XP</span>'+
-      '<span class="nav-pill nav-coins">🪙 '+coins.toLocaleString("fr-FR")+'</span>'+
-      '<button class="btn-nav-logout" id="btn-logout" title="Déconnexion">✕</button></div>';
-    document.getElementById("btn-logout").addEventListener("click",logout);
-  }
+  if(navAuth){navAuth.innerHTML='<div class="nav-user">'+(profile?.avatar?'<img src="'+profile.avatar+'" class="nav-avatar" alt="" onerror="this.style.display=\'none\'">':"")+
+    '<span class="nav-username">'+name+'</span>'+badge+'<span class="nav-pill nav-level">Niv. '+lvl+'</span><span class="nav-pill nav-xp">'+xp.toLocaleString("fr-FR")+' XP</span><span class="nav-pill nav-coins">🪙 '+coins.toLocaleString("fr-FR")+'</span><button class="btn-nav-logout" id="btn-logout" title="Déconnexion">✕</button></div>';
+    document.getElementById("btn-logout").addEventListener("click",logout);}
   const dw=document.getElementById("dash-welcome");if(dw)dw.textContent="Bienvenue, "+(profile?.globalName||profile?.username||"Citoyen")+" !";
 }
 function renderDisconnectedState(){
-  document.getElementById("auth-banner").style.display="";
-  document.body.classList.remove("is-admin","is-modo");
+  document.getElementById("auth-banner").style.display="";document.body.classList.remove("is-admin","is-modo");
   const adminPanel=document.getElementById("admin-panel");if(adminPanel)adminPanel.classList.remove("visible");
   const profileCard=document.getElementById("profile-level-card");if(profileCard)profileCard.style.display="none";
   const dw=document.getElementById("dash-welcome");if(dw)dw.textContent="Tableau de bord";
   const navAuth=document.getElementById("nav-auth");
-  if(navAuth){
-    navAuth.innerHTML='<button class="btn-discord" id="btn-login"><svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.42,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>Connexion Discord</button>';
-    document.getElementById("btn-login").addEventListener("click",loginWithDiscord);
-  }
+  if(navAuth){navAuth.innerHTML='<button class="btn-discord" id="btn-login"><svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.42,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>Connexion Discord</button>';
+    document.getElementById("btn-login").addEventListener("click",loginWithDiscord);}
 }
 
-/* ════ FIX 2 : Leaderboard avec cache 30s ════ */
 async function loadLeaderboard(force=false){
   const lbEl=document.getElementById("leaderboard-dynamic");if(!lbEl)return;
-  // Utiliser le cache si non expiré et pas de force refresh
-  if(!force && _lbCache && (Date.now()-_lbTs)<LB_CACHE_TTL){
-    _renderLeaderboard(_lbCache);
-    return;
-  }
-  try{
-    const q=query(collection(db,"users"),orderBy("xp","desc"),limit(10));
-    const snap=await getDocs(q);
-    const rows=[];
-    snap.forEach(ds=>{rows.push({id:ds.id,...ds.data()});});
-    _lbCache=rows;_lbTs=Date.now();
-    _renderLeaderboard(rows);
-  }catch(err){console.warn("LB error:",err.message);}
+  if(!force&&_lbCache&&(Date.now()-_lbTs)<LB_CACHE_TTL){_renderLeaderboard(_lbCache);return;}
+  try{const q=query(collection(db,"users"),orderBy("xp","desc"),limit(10));const snap=await getDocs(q);const rows=[];snap.forEach(ds=>{rows.push({id:ds.id,...ds.data()});});_lbCache=rows;_lbTs=Date.now();_renderLeaderboard(rows);}
+  catch(err){console.warn("LB error:",err.message);}
 }
-
 function _renderLeaderboard(rows){
   const lbEl=document.getElementById("leaderboard-dynamic");if(!lbEl)return;
   if(!rows||rows.length===0){lbEl.innerHTML='<div style="padding:2rem;text-align:center;color:var(--text-dim);">Aucun joueur classé.</div>';return;}
   const medals=["🥇","🥈","🥉"],topCls=["top1","top2","top3"],rkCls=["rank-1","rank-2","rank-3"];
   lbEl.innerHTML="";let i=0;
-  rows.forEach(p=>{
-    const name=escHtml(p.globalName||p.username||"Inconnu");
-    const xp=p.xp??0,coins=p.coins??0,lvl=getLevelFromXP(xp),init=name.slice(0,2).toUpperCase();
-    const avt=p.avatar?'<div class="lb-avatar"><img src="'+p.avatar+'" alt="" onerror="this.parentNode.textContent=\''+init+'\'"></div>':'<div class="lb-avatar">'+init+'</div>';
-    lbEl.innerHTML+='<div class="lb-row '+(i<3?topCls[i]:'')+'">'+'<div class="lb-rank '+(i<3?rkCls[i]:'rank-other')+'">'+(i<3?medals[i]:i+1)+'</div>'+avt+
-      '<div class="lb-info"><div class="lb-name">'+name+'</div><div class="lb-detail">Niveau '+lvl+' · 🪙 '+coins.toLocaleString('fr-FR')+'</div></div>'+
-      '<div style="text-align:right;"><div class="lb-xp">'+xp.toLocaleString('fr-FR')+' XP</div><div class="lb-level-badge">Niv. '+lvl+'</div></div></div>';
-    i++;
-  });
+  rows.forEach(p=>{const name=escHtml(p.globalName||p.username||"Inconnu"),xp=p.xp??0,coins=p.coins??0,lvl=getLevelFromXP(xp),init=name.slice(0,2).toUpperCase();const avt=p.avatar?'<div class="lb-avatar"><img src="'+p.avatar+'" alt="" onerror="this.parentNode.textContent=\''+init+'\'"></div>':'<div class="lb-avatar">'+init+'</div>';lbEl.innerHTML+='<div class="lb-row '+(i<3?topCls[i]:'')+'">'+'<div class="lb-rank '+(i<3?rkCls[i]:'rank-other')+'">'+(i<3?medals[i]:i+1)+'</div>'+avt+'<div class="lb-info"><div class="lb-name">'+name+'</div><div class="lb-detail">Niveau '+lvl+' · 🪙 '+coins.toLocaleString('fr-FR')+'</div></div><div style="text-align:right;"><div class="lb-xp">'+xp.toLocaleString('fr-FR')+' XP</div><div class="lb-level-badge">Niv. '+lvl+'</div></div></div>';i++;});
 }
 
-/* ════ Admin : joueurs ════ */
+/* ════ Admin Joueurs ════ */
 let _adminPlayersCache={};
 window.adminRefreshPlayers=async function(){
-  const sel=document.getElementById("admin-target-player");if(!sel)return;
-  setAdminFeedback("Chargement…","");
-  try{
-    const snap=await getDocs(collection(db,"users"));_adminPlayersCache={};
-    sel.innerHTML='<option value="">— Sélectionne un joueur ('+snap.size+') —</option>';
-    snap.forEach(ds=>{const p=ds.data();_adminPlayersCache[ds.id]=p;const opt=document.createElement("option");opt.value=ds.id;opt.textContent=(p.globalName||p.username||"Inconnu")+" — "+(p.xp||0)+" XP — ["+(p.role||"citoyen")+"]";sel.appendChild(opt);});
-    setAdminFeedback(snap.size+" joueur(s).","ok");
-  }catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
+  const sel=document.getElementById("admin-target-player");if(!sel)return;setAdminFeedback("Chargement…","");
+  try{const snap=await getDocs(collection(db,"users"));_adminPlayersCache={};sel.innerHTML='<option value="">— Sélectionne un joueur ('+snap.size+') —</option>';snap.forEach(ds=>{const p=ds.data();_adminPlayersCache[ds.id]=p;const opt=document.createElement("option");opt.value=ds.id;opt.textContent=(p.globalName||p.username||"Inconnu")+" — "+(p.xp||0)+" XP — ["+(p.role||"citoyen")+"]";sel.appendChild(opt);});setAdminFeedback(snap.size+" joueur(s).","ok");}
+  catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
 };
 window.onAdminPlayerChange=function(){
-  const sel=document.getElementById("admin-target-player"),uid=sel?.value;
-  const roleSection=document.getElementById("admin-role-section");
+  const sel=document.getElementById("admin-target-player"),uid=sel?.value;const roleSection=document.getElementById("admin-role-section");
   if(!uid||!_adminPlayersCache[uid]){if(roleSection)roleSection.style.display="none";return;}
   const p=_adminPlayersCache[uid];if(roleSection)roleSection.style.display="";
-  const roleDisplay=document.getElementById("admin-player-role-display");
-  if(roleDisplay){const r=p.role||"citoyen";let cls=r==="admin"?"role-admin":r==="modo"?"role-modo":"";roleDisplay.className="role-badge-display nav-role-badge "+cls;roleDisplay.textContent=r.charAt(0).toUpperCase()+r.slice(1);}
-  const grantBtn=document.getElementById("btn-grant-modo"),revokeBtn=document.getElementById("btn-revoke-modo");
-  if(grantBtn&&revokeBtn){const r=p.role||"citoyen";grantBtn.style.display=(r==="admin"||r==="modo")?"none":"";revokeBtn.style.display=(r==="modo"?"":"none");}
+  const roleDisplay=document.getElementById("admin-player-role-display");if(roleDisplay){const r=p.role||"citoyen";let cls=r==="admin"?"role-admin":r==="modo"?"role-modo":"";roleDisplay.className="role-badge-display nav-role-badge "+cls;roleDisplay.textContent=r.charAt(0).toUpperCase()+r.slice(1);}
+  const grantBtn=document.getElementById("btn-grant-modo"),revokeBtn=document.getElementById("btn-revoke-modo");if(grantBtn&&revokeBtn){const r=p.role||"citoyen";grantBtn.style.display=(r==="admin"||r==="modo")?"none":"";revokeBtn.style.display=(r==="modo"?"":"none");}
 };
-window.adminGrantModo=async function(){
-  const uid=document.getElementById("admin-target-player")?.value;if(!uid){setAdminFeedback("Sélectionne un joueur.","err");return;}
-  const p=_adminPlayersCache[uid];if(!p)return;if(p.role==="admin"){setAdminFeedback("Impossible.","err");return;}
-  try{await updateDoc(doc(db,"users",uid),{role:"modo"});setAdminFeedback("✓ Modo attribué.","ok");showToast("✓ Rôle modo attribué !");await adminRefreshPlayers();}
-  catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
-};
-window.adminRevokeModo=async function(){
-  const uid=document.getElementById("admin-target-player")?.value;if(!uid){setAdminFeedback("Sélectionne un joueur.","err");return;}
-  const p=_adminPlayersCache[uid];if(!p)return;if(p.role==="admin"){setAdminFeedback("Impossible.","err");return;}
-  try{await updateDoc(doc(db,"users",uid),{role:"citoyen"});setAdminFeedback("✓ Rôle retiré.","ok");showToast("✓ Rôle modo retiré.");await adminRefreshPlayers();}
-  catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
-};
+window.adminGrantModo=async function(){const uid=document.getElementById("admin-target-player")?.value;if(!uid){setAdminFeedback("Sélectionne un joueur.","err");return;}const p=_adminPlayersCache[uid];if(!p)return;if(p.role==="admin"){setAdminFeedback("Impossible.","err");return;}try{await updateDoc(doc(db,"users",uid),{role:"modo"});setAdminFeedback("✓ Modo attribué.","ok");showToast("✓ Rôle modo attribué !");await adminRefreshPlayers();}catch(err){setAdminFeedback("Erreur: "+err.message,"err");}};
+window.adminRevokeModo=async function(){const uid=document.getElementById("admin-target-player")?.value;if(!uid){setAdminFeedback("Sélectionne un joueur.","err");return;}const p=_adminPlayersCache[uid];if(!p)return;if(p.role==="admin"){setAdminFeedback("Impossible.","err");return;}try{await updateDoc(doc(db,"users",uid),{role:"citoyen"});setAdminFeedback("✓ Rôle retiré.","ok");showToast("✓ Rôle modo retiré.");await adminRefreshPlayers();}catch(err){setAdminFeedback("Erreur: "+err.message,"err");}};
 window.adminModifyXP=async function(sign){
   const targetUid=document.getElementById("admin-target-player")?.value;if(!targetUid){setAdminFeedback("Sélectionne un joueur.","err");return;}
   const rawAmount=parseInt(document.getElementById("admin-xp-amount")?.value,10);if(isNaN(rawAmount)||rawAmount<=0){setAdminFeedback("Montant invalide.","err");return;}
   const delta=sign*rawAmount;setAdminFeedback("Modification…","");
-  try{
-    const ref=doc(db,"users",targetUid),snap=await getDoc(ref);if(!snap.exists()){setAdminFeedback("Joueur introuvable.","err");return;}
-    const profile=snap.data(),oldXP=profile.xp||0,newXP=Math.max(0,oldXP+delta);
-    const oldLvl=getLevelFromXP(oldXP),newLvl=getLevelFromXP(newXP);
-    let coinsBonus=0;if(newLvl>oldLvl){for(let l=oldLvl+1;l<=newLvl;l++){const ld=window.LEVELS?window.LEVELS[l-1]:null;if(ld)coinsBonus+=ld.coins;}}
-    const updData={xp:newXP};if(coinsBonus>0)updData.coins=Math.max(0,(profile.coins||0)+coinsBonus);
-    await updateDoc(ref,updData);
-    const pn=profile.globalName||profile.username||"Joueur";const label=delta>=0?"+"+delta:String(delta);
-    setAdminFeedback("✓ "+pn+" : "+label+" XP → "+newXP+(coinsBonus>0?" | Niv. "+newLvl+" 🪙 +"+coinsBonus:""),"ok");
-    showToast("✓ "+pn+" — "+label+" XP");
-    if(targetUid===_currentUserUID){_currentUserXP=newXP;if(coinsBonus>0)_currentUserCoins=(profile.coins||0)+coinsBonus;renderProfileLevel(_currentUserXP,_currentUserCoins);}
-    await adminRefreshPlayers();await loadLeaderboard(true);
-  }catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
+  try{const ref=doc(db,"users",targetUid),snap=await getDoc(ref);if(!snap.exists()){setAdminFeedback("Joueur introuvable.","err");return;}const profile=snap.data(),oldXP=profile.xp||0,newXP=Math.max(0,oldXP+delta);const oldLvl=getLevelFromXP(oldXP),newLvl=getLevelFromXP(newXP);let coinsBonus=0;if(newLvl>oldLvl){for(let l=oldLvl+1;l<=newLvl;l++){const ld=window.LEVELS?window.LEVELS[l-1]:null;if(ld)coinsBonus+=ld.coins;}}const updData={xp:newXP};if(coinsBonus>0)updData.coins=Math.max(0,(profile.coins||0)+coinsBonus);await updateDoc(ref,updData);const pn=profile.globalName||profile.username||"Joueur";const label=delta>=0?"+"+delta:String(delta);setAdminFeedback("✓ "+pn+" : "+label+" XP → "+newXP+(coinsBonus>0?" | Niv. "+newLvl+" 🪙 +"+coinsBonus:""),"ok");showToast("✓ "+pn+" — "+label+" XP");if(targetUid===_currentUserUID){_currentUserXP=newXP;if(coinsBonus>0)_currentUserCoins=(profile.coins||0)+coinsBonus;renderProfileLevel(_currentUserXP,_currentUserCoins);}await adminRefreshPlayers();await loadLeaderboard(true);}
+  catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
 };
 window.adminModifyCoins=async function(sign){
   const targetUid=document.getElementById("admin-target-player")?.value;if(!targetUid){setAdminFeedback("Sélectionne un joueur.","err");return;}
   const rawAmount=parseInt(document.getElementById("admin-coins-amount")?.value,10);if(isNaN(rawAmount)||rawAmount<=0){setAdminFeedback("Montant invalide.","err");return;}
   const delta=sign*rawAmount;setAdminFeedback("Modification…","");
-  try{
-    const ref=doc(db,"users",targetUid),snap=await getDoc(ref);if(!snap.exists()){setAdminFeedback("Joueur introuvable.","err");return;}
-    const profile=snap.data(),newCoins=Math.max(0,(profile.coins||0)+delta);
-    await updateDoc(ref,{coins:newCoins});
-    const pn=profile.globalName||profile.username||"Joueur";const label=delta>=0?"+"+delta:String(delta);
-    setAdminFeedback("✓ "+pn+" : "+label+" pièces → "+newCoins,"ok");showToast("✓ "+pn+" — "+label+" pièces");
-    if(targetUid===_currentUserUID){_currentUserCoins=newCoins;renderProfileLevel(_currentUserXP,_currentUserCoins);}
-    await adminRefreshPlayers();await loadLeaderboard(true);
-  }catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
+  try{const ref=doc(db,"users",targetUid),snap=await getDoc(ref);if(!snap.exists()){setAdminFeedback("Joueur introuvable.","err");return;}const profile=snap.data(),newCoins=Math.max(0,(profile.coins||0)+delta);await updateDoc(ref,{coins:newCoins});const pn=profile.globalName||profile.username||"Joueur";const label=delta>=0?"+"+delta:String(delta);setAdminFeedback("✓ "+pn+" : "+label+" pièces → "+newCoins,"ok");showToast("✓ "+pn+" — "+label+" pièces");if(targetUid===_currentUserUID){_currentUserCoins=newCoins;renderProfileLevel(_currentUserXP,_currentUserCoins);}await adminRefreshPlayers();await loadLeaderboard(true);}
+  catch(err){setAdminFeedback("Erreur: "+err.message,"err");}
 };
 
-/* ════ Admin : découverte ════ */
-window.adminLoadDiscoveryEditor=function(){
-  if(!_discovery)return;
-  setInputVal("disc-flow-title",_discovery.title||"");setInputVal("disc-flow-desc",_discovery.desc||"");setInputVal("disc-flow-note",_discovery.note||"");
-  const stepsTA=document.getElementById("disc-flow-steps");
-  if(stepsTA&&_discovery.steps)stepsTA.value=_discovery.steps.map(s=>s.title+"|"+s.desc+"|"+(s.xp||0)+"|"+(s.url||"")+"|"+(s.urlLabel||"")).join("\n");
-};
-window.adminSaveDiscovery=async function(){
-  if(!_currentUserRole||(_currentUserRole!=="admin"&&_currentUserRole!=="modo")){document.getElementById("admin-disc-feedback").textContent="⚠ Accès refusé.";return;}
-  const stepsRaw=(document.getElementById("disc-flow-steps")?.value||"").trim().split("\n").filter(Boolean);
-  const steps=stepsRaw.map(line=>{const p=line.split("|");return{title:(p[0]||"").trim(),desc:(p[1]||"").trim(),xp:parseInt(p[2]||"0",10)||0,url:(p[3]||"").trim(),urlLabel:(p[4]||"").trim()};});
-  const newDiscovery={title:(document.getElementById("disc-flow-title")?.value||"").trim()||_discovery.title,desc:(document.getElementById("disc-flow-desc")?.value||"").trim()||_discovery.desc,note:(document.getElementById("disc-flow-note")?.value||"").trim()||_discovery.note,steps};
-  const fbEl=document.getElementById("admin-disc-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";
-  try{
-    await setDoc(doc(db,"sitedata","discovery"),newDiscovery);
-    _discovery=newDiscovery;
-    invalidateSitedataCache();
-    fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";
-    renderDiscovery();showToast("Flow mis à jour !");
-  }catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}
-};
-
-/* ════ Admin : tutoriels ════ */
+/* ════ Admin Tutos ════ */
 window._editingTutoId=null;
-window.adminLoadTutoEditor=function(){
-  if(!_tutos)return;const list=document.getElementById("admin-tuto-list");if(!list)return;list.innerHTML="";
-  _tutos.forEach(t=>{const item=document.createElement("div");item.className="admin-card-item";item.innerHTML='<span style="font-size:1.1rem;">'+(t.icon||'📖')+'</span><span class="admin-card-item-name">'+escHtml(t.title)+'</span>';
-    item.onclick=function(){document.querySelectorAll("#admin-tuto-list .admin-card-item").forEach(i=>i.classList.remove("selected"));item.classList.add("selected");window._editingTutoId=t.id;document.getElementById("ate-title").value=t.title||"";document.getElementById("ate-icon").value=t.icon||"📖";document.getElementById("ate-image").value=t.image||"";document.getElementById("ate-link").value=t.link||"";document.getElementById("ate-link-label").value=t.linkLabel||"";document.getElementById("ate-desc").value=t.desc||"";document.getElementById("ate-steps").value=(t.steps||[]).map(s=>{let l=s.title+"|"+s.desc;if(s.img)l+="|img:"+s.img;if(s.link)l+="|lien:"+s.link+"|"+(s.linkLabel||"Voir");return l;}).join("\n");document.getElementById("admin-tuto-editor").style.display="";document.getElementById("btn-del-tuto").style.display="";};list.appendChild(item);});
-};
+window.adminLoadTutoEditor=function(){if(!_tutos)return;const list=document.getElementById("admin-tuto-list");if(!list)return;list.innerHTML="";_tutos.forEach(t=>{const item=document.createElement("div");item.className="admin-card-item";item.innerHTML='<span style="font-size:1.1rem;">'+(t.icon||'📖')+'</span><span class="admin-card-item-name">'+escHtml(t.title)+'</span>';item.onclick=function(){document.querySelectorAll("#admin-tuto-list .admin-card-item").forEach(i=>i.classList.remove("selected"));item.classList.add("selected");window._editingTutoId=t.id;document.getElementById("ate-title").value=t.title||"";document.getElementById("ate-icon").value=t.icon||"📖";document.getElementById("ate-image").value=t.image||"";document.getElementById("ate-link").value=t.link||"";document.getElementById("ate-link-label").value=t.linkLabel||"";document.getElementById("ate-desc").value=t.desc||"";document.getElementById("ate-steps").value=(t.steps||[]).map(s=>{let l=s.title+"|"+s.desc;if(s.img)l+="|img:"+s.img;if(s.link)l+="|lien:"+s.link+"|"+(s.linkLabel||"Voir");return l;}).join("\n");document.getElementById("admin-tuto-editor").style.display="";document.getElementById("btn-del-tuto").style.display="";};list.appendChild(item);});};
 window.adminNewTuto=function(){window._editingTutoId="t_"+Date.now();["ate-title","ate-icon","ate-image","ate-link","ate-link-label","ate-desc","ate-steps"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});document.getElementById("ate-icon").value="📖";document.getElementById("admin-tuto-editor").style.display="";document.getElementById("btn-del-tuto").style.display="none";document.querySelectorAll("#admin-tuto-list .admin-card-item").forEach(i=>i.classList.remove("selected"));};
 window.adminDeleteTuto=async function(){const tid=window._editingTutoId;if(!tid)return;if(!confirm("Supprimer ?"))return;_tutos=_tutos.filter(t=>t.id!==tid);try{await setDoc(doc(db,"sitedata","tutos"),{list:_tutos});invalidateSitedataCache();document.getElementById("admin-tuto-editor").style.display="none";document.getElementById("btn-del-tuto").style.display="none";renderTutos();adminLoadTutoEditor();showToast("Tutoriel supprimé.");}catch(err){showToast("Erreur: "+err.message);}};
 function parseTutoSteps(raw){return raw.trim().split("\n").filter(Boolean).map(line=>{const parts=line.split("|");const step={title:(parts[0]||"").trim(),desc:(parts[1]||"").trim()};for(let i=2;i<parts.length;i++){const seg=parts[i].trim();if(seg.startsWith("img:"))step.img=seg.slice(4).trim();else if(seg.startsWith("lien:")){step.link=seg.slice(5).trim();if(parts[i+1]!==undefined){step.linkLabel=parts[i+1].trim();i++;}else step.linkLabel="Voir";}}return step;});}
 window.adminSaveTuto=async function(){const tid=window._editingTutoId;if(!tid)return;const steps=parseTutoSteps(document.getElementById("ate-steps").value||"");const newTuto={id:tid,icon:(document.getElementById("ate-icon").value||"").trim()||"📖",title:(document.getElementById("ate-title").value||"").trim()||"Tutoriel",desc:(document.getElementById("ate-desc").value||"").trim()||"",image:(document.getElementById("ate-image").value||"").trim()||"",link:(document.getElementById("ate-link").value||"").trim()||"",linkLabel:(document.getElementById("ate-link-label").value||"").trim()||"",steps};if(!newTuto.image)delete newTuto.image;if(!newTuto.link){delete newTuto.link;delete newTuto.linkLabel;}if(!newTuto.linkLabel)delete newTuto.linkLabel;const idx=_tutos.findIndex(t=>t.id===tid);if(idx>=0)_tutos[idx]=newTuto;else _tutos.push(newTuto);const fbEl=document.getElementById("admin-tuto-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","tutos"),{list:_tutos});invalidateSitedataCache();fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderTutos();adminLoadTutoEditor();showToast("Tutoriel mis à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
 
-/* ════ Admin : pays ════ */
+/* ════ Admin Pays ════ */
 window.adminLoadPaysEditor=function(){if(!_pays)return;setInputVal("ape-membres",_pays.membres||"");setInputVal("ape-rang",_pays.rang||"");setInputVal("ape-fondation",_pays.fondation||"");setInputVal("ape-herodesc",_pays.herodesc||"");setInputVal("ape-paydesc",_pays.paydesc||"");const gouvTA=document.getElementById("ape-gouv");if(gouvTA&&_pays.gouv)gouvTA.value=_pays.gouv.map(m=>m.init+"|"+m.nom+"|"+m.role+"|"+m.badge).join("\n");};
 window.adminSavePays=async function(){const gouvRaw=(document.getElementById("ape-gouv")?.value||"").trim().split("\n").filter(Boolean);const gouv=gouvRaw.map(line=>{const p=line.split("|");return{init:(p[0]||"").trim(),nom:(p[1]||"").trim(),role:(p[2]||"").trim(),badge:(p[3]||"").trim()};});_pays={membres:(document.getElementById("ape-membres")?.value||"").trim()||_pays.membres,rang:(document.getElementById("ape-rang")?.value||"").trim()||_pays.rang,fondation:(document.getElementById("ape-fondation")?.value||"").trim()||_pays.fondation,herodesc:(document.getElementById("ape-herodesc")?.value||"").trim()||_pays.herodesc,paydesc:(document.getElementById("ape-paydesc")?.value||"").trim()||_pays.paydesc,gouv:gouv.length?gouv:_pays.gouv};const fbEl=document.getElementById("admin-pays-feedback");fbEl.textContent="Sauvegarde…";fbEl.className="admin-feedback";try{await setDoc(doc(db,"sitedata","pays"),_pays);invalidateSitedataCache();fbEl.textContent="✓ Sauvegardé !";fbEl.className="admin-feedback ok";renderPays();showToast("Infos pays mises à jour !");}catch(err){fbEl.textContent=err.code==="permission-denied"?"❌ Règles Firestore.":"Erreur: "+err.message;fbEl.className="admin-feedback err";}};
 
-/* ════ Admin : boutique ════ */
+/* ════ Admin Boutique ════ */
 window._editingShopItemId=null;
 window.adminLoadShopEditor=function(){if(!_shop)return;const list=document.getElementById("admin-shop-list");if(!list)return;list.innerHTML="";(_shop.items||[]).forEach(item=>{const el=document.createElement("div");el.className="admin-card-item";el.innerHTML='<span style="font-size:1.1rem;">'+(item.icon||'🛒')+'</span><span class="admin-card-item-name">'+escHtml(item.name||'Article')+'</span><span class="admin-card-item-xp">🪙 '+(item.price||0)+'</span>';el.onclick=function(){document.querySelectorAll("#admin-shop-list .admin-card-item").forEach(i=>i.classList.remove("selected"));el.classList.add("selected");window._editingShopItemId=item.id;document.getElementById("ase-name").value=item.name||"";document.getElementById("ase-icon").value=item.icon||"🛒";document.getElementById("ase-cat").value=item.cat||"";document.getElementById("ase-price").value=item.price!==undefined?item.price:"";document.getElementById("ase-stock").value=item.stock!==undefined?item.stock:-1;document.getElementById("ase-image").value=item.image||"";document.getElementById("ase-unique").value=item.unique?"true":"false";document.getElementById("ase-limited").value=item.limited?"true":"false";document.getElementById("ase-desc").value=item.desc||"";document.getElementById("ase-instructions").value=item.instructions||"";document.getElementById("admin-shop-editor").style.display="";document.getElementById("btn-del-shop").style.display="";};list.appendChild(el);});};
 window.adminNewShopItem=function(){window._editingShopItemId="shop_"+Date.now();["ase-name","ase-icon","ase-cat","ase-price","ase-image","ase-desc","ase-instructions"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});document.getElementById("ase-icon").value="🛒";document.getElementById("ase-stock").value="-1";document.getElementById("ase-unique").value="false";document.getElementById("ase-limited").value="false";document.getElementById("admin-shop-editor").style.display="";document.getElementById("btn-del-shop").style.display="none";document.querySelectorAll("#admin-shop-list .admin-card-item").forEach(i=>i.classList.remove("selected"));};
@@ -1681,15 +1094,9 @@ window.adminSaveShopItem=async function(){const id=window._editingShopItemId;if(
 function setAdminFeedback(msg,type){const el=document.getElementById("admin-feedback");if(!el)return;el.textContent=msg;el.className="admin-feedback"+(type?" "+type:"");}
 function setEl(id,val){var e=document.getElementById(id);if(e)e.textContent=val;}
 function setInputVal(id,val){var e=document.getElementById(id);if(e)e.value=val;}
-function escHtml(str){return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
 window.Timor={loginWithDiscord,logout,handleDiscordCallback};
-
-(async function(){
-  const code=sessionStorage.getItem("discord_pending_code");
-  const state=sessionStorage.getItem("discord_pending_state");
-  if(code){sessionStorage.removeItem("discord_pending_code");sessionStorage.removeItem("discord_pending_state");await handleDiscordCallback(code,state||"");}
-})();
+(async function(){const code=sessionStorage.getItem("discord_pending_code"),state=sessionStorage.getItem("discord_pending_state");if(code){sessionStorage.removeItem("discord_pending_code");sessionStorage.removeItem("discord_pending_state");await handleDiscordCallback(code,state||"");}})();
 </script>
 
 <!-- ════ UI HELPERS ════ -->
