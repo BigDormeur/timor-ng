@@ -935,3 +935,84 @@ footer a { color: var(--gold-dim); text-decoration: none; }
   .quest-card { flex-direction: column; }
   .quest-card-footer { flex-direction: column; align-items: flex-start; }
 }
+.maintenance-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0f0f1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.maintenance-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.maintenance-content {
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.maintenance-icon { font-size: 3.5rem; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.1);opacity:0.8} }
+.maintenance-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #e8e8f0;
+}
+.maintenance-title span { color: #c9a84c; }
+.maintenance-subtitle {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c9a84c;
+  font-weight: 600;
+}
+.maintenance-text {
+  font-size: 1.1rem;
+  color: #a0a0b8;
+  line-height: 1.8;
+  margin-top: 8px;
+}
+.maintenance-loader { margin-top: 24px; width: 220px; }
+.maintenance-bar-track {
+  height: 3px;
+  background: rgba(201,168,76,0.15);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.maintenance-bar-fill {
+  height: 100%;
+  width: 40%;
+  background: #c9a84c;
+  border-radius: 99px;
+  animation: loading 1.8s ease-in-out infinite;
+}
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+.admin-maintenance-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(201,168,76,0.06);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+#maintenance-status-label { font-size: 0.85rem; color: #a0a0b8; flex: 1; }
+.btn-maintenance { background: #e05252 !important; }
+.btn-maintenance.active { background: #52c97a !important; }
