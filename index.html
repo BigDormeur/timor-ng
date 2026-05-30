@@ -439,6 +439,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const ADMIN_IDS = new Set(['1407099669271810159']);
 const MODO_IDS  = new Set([]);
 
+// ══ Stockage robuste : sessionStorage + localStorage + mémoire ══
 const _safeStorage = {
   _data: {},
   getItem(k) {
@@ -458,61 +459,19 @@ const _safeStorage = {
   },
 };
 
-(function interceptOAuthToken() {
-  try {
-    const hash = window.location.hash;
-    if (!hash || !hash.includes('access_token')) return;
-    const params = new URLSearchParams(hash.substring(1));
-    const at  = params.get('access_token');
-    const rt  = params.get('refresh_token') || '';
-    const exp = parseInt(params.get('expires_at') || '0', 10) || Math.floor(Date.now() / 1000) + 3600;
-    if (!at) return;
-    const sessionKey = 'sb-hhirhrvyqzkdezjenpdr-auth-token';
-    const sessionData = JSON.stringify({
-      access_token:  at,
-      refresh_token: rt,
-      expires_at:    exp,
-      token_type:    'bearer',
-      user:          null
-    });
-    try { localStorage.setItem(sessionKey, sessionData);   } catch(e) {}
-    try { sessionStorage.setItem(sessionKey, sessionData); } catch(e) {}
-    _safeStorage._data[sessionKey] = sessionData;
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    console.log('[Timor] ✅ Token OAuth intercepté et injecté');
-  } catch(e) {
-    console.warn('[Timor] interceptOAuthToken error:', e);
-  }
-})();
-
+// ══ Client Supabase — PKCE flow ══
+// CHANGEMENT CLÉ : flowType 'implicit' → 'pkce'
+// Le redirect passe désormais par callback.html qui échange le ?code=
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storage:            _safeStorage,
     persistSession:     true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: false,  // false ici : c'est callback.html qui gère le ?code=
     autoRefreshToken:   true,
-    flowType:           'implicit'
+    flowType:           'pkce'
   }
 });
 window._sb = _sb;
-
-window.addEventListener('load', async function() {
-  try {
-    const { data: { session } } = await _sb.auth.getSession();
-    if (!session) {
-      const key = 'sb-hhirhrvyqzkdezjenpdr-auth-token';
-      const stored = _safeStorage.getItem(key);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.refresh_token) {
-          await _sb.auth.refreshSession({ refresh_token: parsed.refresh_token });
-        }
-      }
-    }
-  } catch(e) {
-    console.warn('[Timor] load session error:', e);
-  }
-});
 </script>
 
 <!-- ════ LEVEL SYSTEM ════ -->
@@ -726,13 +685,13 @@ window._adminSaveSpinPrizesSupabase=async function(prizes){await sdSet('spinpriz
 async function loadSpinPrizes(){try{const val=await sdGet('spinprizes');if(val?.prizes?.length>=2)window._spinPrizes=val.prizes;}catch(e){}window.drawWheel(window._spinCurrentAngle||0);window.buildPrizeLegend();}
 async function syncSpinCooldown(uid){try{const profile=await userGet(uid);if(profile?.last_spin_at){const fsTs=new Date(profile.last_spin_at).getTime();const localTs=window.getLastSpinTime?window.getLastSpinTime():0;if(fsTs>localTs)window.setLastSpinTime(fsTs);}}catch(e){}window.updateSpinUI();window.startCooldownTimer();}
 
-// ── Fonction appelée par le bouton connexion ──
+// ══ CHANGEMENT CLÉ : redirectTo pointe vers callback.html ══
 function loginWithDiscord(){
   sb.auth.signInWithOAuth({
-    provider:'discord',
-    options:{
-      redirectTo:'https://yanisss908.github.io/timor-ng/',
-      skipBrowserRedirect:false
+    provider: 'discord',
+    options: {
+      redirectTo: 'https://yanisss908.github.io/timor-ng/callback.html',
+      skipBrowserRedirect: false
     }
   });
 }
@@ -776,7 +735,7 @@ async function handleUserSession(user) {
   await loadLeaderboard();
 }
 
-// ── Écoute les changements d'auth ──
+// ══ onAuthStateChange : détecte la session restaurée depuis callback.html ══
 sb.auth.onAuthStateChange(async(event, session) => {
   console.log('[Timor] Auth event:', event, session?.user?.id ?? 'no user');
   if (session?.user) {
@@ -790,19 +749,18 @@ sb.auth.onAuthStateChange(async(event, session) => {
   }
 });
 
-// ── Fallback : si onAuthStateChange rate la session (storage bloqué par Edge) ──
-setTimeout(async () => {
-  if (_currentUserUID) return;
+// ══ Fallback getSession au chargement (si storage accessible) ══
+(async () => {
   try {
-    console.log('[Timor] Fallback: tentative getUser...');
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) { console.log('[Timor] Fallback: pas d\'utilisateur'); return; }
-    console.log('[Timor] Fallback: utilisateur trouvé', user.id);
-    await handleUserSession(user);
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user && !_currentUserUID) {
+      console.log('[Timor] Session restaurée via getSession()');
+      await handleUserSession(session.user);
+    }
   } catch(e) {
-    console.warn('[Timor] Fallback error:', e);
+    console.warn('[Timor] getSession fallback error:', e);
   }
-}, 2500);
+})();
 
 loadSiteData();
 
