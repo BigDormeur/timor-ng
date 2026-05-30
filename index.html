@@ -1064,5 +1064,25 @@ window.Timor = window.Timor || {
   logout: function() {}
 };
 </script>
+<script type="module">
+setTimeout(async () => {
+  if (window._currentUserUID) return;
+  try {
+    const sb = window._sb;
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    const { data: profile } = await sb.from('users').select('*').eq('id', user.id).single();
+    if (!profile) return;
+    document.getElementById('auth-banner').style.display = 'none';
+    document.getElementById('admin-panel')?.classList.remove('visible');
+    const name = profile.global_name || profile.username || 'Citoyen';
+    const navAuth = document.getElementById('nav-auth');
+    if (navAuth) {
+      navAuth.innerHTML = '<div class="nav-user"><span class="nav-username">' + name + '</span><span class="nav-pill nav-xp">' + (profile.xp||0) + ' XP</span><span class="nav-pill nav-coins">🪙 ' + (profile.coins||0) + '</span><button class="btn-nav-logout" onclick="Timor.logout()">✕</button></div>';
+    }
+    window.renderProfileLevel(profile.xp||0, profile.coins||0);
+  } catch(e) { console.warn('Fallback error:', e); }
+}, 3000);
+</script>
 </body>
 </html>
