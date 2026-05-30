@@ -905,7 +905,8 @@ function renderQuestsList(quests,cat,done){
     ? '<div class="quest-done-badge" style="display:block;text-align:center;font-size:0.72rem;">✅ Accomplie</div>'
     : '<button class="quest-claim-btn" style="width:100%;font-size:0.72rem;padding:6px;" onclick="claimQuest(\''+escHtml(q.id)+'\','+parseInt(q.xp||0)+','+parseInt(q.coins||0)+')">Réclamer +'+q.xp+' XP</button>'
   )+
-'</div>';.join('');
+'</div>';
+  }).join('');
 }
 window.filterQuestsCat=function(cat,btn){document.querySelectorAll('.quest-cat-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const quests=_quests?_quests.quests||[]:[];const done=loadQuestsDone();renderQuestsList(quests,cat,done);};
 window.claimQuest=async function(questId,xpAmount,coinsAmount){
