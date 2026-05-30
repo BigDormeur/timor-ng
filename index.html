@@ -96,7 +96,40 @@
     <div class="quests-list" id="quests-list"></div>
   </div>
 </div>
+<!-- ══ PREUVE QUÊTE ══ -->
+<div class="proof-overlay" id="proof-overlay">
+  <div class="proof-modal">
+    <div class="proof-modal-icon" id="proof-quest-icon">📸</div>
+    <div class="proof-modal-title" id="proof-quest-title">Soumettre une preuve</div>
+    <div class="proof-modal-desc" id="proof-quest-desc"></div>
 
+    <div class="proof-upload-area" id="proof-upload-area">
+      <input type="file" id="proof-file-input" accept="image/*" style="display:none;" onchange="onProofFileChange(event)">
+      <div id="proof-upload-placeholder" onclick="document.getElementById('proof-file-input').click()">
+        <div class="proof-upload-icon">📎</div>
+        <div class="proof-upload-label">Clique pour uploader ton screenshot</div>
+        <div class="proof-upload-hint">PNG, JPG, WEBP — max 5 Mo</div>
+      </div>
+      <div id="proof-preview-wrap" style="display:none;">
+        <img id="proof-preview-img" src="" alt="Aperçu" class="proof-preview-img">
+        <button class="proof-change-btn" onclick="document.getElementById('proof-file-input').click()">Changer l'image</button>
+      </div>
+    </div>
+
+    <div class="proof-status" id="proof-status"></div>
+
+    <div class="proof-modal-actions">
+      <button class="btn-proof-submit" id="proof-submit-btn" onclick="submitProof()" disabled>🔍 Analyser avec l'IA</button>
+      <button class="btn-proof-cancel" onclick="closeProofModal()">Annuler</button>
+    </div>
+
+    <!-- Affiché après refus IA -->
+    <div class="proof-escalate-wrap" id="proof-escalate-wrap" style="display:none;">
+      <div class="proof-escalate-msg" id="proof-escalate-msg"></div>
+      <button class="btn-proof-modo" onclick="escalateToModo()">📨 Demander vérification à un modo</button>
+    </div>
+  </div>
+</div>
 <!-- ══ LIENS RAPIDES ══ -->
 <div class="ql-sidebar" id="ql-sidebar">
   <button class="ql-toggle" onclick="toggleQuickLinks()" title="Liens rapides">🔗</button>
