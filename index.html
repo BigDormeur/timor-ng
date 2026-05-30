@@ -468,9 +468,16 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const ADMIN_IDS = new Set(['1407099669271810159']);
 const MODO_IDS  = new Set([]);
 
-const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    storage: window.sessionStorage,
+    persistSession: true,
+    detectSessionInUrl: true,
+    autoRefreshToken: true,
+    storageKey: 'timor-auth'
+  }
+});
 window._sb = _sb;
-</script>
 
 <!-- ════ LEVEL SYSTEM ════ -->
 <script>
