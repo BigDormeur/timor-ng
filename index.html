@@ -624,6 +624,29 @@ window.addEventListener("DOMContentLoaded",function(){updateSpinUI();startCooldo
 
 <!-- ════ AUTH DISCORD via Cloudflare Worker ════ -->
 <script type="module">
+  window.toggleMaintenance = async function() {
+  try {
+    const current = await sdGet('maintenance');
+    const newVal = !current?.active;
+    await sdSet('maintenance', { active: newVal });
+    applyMaintenanceState(newVal);
+    showToast(newVal ? '🔧 Site en maintenance' : '✅ Site en ligne');
+  } catch(err) {
+    showToast('Erreur : ' + err.message);
+  }
+};
+  
+function applyMaintenanceState(active) {
+  const overlay = document.getElementById('maintenance-overlay');
+  const btn = document.getElementById('btn-toggle-maintenance');
+  const label = document.getElementById('maintenance-status-label');
+  if (overlay) overlay.style.display = active ? 'flex' : 'none';
+  if (btn) {
+    btn.textContent = active ? '✅ Désactiver la maintenance' : '🔧 Activer la maintenance';
+    btn.classList.toggle('active', active);
+  }
+  if (label) label.textContent = active ? '🔴 Site en maintenance' : '🟢 Site en ligne';
+}
 const sb = window._sb;
 const WORKER_URL        = 'https://timor-discord-auth.yanismanca66.workers.dev';
 const DISCORD_CLIENT_ID = '1508123459782443260';
@@ -736,6 +759,10 @@ async function loadSiteData(){
   try{const cached=localStorage.getItem(SITEDATA_CACHE_KEY);if(cached){const d=JSON.parse(cached);_tutos=d.tutos;_pays=d.pays;_quests=d.quests;_shop=d.shop;_quickLinks=d.quickLinks||[];renderTutos();renderPays();renderQuests();renderShop();renderQuickLinks(_quickLinks);await loadSpinPrizes();return;}}catch(e){}
   try{const[tVal,pVal,qVal,sVal,qlVal]=await Promise.all([sdGet('tutos'),sdGet('pays'),sdGet('quests'),sdGet('shop'),sdGet('quicklinks')]);_tutos=tVal?.list??DEFAULT_TUTOS;_pays=pVal??DEFAULT_PAYS;_quests=qVal??DEFAULT_QUESTS;_shop=sVal??DEFAULT_SHOP;_quickLinks=qlVal?.links??[];try{localStorage.setItem(SITEDATA_CACHE_KEY,JSON.stringify({tutos:_tutos,pays:_pays,quests:_quests,shop:_shop,quickLinks:_quickLinks}));}catch(e){}}
   catch(e){console.warn('loadSiteData error:',e.message);_tutos=DEFAULT_TUTOS;_pays=DEFAULT_PAYS;_quests=DEFAULT_QUESTS;_shop=DEFAULT_SHOP;_quickLinks=[];}
+  const maintenanceVal = await sdGet('maintenance');
+if (maintenanceVal?.active && _currentUserRole !== 'admin') {
+  applyMaintenanceState(true);
+}
   renderTutos();renderPays();renderQuests();renderShop();renderQuickLinks(_quickLinks);
   await loadSpinPrizes();
 }
