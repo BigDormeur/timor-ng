@@ -463,7 +463,7 @@ const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storage:            _safeStorage,
     persistSession:     true,
-    detectSessionInUrl: false,
+    detectSessionInUrl: true,
     autoRefreshToken:   true,
     flowType:           'pkce'
   }
@@ -686,7 +686,7 @@ function loginWithDiscord(){
   sb.auth.signInWithOAuth({
     provider: 'discord',
     options: {
-      redirectTo: 'https://yanisss908.github.io/timor-ng/callback.html',
+      redirectTo: 'https://yanisss908.github.io/timor-ng/',
       skipBrowserRedirect: false
     }
   });
@@ -751,22 +751,6 @@ sb.auth.onAuthStateChange(async(event, session) => {
 // ══ CORRECTIF PRINCIPAL : getSession() au chargement de la page ══
 // Lit la session depuis localStorage (écrite par callback.html)
 // et déclenche handleUserSession si une session valide existe.
-(async () => {
-  try {
-    const { data: { session }, error } = await sb.auth.getSession();
-    if (error) { console.warn('[Timor] getSession error:', error.message); return; }
-    if (session?.user) {
-      console.log('[Timor] Session restaurée via getSession():', session.user.id);
-      // onAuthStateChange sera aussi déclenché, mais handleUserSession
-      // est idempotent donc un double appel est sans danger.
-      await handleUserSession(session.user);
-    } else {
-      console.log('[Timor] Aucune session active.');
-    }
-  } catch(e) {
-    console.warn('[Timor] getSession fallback error:', e);
-  }
-})();
 
 loadSiteData();
 
