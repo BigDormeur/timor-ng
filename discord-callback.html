@@ -16,6 +16,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
+    storage: window.sessionStorage,
+    storageKey: 'timor-auth',
     detectSessionInUrl: true,
     persistSession: true,
     autoRefreshToken: true
@@ -23,13 +25,11 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 (async function() {
-  // Laisser Supabase traiter le hash #access_token
-  await _supabase.auth.getSession();
-  
-  // Attendre que la session soit bien enregistrée
+  const { data, error } = await _supabase.auth.getSession();
+  if (error) console.error('Auth error:', error.message);
   setTimeout(function() {
     window.location.replace('./index.html');
-  }, 1500);
+  }, 800);
 })();
 </script>
 </body>
