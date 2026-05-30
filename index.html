@@ -1026,6 +1026,7 @@ function showSection(id){
   var links=document.querySelectorAll('.nav-links a:not(.spin-nav-btn)');
   if(map[id]!==undefined&&links[map[id]])links[map[id]].classList.add('active');
   window.scrollTo({top:document.querySelector('nav').offsetHeight,behavior:'smooth'});
+  try{localStorage.setItem('timor_section',id);}catch(e){}
 }
 function toggleTuto(card){
   var isOpen=card.classList.contains('open');
