@@ -8,29 +8,34 @@
 </style>
 </head>
 <body>
-<div>⚔️ Connexion en cours…</div>
+<div id="msg">⚔️ Connexion en cours…</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://hhirhrvyqzkdezjenpdr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoaXJocnZ5cXprZGV6amVucGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTI1NzYsImV4cCI6MjA5NTY2ODU3Nn0.4AbQlyhoZPOWMTgzLCSL-8590ZuOhF8uKP2Wp9SGGZc';
 
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    storage: window.localStorage,
-    storageKey: 'timor-auth',
-    detectSessionInUrl: true,
-    persistSession: true,
-    autoRefreshToken: true
-  }
-});
+// Extraire les tokens depuis l'URL hash
+const hash = window.location.hash.substring(1);
+const params = new URLSearchParams(hash);
+const access_token = params.get('access_token');
+const refresh_token = params.get('refresh_token');
 
-(async function() {
-  const { data, error } = await _supabase.auth.getSession();
-  if (error) console.error('Auth error:', error.message);
-  setTimeout(function() {
-    window.location.replace('./index.html');
-  }, 800);
-})();
+if (access_token) {
+  // Stocker manuellement dans localStorage
+  const session = {
+    access_token,
+    refresh_token,
+    expires_at: parseInt(params.get('expires_at') || '0'),
+    token_type: params.get('token_type') || 'bearer'
+  };
+  try {
+    localStorage.setItem('timor-auth', JSON.stringify({ currentSession: session, expiresAt: session.expires_at }));
+  } catch(e) {}
+  document.getElementById('msg').textContent = '✅ Connecté ! Redirection…';
+}
+setTimeout(function() {
+  window.location.replace('./index.html');
+}, 800);
 </script>
 </body>
 </html>
