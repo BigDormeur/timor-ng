@@ -9,6 +9,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="maintenance-overlay" id="maintenance-overlay" style="display:none;">
+  <div class="maintenance-content">
+    <div class="maintenance-icon">⚔️</div>
+    <div class="maintenance-title">TIMOR</div>
+    <div class="maintenance-subtitle">Maintenance exceptionnelle</div>
+    <div class="maintenance-text">Merci de patienter,<br>le site sera de retour très bientôt.</div>
+    <div class="maintenance-loader">
+      <div class="maintenance-bar-track"><div class="maintenance-bar-fill"></div></div>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 <canvas id="confetti-canvas"></canvas>
 
@@ -179,6 +190,10 @@
   <!-- ADMIN PANEL -->
   <div class="admin-section" id="admin-panel">
     <div class="admin-title">⚔ Panneau Administrateur</div>
+    <div class="admin-maintenance-bar" id="admin-maintenance-bar">
+  <span id="maintenance-status-label">🟢 Site en ligne</span>
+  <button class="btn-admin btn-maintenance" id="btn-toggle-maintenance" onclick="toggleMaintenance()">🔧 Activer la maintenance</button>
+</div>
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="switchAdminTab('joueurs',this)">👤 Joueurs</button>
       <button class="admin-tab has-notif" id="tab-orders-btn" onclick="switchAdminTab('orders',this)">📦 Commandes <span class="orders-count-badge" id="orders-pending-count" style="display:none;">0</span></button>
