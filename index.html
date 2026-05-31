@@ -92,37 +92,6 @@
       font-size: 0.68rem; color: var(--text-dim, #888);
       margin-top: 4px; text-align: center;
     }
-
-    /* ── CARTE ── */
-    .map-server-btn {
-      padding: 5px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;
-      cursor: pointer; display: flex; align-items: center; gap: 5px;
-      transition: background .15s, transform .1s;
-    }
-    .map-server-btn:hover { filter: brightness(1.15); }
-    .map-server-btn:active { transform: scale(0.97); }
-    .map-iframe-wrap {
-      position: relative; height: 600px;
-    }
-    .map-iframe-wrap iframe {
-      width: 100%; height: 100%; border: none; display: block;
-    }
-    .map-fallback {
-      display: none; position: absolute; inset: 0;
-      background: #0a0a18; flex-direction: column;
-      align-items: center; justify-content: center; gap: 14px;
-      text-align: center;
-    }
-    .map-fallback.visible { display: flex; }
-    .map-fallback-icon { font-size: 3rem; }
-    .map-fallback-title { font-size: 1rem; font-weight: 700; color: #eee; }
-    .map-fallback-desc { font-size: 0.82rem; color: #888; max-width: 320px; line-height: 1.6; }
-    .map-fallback-btn {
-      background: #a855f7; color: #fff; border: none; border-radius: 10px;
-      padding: 10px 24px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
-      text-decoration: none; display: inline-block; margin-top: 4px;
-    }
-    .map-fallback-btn:hover { background: #9333ea; }
   </style>
 </head>
 <body>
@@ -655,42 +624,27 @@
   <div class="section-header">
     <div class="section-header-line">
       <h2>🗺 Carte interactive</h2>
-      <p>Explore la map NationsGlory en temps réel — choisis ton serveur</p>
+      <p>Carte NationsGlory — Serveur Black</p>
     </div>
   </div>
 
   <div style="background:var(--card-bg,#13131f);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
-    <!-- Barre de sélection de serveur -->
-    <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,0.07);background:rgba(0,0,0,0.2);">
-      <span style="font-size:0.82rem;font-weight:600;color:var(--text-muted,#aaa);">Serveur :</span>
-      <div id="map-server-btns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-      <a id="map-open-link" href="https://green.nationsglory.fr" target="_blank" rel="noopener"
-         style="margin-left:auto;background:#a855f7;color:#fff;padding:7px 18px;border-radius:10px;font-size:0.8rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;white-space:nowrap;">
-        Ouvrir dans un onglet ↗
-      </a>
-    </div>
-
-    <!-- Iframe + fallback -->
-    <div class="map-iframe-wrap">
-      <iframe
-        id="map-iframe"
-        src="https://green.nationsglory.fr"
-        title="Carte interactive NationsGlory"
-        loading="lazy"
-        allowfullscreen
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-        onerror="document.getElementById('map-fallback').classList.add('visible')"
-      ></iframe>
-
-      <!-- Fallback si X-Frame-Options bloque l'iframe -->
-      <div class="map-fallback" id="map-fallback">
-        <div class="map-fallback-icon">🗺</div>
-        <div class="map-fallback-title">La carte ne peut pas s'afficher ici</div>
-        <div class="map-fallback-desc">Le serveur NationsGlory bloque l'affichage dans un cadre. Ouvre la carte directement dans un nouvel onglet.</div>
-        <a id="map-fallback-btn" href="https://green.nationsglory.fr" target="_blank" rel="noopener" class="map-fallback-btn">
-          🗺 Ouvrir la carte ↗
-        </a>
+    <!-- Panneau lien direct — iframe bloquée par X-Frame-Options -->
+    <div style="padding:56px 24px;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;">
+      <div style="width:72px;height:72px;border-radius:18px;background:#a855f718;border:1px solid #a855f740;display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🗺</div>
+      <div>
+        <div style="font-size:1.05rem;font-weight:700;color:#eee;margin-bottom:10px;">Carte NationsGlory — Serveur Black</div>
+        <div style="font-size:0.82rem;color:#888;max-width:400px;line-height:1.7;margin:0 auto;">
+          NationsGlory bloque l'intégration dans les iframes.<br>
+          Clique sur le bouton ci-dessous pour ouvrir la carte en temps réel dans un nouvel onglet.
+        </div>
       </div>
+      <a href="https://black.nationsglory.fr/?worldname=world&mapname=flat&zoom=0&x=0&y=64&z=0"
+         target="_blank" rel="noopener"
+         style="background:#a855f7;color:#fff;padding:13px 36px;border-radius:12px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:10px;letter-spacing:.01em;">
+        🗺 Ouvrir la carte Black ↗
+      </a>
+      <div style="font-size:0.72rem;color:#555;margin-top:-8px;">black.nationsglory.fr</div>
     </div>
   </div>
 </div>
@@ -2496,83 +2450,6 @@ document.addEventListener('click', e => {
 document.getElementById('spin-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeSpinModal();
 });
-
-// ── Carte NationsGlory ────────────────────────────────────────────────────
-(function() {
-  const MAP_SERVERS = [
-    { id: 'green',  label: 'Green',  url: 'https://green.nationsglory.fr',  color: '#52c97a' },
-    { id: 'blue',   label: 'Blue',   url: 'https://blue.nationsglory.fr',   color: '#4a7fa5' },
-    { id: 'orange', label: 'Orange', url: 'https://orange.nationsglory.fr', color: '#f97316' },
-    { id: 'cyan',   label: 'Cyan',   url: 'https://cyan.nationsglory.fr',   color: '#06b6d4' },
-    { id: 'red',    label: 'Red',    url: 'https://red.nationsglory.fr',    color: '#e05252' },
-    { id: 'white',  label: 'White',  url: 'https://white.nationsglory.fr',  color: '#cccccc' },
-  ];
-
-  let activeServer = MAP_SERVERS[0];
-
-  function renderMapButtons() {
-    const c = document.getElementById('map-server-btns');
-    if (!c) return;
-    c.innerHTML = MAP_SERVERS.map(s => `
-      <button class="map-server-btn" onclick="selectMapServer('${s.id}')"
-        style="border:1px solid ${s.color}55;
-               background:${s.id === activeServer.id ? s.color + '28' : 'transparent'};
-               color:${s.color};">
-        <span style="width:7px;height:7px;border-radius:50%;background:${s.color};display:inline-block;flex-shrink:0;"></span>
-        ${s.label}
-      </button>`).join('');
-  }
-
-  window.selectMapServer = function(id) {
-    const s = MAP_SERVERS.find(x => x.id === id);
-    if (!s || s.id === activeServer.id) return;
-    activeServer = s;
-    const iframe      = document.getElementById('map-iframe');
-    const openLink    = document.getElementById('map-open-link');
-    const fallbackBtn = document.getElementById('map-fallback-btn');
-    if (iframe)      iframe.src      = s.url;
-    if (openLink)    openLink.href   = s.url;
-    if (fallbackBtn) fallbackBtn.href = s.url;
-    // Réinitialise le fallback au changement de serveur
-    const fallback = document.getElementById('map-fallback');
-    if (fallback) fallback.classList.remove('visible');
-    renderMapButtons();
-  };
-
-  // Détection du blocage iframe après chargement
-  function detectIframeBlock() {
-    const iframe = document.getElementById('map-iframe');
-    if (!iframe) return;
-    // Si l'iframe ne charge pas dans 8s, affiche le fallback
-    const timer = setTimeout(() => {
-      try {
-        // Accès cross-origin bloqué = exception → iframe probablement bloquée
-        const doc = iframe.contentDocument;
-        if (!doc || !doc.body || doc.body.innerHTML === '') {
-          document.getElementById('map-fallback')?.classList.add('visible');
-        }
-      } catch(e) {
-        // Cross-origin = la page est chargée (pas bloquée), tout va bien
-      }
-    }, 8000);
-    iframe.addEventListener('load', () => {
-      clearTimeout(timer);
-      try {
-        const doc = iframe.contentDocument;
-        if (!doc || !doc.body || doc.body.innerHTML === '') {
-          document.getElementById('map-fallback')?.classList.add('visible');
-        }
-      } catch(e) {
-        // Cross-origin : page chargée normalement
-      }
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    renderMapButtons();
-    detectIframeBlock();
-  });
-})();
 
 (function() {
   try {
