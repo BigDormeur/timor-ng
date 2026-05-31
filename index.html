@@ -7,6 +7,100 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- ══ STYLES NOUVEAUX (ban + commandes + niveaux) ══ -->
+  <style>
+    /* ── BAN OVERLAY ── */
+    .ban-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #0a0a12;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px;
+    }
+    .ban-box {
+      background: #13131f; border: 1px solid #e0525280;
+      border-radius: 20px; padding: 40px 48px; max-width: 480px; width: 90%;
+      text-align: center; box-shadow: 0 0 80px #e0525222;
+    }
+    .ban-icon { font-size: 3rem; margin-bottom: 12px; }
+    .ban-title { font-size: 1.6rem; font-weight: 700; color: #e05252; letter-spacing: .04em; margin-bottom: 8px; }
+    .ban-subtitle { font-size: 0.9rem; color: var(--text-muted, #888); margin-bottom: 16px; }
+    .ban-reason {
+      background: #e0525215; border: 1px solid #e0525240;
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 0.88rem; color: #ccc; line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .ban-logout-btn {
+      background: #e05252; color: #fff; border: none; border-radius: 10px;
+      padding: 10px 28px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    }
+    .ban-logout-btn:hover { background: #c94040; }
+
+    /* ── ADMIN BAN CONTROLS ── */
+    .ban-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.07); }
+    .ban-current { font-size: 0.78rem; color: var(--text-dim, #888); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .ban-badge { background: #e0525222; color: #e05252; border: 1px solid #e0525255; border-radius: 6px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700; }
+    .btn-role.btn-role-ban { background: #e0525218; color: #e05252; border: 1px solid #e0525240; }
+    .btn-role.btn-role-ban:hover { background: #e0525230; }
+    .btn-role.btn-role-unban { background: #52c97a18; color: #52c97a; border: 1px solid #52c97a40; }
+    .btn-role.btn-role-unban:hover { background: #52c97a30; }
+    .ban-reason-input { width: 100%; margin-top: 8px; }
+
+    /* ── MES COMMANDES ── */
+    .my-orders-section {
+      margin-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding-top: 24px;
+    }
+    .my-orders-title {
+      font-size: 1rem; font-weight: 700; color: var(--text, #eee);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .my-orders-list { display: flex; flex-direction: column; gap: 10px; }
+    .my-order-card {
+      background: var(--card-bg, #13131f);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+      transition: border-color .2s;
+    }
+    .my-order-card:hover { border-color: rgba(255,255,255,0.14); }
+    .my-order-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .my-order-info { flex: 1; min-width: 0; }
+    .my-order-name { font-size: 0.88rem; font-weight: 600; color: var(--text, #eee); }
+    .my-order-date { font-size: 0.72rem; color: var(--text-dim, #888); margin-top: 2px; }
+    .my-order-price { font-size: 0.78rem; color: var(--text-muted, #aaa); margin-top: 2px; }
+    .my-order-status {
+      flex-shrink: 0; font-size: 0.72rem; font-weight: 700;
+      border-radius: 8px; padding: 4px 12px;
+    }
+    .my-order-status.pending  { background: #c9a84c18; color: #c9a84c; border: 1px solid #c9a84c40; }
+    .my-order-status.fulfilled { background: #52c97a18; color: #52c97a; border: 1px solid #52c97a40; }
+    .my-order-status.cancelled { background: #e0525218; color: #e05252; border: 1px solid #e0525240; }
+    .my-orders-empty { font-size: 0.85rem; color: var(--text-dim, #888); padding: 20px; text-align: center; }
+
+    /* ── NIVEAUX BOUTIQUE ── */
+    .shop-level-lock {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 700;
+      color: #a855f7; background: #a855f718;
+      border: 1px solid #a855f740;
+      border-radius: 8px; padding: 4px 10px;
+      margin-bottom: 8px;
+    }
+    .shop-card.locked { opacity: 0.7; }
+    .shop-card.locked .shop-card-title { color: var(--text-dim, #888); }
+    .btn-shop-locked {
+      width: 100%; padding: 8px; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+      background: #a855f718; color: #a855f7; border: 1px solid #a855f740;
+      cursor: not-allowed;
+    }
+    .shop-level-progress {
+      font-size: 0.68rem; color: var(--text-dim, #888);
+      margin-top: 4px; text-align: center;
+    }
+  </style>
 </head>
 <body>
 
@@ -20,6 +114,18 @@
     <div class="maintenance-loader">
       <div class="maintenance-bar-track"><div class="maintenance-bar-fill"></div></div>
     </div>
+  </div>
+</div>
+
+<!-- ══ BAN OVERLAY ══ -->
+<div class="ban-overlay" id="ban-overlay" style="display:none;">
+  <div class="ban-box">
+    <div class="ban-icon">🔨</div>
+    <div class="ban-title">COMPTE BANNI</div>
+    <div class="ban-subtitle">Ton compte a été suspendu par l'équipe de Timor.</div>
+    <div class="ban-reason" id="ban-reason-display">Aucune raison spécifiée.</div>
+    <p style="font-size:0.78rem;color:#666;margin-bottom:16px;">Si tu penses que c'est une erreur, contacte un administrateur sur Discord.</p>
+    <button class="ban-logout-btn" onclick="App.logout()">Se déconnecter</button>
   </div>
 </div>
 
@@ -272,6 +378,20 @@
           <button class="btn-role btn-role-revoke" id="btn-revoke-modo" onclick="adminRevokeModo()">✕ Retirer Modo</button>
         </div>
       </div>
+
+      <!-- ══ BAN SECTION ══ -->
+      <div class="ban-section" id="admin-ban-section" style="display:none;">
+        <label class="admin-label">MODÉRATION — BANNISSEMENT</label>
+        <div class="ban-current" id="admin-ban-current">
+          Statut : <span id="admin-ban-status-label" style="color:var(--success,#52c97a);">✓ Actif</span>
+        </div>
+        <input class="admin-input ban-reason-input" id="admin-ban-reason" placeholder="Raison du ban (optionnel)…" style="margin-bottom:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-role btn-role-ban" id="btn-ban-player" onclick="adminBanPlayer()">🔨 Bannir ce joueur</button>
+          <button class="btn-role btn-role-unban" id="btn-unban-player" onclick="adminUnbanPlayer()" style="display:none;">✓ Débannir</button>
+        </div>
+      </div>
+
       <div class="admin-feedback" id="admin-feedback"></div>
     </div>
 
@@ -297,13 +417,10 @@
 
     <!-- Tab: Quêtes (édition + preuves à valider) -->
     <div class="admin-tab-panel" id="admin-tab-quetes-edit">
-      <!-- Sous-onglets internes -->
       <div class="admin-tabs" style="margin-bottom:12px;">
         <button class="admin-tab active" onclick="switchQuestAdminTab('edit',this)">✏️ Éditer les quêtes</button>
         <button class="admin-tab" id="tab-proofs-btn" onclick="switchQuestAdminTab('proofs',this)">📸 Preuves à valider <span class="orders-count-badge" id="proofs-pending-count" style="display:none;">0</span></button>
       </div>
-
-      <!-- Panneau édition quêtes -->
       <div id="quest-admin-edit-panel">
         <label class="admin-label">TITRE</label>
         <input class="admin-input" id="quest-page-title" placeholder="⚔️ Quêtes">
@@ -319,8 +436,6 @@
         </div>
         <div class="admin-feedback" id="admin-quests-feedback"></div>
       </div>
-
-      <!-- Panneau preuves à valider -->
       <div id="quest-admin-proofs-panel" style="display:none;">
         <div class="orders-filter-bar">
           <div class="orders-filter-tabs">
@@ -389,6 +504,12 @@
         <div class="admin-row"><label>Catégorie</label><input class="admin-input" id="ase-cat" placeholder="Rôles…"></div>
         <div class="admin-row"><label>Prix (🪙)</label><input class="admin-input" id="ase-price" type="number" min="0" placeholder="500" style="max-width:130px"></div>
         <div class="admin-row"><label>Stock</label><input class="admin-input" id="ase-stock" type="number" placeholder="-1 = illimité" style="max-width:130px"></div>
+        <!-- ══ NIVEAU REQUIS ══ -->
+        <div class="admin-row">
+          <label>Niveau requis</label>
+          <input class="admin-input" id="ase-minlevel" type="number" min="1" max="20" placeholder="1 = aucune restriction" style="max-width:180px">
+          <span style="font-size:0.72rem;color:var(--text-dim);align-self:center;margin-left:6px;">Laisser vide ou 1 = libre</span>
+        </div>
         <div class="admin-row"><label>Image</label><input class="admin-input" id="ase-image" placeholder="URL image"></div>
         <div class="admin-row"><label>Unique</label>
           <select class="admin-input" id="ase-unique" style="max-width:175px;margin-bottom:0;">
@@ -495,7 +616,17 @@
   <div class="shop-grid" id="shop-grid">
     <div class="shop-empty">Aucun article disponible.</div>
   </div>
-  <!-- FIX 2: section "Mes achats" supprimée de la boutique -->
+
+  <!-- ══ MES COMMANDES ══ -->
+  <div class="my-orders-section" id="my-orders-section" style="display:none;">
+    <div class="my-orders-title">
+      📦 Mes commandes
+      <button class="btn-admin" style="margin-left:auto;font-size:0.72rem;padding:4px 12px;" onclick="loadMyOrders()">↺ Actualiser</button>
+    </div>
+    <div class="my-orders-list" id="my-orders-list">
+      <div class="my-orders-empty">Aucune commande.</div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ CLASSEMENT ══ -->
@@ -867,8 +998,6 @@ const WORKER_URL   = 'https://timor-discord-auth.yanismanca66.workers.dev';
 const DISCORD_ID   = '1508123459782443260';
 const REDIRECT     = 'https://yanisss908.github.io/timor-ng/';
 const SESSION_KEY  = 'timor_session_v1';
-// FIX 3: cache supprimé — on ne met plus en cache les données du pays/quêtes/boutique
-// pour toujours avoir les données fraîches depuis Supabase au chargement
 const LB_TTL       = 6 * 60 * 60 * 1000;
 
 // ── Defaults ───────────────────────────────────────────────────────────────
@@ -940,6 +1069,7 @@ async function logout() {
   state.user = null;
   window._spinUID = null;
   document.body.classList.remove('is-admin', 'is-modo');
+  document.getElementById('ban-overlay').style.display = 'none';
   renderNav();
   renderUI();
   await loadLeaderboard();
@@ -970,6 +1100,17 @@ async function handleCallback() {
 
 async function startSession(profile) {
   const db = await dbGetUser(profile.uid);
+
+  // ── VÉRIFICATION BAN ──────────────────────────────────────────────────
+  if (db?.banned === true) {
+    clearSession();
+    const overlay = document.getElementById('ban-overlay');
+    const reasonEl = document.getElementById('ban-reason-display');
+    if (reasonEl) reasonEl.textContent = db.banned_reason || 'Aucune raison spécifiée.';
+    if (overlay) overlay.style.display = 'flex';
+    return;
+  }
+
   state.user = {
     ...profile,
     xp:     db?.xp     ?? 0,
@@ -988,7 +1129,6 @@ async function startSession(profile) {
   updateSpinUI(); startSpinTimer();
 
   try {
-    // FIX 2: on ne charge que les achats boutique réels (pas les preuves de quêtes)
     const { data } = await sb.from('purchases').select('*').eq('uid', profile.uid)
       .not('item_cat', 'eq', 'Quête');
     state.purchases = data || [];
@@ -1014,7 +1154,7 @@ async function startSession(profile) {
   if (state.user.role === 'admin') applyMaintenance(false);
 }
 
-// ── Site data (FIX 3: toujours charger depuis Supabase, pas de cache) ──────
+// ── Site data ──────────────────────────────────────────────────────────────
 async function loadSiteData() {
   try {
     const [t, p, q, s, l] = await Promise.all([
@@ -1066,6 +1206,9 @@ function renderNav() {
     document.getElementById('admin-panel').classList.remove('visible');
     document.getElementById('profile-level-card').style.display = 'none';
     setText('dash-welcome', 'Tableau de bord');
+    // Masquer mes commandes si déconnecté
+    const mo = document.getElementById('my-orders-section');
+    if (mo) mo.style.display = 'none';
     return;
   }
   const u = state.user;
@@ -1088,6 +1231,9 @@ function renderNav() {
     <button class="btn-nav-logout" id="btn-logout" title="Déconnexion">✕</button>
   </div>`;
   document.getElementById('btn-logout').onclick = logout;
+  // Afficher mes commandes si connecté
+  const mo = document.getElementById('my-orders-section');
+  if (mo) { mo.style.display = ''; loadMyOrders(); }
 }
 
 function renderTutos() {
@@ -1259,7 +1405,6 @@ function renderShop() {
     `<button class="shop-cat-btn${i === 0 ? ' active' : ''}" onclick="filterShop('${esc(c)}',this)">${esc(c)}</button>`
   ).join('');
   renderShopGrid('Tous');
-  // FIX 2: updateInventory() supprimé — plus de section "Mes achats" dans la boutique
   const bal = document.getElementById('shop-balance-display');
   const ban = document.getElementById('shop-auth-banner');
   if (state.user) {
@@ -1277,26 +1422,52 @@ function renderShopGrid(cat) {
   const items = state.shop.items || [];
   const filtered = cat === 'Tous' ? items : items.filter(i => (i.cat || 'Général') === cat);
   if (!filtered.length) { grid.innerHTML = '<div class="shop-empty">Aucun article disponible.</div>'; return; }
+
+  // Niveau actuel du joueur (0 si non connecté)
+  const userLevel = state.user ? getLevelFromXP(state.user.xp) : 0;
+
   grid.innerHTML = filtered.map(item => {
     const owned   = state.user && state.purchases.some(p => p.item_id === item.id && item.unique);
     const soldOut = item.stock !== undefined && item.stock !== -1 && item.stock <= 0;
     const price   = item.price || 0;
     const can     = state.user && state.user.coins >= price;
+
+    // ── NIVEAU REQUIS ──────────────────────────────────────────────────
+    const minLevel   = item.minlevel && item.minlevel > 1 ? item.minlevel : 1;
+    const levelLocked = state.user && userLevel < minLevel;
+    const levelLockEl = minLevel > 1
+      ? `<div class="shop-level-lock">🔒 Niveau ${minLevel} requis${levelLocked ? ' · Tu es niv. ' + userLevel : ' ✓'}</div>`
+      : '';
+    // XP restant pour débloquer (si verrouillé)
+    const nextLevelXp = minLevel <= LEVELS.length ? LEVELS[minLevel - 1].xpMin : 0;
+    const xpGap = levelLocked
+      ? `<div class="shop-level-progress">Encore ${fmtNum(nextLevelXp - (state.user?.xp || 0))} XP pour débloquer</div>`
+      : '';
+
     const img = item.image
       ? `<img class="shop-card-img" src="${esc(item.image)}" alt="" onerror="this.parentNode.innerHTML='<div class=shop-card-img-placeholder>${esc(item.icon||'🛒')}</div>'">`
       : `<div class="shop-card-img-placeholder">${item.icon || '🛒'}</div>`;
     const priceEl = `<div class="shop-card-price${price === 0 ? ' free' : ''}">${price === 0 ? '🆓 Gratuit' : '🪙 ' + fmtNum(price)}</div>`;
+
     let footer;
-    if (owned)          footer = priceEl + '<span class="shop-badge-owned">✓ Acquis</span>';
-    else if (soldOut)   footer = priceEl + '<span class="shop-badge-soldout">Épuisé</span>';
-    else if (!state.user) footer = priceEl + `<button class="btn-shop-buy" onclick="App.loginWithDiscord()">Connexion</button>`;
-    else footer = priceEl + `<button class="btn-shop-buy"${can ? '' : ' disabled title="Pièces insuffisantes"'} onclick="openPurchaseModal('${esc(item.id)}')">Acheter</button>`;
-    return `<div class="shop-card${owned ? ' owned' : ''}${soldOut ? ' sold-out' : ''}">
+    if (owned)
+      footer = priceEl + '<span class="shop-badge-owned">✓ Acquis</span>';
+    else if (soldOut)
+      footer = priceEl + '<span class="shop-badge-soldout">Épuisé</span>';
+    else if (levelLocked)
+      footer = priceEl + `<button class="btn-shop-locked" disabled title="Niveau ${minLevel} requis">🔒 Niv. ${minLevel}</button>${xpGap}`;
+    else if (!state.user)
+      footer = priceEl + `<button class="btn-shop-buy" onclick="App.loginWithDiscord()">Connexion</button>`;
+    else
+      footer = priceEl + `<button class="btn-shop-buy"${can ? '' : ' disabled title="Pièces insuffisantes"'} onclick="openPurchaseModal('${esc(item.id)}')">Acheter</button>`;
+
+    return `<div class="shop-card${owned ? ' owned' : ''}${soldOut ? ' sold-out' : ''}${levelLocked ? ' locked' : ''}">
       ${item.limited ? '<div class="shop-badge-limited">LIMITÉ</div>' : ''}
       ${img}
       <div class="shop-card-body">
         <div class="shop-card-cat">${esc(item.cat || 'Général')}</div>
         <div class="shop-card-title">${esc(item.name || 'Article')}</div>
+        ${levelLockEl}
         <div class="shop-card-desc">${esc(item.desc || '')}</div>
         ${item.stock !== undefined && item.stock !== -1 ? `<div style="font-size:0.68rem;color:var(--text-dim);margin-bottom:8px;font-family:'JetBrains Mono',monospace;">Stock : ${item.stock}</div>` : ''}
         <div class="shop-card-footer">${footer}</div>
@@ -1315,6 +1486,15 @@ window.openPurchaseModal = (itemId) => {
   if (!state.user) return;
   const item = (state.shop.items || []).find(i => i.id === itemId);
   if (!item) return;
+
+  // Double-vérification niveau requis
+  const minLevel = item.minlevel && item.minlevel > 1 ? item.minlevel : 1;
+  const userLevel = getLevelFromXP(state.user.xp);
+  if (userLevel < minLevel) {
+    toast('🔒 Niveau ' + minLevel + ' requis pour cet article !');
+    return;
+  }
+
   state.pendingItem = item;
   setText('pm-icon', item.icon || '🛒');
   setText('pm-title', item.name || 'Article');
@@ -1344,6 +1524,10 @@ window.confirmPurchase = async () => {
     if (item.unique && state.purchases.some(p => p.item_id === item.id)) throw new Error('Tu possèdes déjà cet article.');
     if (item.stock !== undefined && item.stock !== -1 && item.stock <= 0) throw new Error('Article épuisé.');
 
+    // Vérification niveau (sécurité côté client)
+    const minLevel = item.minlevel && item.minlevel > 1 ? item.minlevel : 1;
+    if (getLevelFromXP(db.xp || 0) < minLevel) throw new Error('Niveau ' + minLevel + ' requis pour cet article.');
+
     const newCoins = db.coins - price;
     await dbUpdateUser(state.user.uid, { coins: newCoins });
     state.user.coins = newCoins;
@@ -1369,11 +1553,52 @@ window.confirmPurchase = async () => {
     }
     renderShop(); renderNav();
     await loadLeaderboard(true);
+    await loadMyOrders(); // Rafraîchir mes commandes après achat
     closePurchaseModal();
     toast('✅ ' + esc(item.name) + ' commandé !');
   } catch(e) {
     errEl.textContent = e.message;
     btn.disabled = false; btn.textContent = 'Acheter';
+  }
+};
+
+// ── MES COMMANDES ─────────────────────────────────────────────────────────
+window.loadMyOrders = async () => {
+  if (!state.user) return;
+  const listEl = document.getElementById('my-orders-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div class="my-orders-empty">Chargement…</div>';
+  try {
+    const { data, error } = await sb.from('purchases')
+      .select('*')
+      .eq('uid', state.user.uid)
+      .not('item_cat', 'eq', 'Quête')
+      .order('purchased_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) {
+      listEl.innerHTML = '<div class="my-orders-empty">Tu n\'as pas encore de commandes.</div>';
+      return;
+    }
+    const statusMap = {
+      pending:   { label: '⏳ En attente de traitement', cls: 'pending' },
+      fulfilled: { label: '✅ Traité',                   cls: 'fulfilled' },
+      cancelled: { label: '✕ Annulé',                    cls: 'cancelled' },
+    };
+    listEl.innerHTML = data.map(o => {
+      const s = statusMap[o.status || 'pending'] || statusMap['pending'];
+      const date = o.purchased_at ? new Date(o.purchased_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+      return `<div class="my-order-card">
+        <div class="my-order-icon">${o.item_icon || '🛒'}</div>
+        <div class="my-order-info">
+          <div class="my-order-name">${esc(o.item_name || o.item_id)}</div>
+          <div class="my-order-date">${date}</div>
+          <div class="my-order-price">🪙 ${fmtNum(o.price)} pièces</div>
+        </div>
+        <div class="my-order-status ${s.cls}">${s.label}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    listEl.innerHTML = `<div class="my-orders-empty" style="color:var(--danger,#e05252);">Erreur : ${esc(e.message)}</div>`;
   }
 };
 
@@ -1459,7 +1684,8 @@ window.adminRefreshPlayers = async () => {
       state.adminPlayers[p.id] = p;
       const opt = document.createElement('option');
       opt.value = p.id;
-      opt.textContent = (p.global_name || p.username || 'Inconnu') + ' — ' + fmtNum(p.xp) + ' XP — [' + (p.role || 'citoyen') + ']';
+      const bannedTag = p.banned ? ' 🔨[BANNI]' : '';
+      opt.textContent = (p.global_name || p.username || 'Inconnu') + ' — ' + fmtNum(p.xp) + ' XP — [' + (p.role || 'citoyen') + ']' + bannedTag;
       sel.appendChild(opt);
     });
     setFb(fb, data.length + ' joueur(s).', 'ok');
@@ -1468,16 +1694,43 @@ window.adminRefreshPlayers = async () => {
 
 window.onAdminPlayerChange = () => {
   const uid = document.getElementById('admin-target-player')?.value;
-  const sec = document.getElementById('admin-role-section');
-  if (!uid || !state.adminPlayers[uid]) { if (sec) sec.style.display = 'none'; return; }
-  if (sec) sec.style.display = '';
+  const roleSec = document.getElementById('admin-role-section');
+  const banSec  = document.getElementById('admin-ban-section');
+  if (!uid || !state.adminPlayers[uid]) {
+    if (roleSec) roleSec.style.display = 'none';
+    if (banSec)  banSec.style.display  = 'none';
+    return;
+  }
+  if (roleSec) roleSec.style.display = '';
+  if (banSec)  banSec.style.display  = '';
+
   const p = state.adminPlayers[uid];
   const role = p.role || 'citoyen';
+
+  // Rôle
   const rd = document.getElementById('admin-player-role-display');
   if (rd) { rd.className = 'role-badge-display nav-role-badge' + (role === 'admin' ? ' role-admin' : role === 'modo' ? ' role-modo' : ''); rd.textContent = role.charAt(0).toUpperCase() + role.slice(1); }
   const g = document.getElementById('btn-grant-modo'), r = document.getElementById('btn-revoke-modo');
   if (g) g.style.display = (role === 'admin' || role === 'modo') ? 'none' : '';
   if (r) r.style.display = role === 'modo' ? '' : 'none';
+
+  // Ban — les modos ne peuvent pas bannir d'autres modos ni admins
+  const canBan = state.user?.role === 'admin' || (state.user?.role === 'modo' && role === 'citoyen');
+  if (banSec) banSec.style.display = canBan ? '' : 'none';
+  if (canBan) {
+    const isBanned = p.banned === true;
+    const statusLbl = document.getElementById('admin-ban-status-label');
+    if (statusLbl) {
+      statusLbl.textContent = isBanned ? '🔨 Banni' : '✓ Actif';
+      statusLbl.style.color = isBanned ? '#e05252' : '#52c97a';
+    }
+    const btnBan   = document.getElementById('btn-ban-player');
+    const btnUnban = document.getElementById('btn-unban-player');
+    if (btnBan)   btnBan.style.display   = isBanned ? 'none' : '';
+    if (btnUnban) btnUnban.style.display = isBanned ? '' : 'none';
+    const ri = document.getElementById('admin-ban-reason');
+    if (ri) ri.value = isBanned ? (p.banned_reason || '') : '';
+  }
 };
 
 const adminFeedback = (msg, type) => setFb(document.getElementById('admin-feedback'), msg, type);
@@ -1498,6 +1751,60 @@ window.adminRevokeModo = async () => {
   if (!p || p.role === 'admin') { adminFeedback('Impossible.', 'err'); return; }
   try { await dbUpdateUser(uid, { role: 'citoyen' }); adminFeedback('✓ Rôle retiré.', 'ok'); toast('✓ Rôle retiré.'); await adminRefreshPlayers(); }
   catch(e) { adminFeedback('Erreur: ' + e.message, 'err'); }
+};
+
+// ── BAN / DÉBANNIR ─────────────────────────────────────────────────────────
+window.adminBanPlayer = async () => {
+  const uid = document.getElementById('admin-target-player')?.value;
+  if (!uid) { adminFeedback('Sélectionne un joueur.', 'err'); return; }
+  const p = state.adminPlayers[uid];
+  if (!p) { adminFeedback('Joueur introuvable.', 'err'); return; }
+
+  // Sécurité : un modo ne peut pas bannir un admin ou un autre modo
+  if (state.user?.role === 'modo' && (p.role === 'admin' || p.role === 'modo')) {
+    adminFeedback('Tu ne peux pas bannir un admin ou un modo.', 'err'); return;
+  }
+  // Un admin ne peut pas se bannir lui-même
+  if (uid === state.user?.uid) { adminFeedback('Tu ne peux pas te bannir toi-même.', 'err'); return; }
+
+  const reason = (document.getElementById('admin-ban-reason')?.value || '').trim();
+  if (!confirm(`Bannir "${p.global_name || p.username}"${reason ? ` (raison : ${reason})` : ''} ?`)) return;
+
+  adminFeedback('Bannissement…');
+  try {
+    await dbUpdateUser(uid, {
+      banned: true,
+      banned_reason: reason || null,
+      banned_at: new Date().toISOString(),
+      banned_by: state.user?.uid,
+    });
+    adminFeedback('✓ Joueur banni.', 'ok');
+    toast('🔨 Joueur banni : ' + (p.global_name || p.username));
+    await adminRefreshPlayers();
+    onAdminPlayerChange();
+  } catch(e) { adminFeedback('Erreur: ' + e.message, 'err'); }
+};
+
+window.adminUnbanPlayer = async () => {
+  const uid = document.getElementById('admin-target-player')?.value;
+  if (!uid) { adminFeedback('Sélectionne un joueur.', 'err'); return; }
+  const p = state.adminPlayers[uid];
+  if (!p) { adminFeedback('Joueur introuvable.', 'err'); return; }
+  if (!confirm(`Débannir "${p.global_name || p.username}" ?`)) return;
+
+  adminFeedback('Débannissement…');
+  try {
+    await dbUpdateUser(uid, {
+      banned: false,
+      banned_reason: null,
+      banned_at: null,
+      banned_by: null,
+    });
+    adminFeedback('✓ Joueur débanni.', 'ok');
+    toast('✓ Joueur débanni : ' + (p.global_name || p.username));
+    await adminRefreshPlayers();
+    onAdminPlayerChange();
+  } catch(e) { adminFeedback('Erreur: ' + e.message, 'err'); }
 };
 
 window.adminModifyXP = async (sign) => {
@@ -1543,7 +1850,7 @@ window.adminModifyCoins = async (sign) => {
   } catch(e) { adminFeedback('Erreur: ' + e.message, 'err'); }
 };
 
-// FIX 1: adminLoadOrders ne charge que les achats boutique (pas les preuves de quêtes)
+// ── Admin Commandes ────────────────────────────────────────────────────────
 window.adminLoadOrders = async () => {
   const list = document.getElementById('orders-list');
   if (!list) return;
@@ -1629,7 +1936,7 @@ window.adminCancelOrder = async (id) => {
   } catch(e) { toast('Erreur: ' + e.message); }
 };
 
-// FIX 1: système de preuves de quêtes séparé dans l'onglet Quêtes
+// ── Admin Preuves ──────────────────────────────────────────────────────────
 window.adminLoadProofs = async () => {
   const list = document.getElementById('proofs-list');
   if (!list) return;
@@ -1695,7 +2002,6 @@ window.adminFulfillProof = async (id, uid, questId) => {
   try {
     const { error } = await sb.from('purchases').update({ status: 'fulfilled', fulfilled_at: new Date().toISOString(), fulfilled_by: state.user?.uid }).eq('id', id);
     if (error) throw error;
-    // Attribuer l'XP de la quête au joueur
     const quest = (state.quests.quests || []).find(q => q.id === questId);
     if (quest && uid) {
       const db = await dbGetUser(uid);
@@ -1888,7 +2194,8 @@ window.adminLoadShopEditor = () => {
   (state.shop.items || []).forEach(item => {
     const el = document.createElement('div');
     el.className = 'admin-card-item';
-    el.innerHTML = `<span>${item.icon || '🛒'}</span><span class="admin-card-item-name">${esc(item.name || 'Article')}</span><span class="admin-card-item-xp">🪙 ${item.price || 0}</span>`;
+    const lockBadge = item.minlevel && item.minlevel > 1 ? ` 🔒Niv.${item.minlevel}` : '';
+    el.innerHTML = `<span>${item.icon || '🛒'}</span><span class="admin-card-item-name">${esc(item.name || 'Article')}${lockBadge}</span><span class="admin-card-item-xp">🪙 ${item.price || 0}</span>`;
     el.onclick = () => {
       document.querySelectorAll('#admin-shop-list .admin-card-item').forEach(i => i.classList.remove('selected'));
       el.classList.add('selected');
@@ -1897,6 +2204,7 @@ window.adminLoadShopEditor = () => {
       setVal('ase-cat', item.cat || '');
       setVal('ase-price', item.price !== undefined ? item.price : '');
       setVal('ase-stock', item.stock !== undefined ? item.stock : -1);
+      setVal('ase-minlevel', item.minlevel || '');  // ← niveau requis
       setVal('ase-image', item.image || ''); setVal('ase-desc', item.desc || '');
       setVal('ase-instructions', item.instructions || '');
       setVal('ase-unique', item.unique ? 'true' : 'false');
@@ -1910,7 +2218,7 @@ window.adminLoadShopEditor = () => {
 
 window.adminNewShopItem = () => {
   state.editingShopId = 'shop_' + Date.now();
-  ['ase-name','ase-cat','ase-price','ase-image','ase-desc','ase-instructions'].forEach(id => setVal(id, ''));
+  ['ase-name','ase-cat','ase-price','ase-image','ase-desc','ase-instructions','ase-minlevel'].forEach(id => setVal(id, ''));
   setVal('ase-icon', '🛒'); setVal('ase-stock', '-1');
   setVal('ase-unique', 'false'); setVal('ase-limited', 'false');
   document.getElementById('admin-shop-editor').style.display = '';
@@ -1932,8 +2240,9 @@ window.adminDeleteShopItem = async () => {
 
 window.adminSaveShopItem = async () => {
   if (!state.editingShopId) return;
-  const price = parseInt(document.getElementById('ase-price')?.value || '0', 10);
-  const stock = parseInt(document.getElementById('ase-stock')?.value || '-1', 10);
+  const price    = parseInt(document.getElementById('ase-price')?.value || '0', 10);
+  const stock    = parseInt(document.getElementById('ase-stock')?.value || '-1', 10);
+  const minlevel = parseInt(document.getElementById('ase-minlevel')?.value || '1', 10);
   const item = {
     id: state.editingShopId,
     name:         document.getElementById('ase-name')?.value?.trim()         || 'Article',
@@ -1941,6 +2250,7 @@ window.adminSaveShopItem = async () => {
     cat:          document.getElementById('ase-cat')?.value?.trim()          || 'Général',
     price:        isNaN(price) ? 0 : Math.max(0, price),
     stock:        isNaN(stock) ? -1 : stock,
+    minlevel:     isNaN(minlevel) || minlevel <= 1 ? undefined : minlevel,
     image:        document.getElementById('ase-image')?.value?.trim()        || undefined,
     unique:       document.getElementById('ase-unique')?.value === 'true',
     limited:      document.getElementById('ase-limited')?.value === 'true',
@@ -1949,6 +2259,7 @@ window.adminSaveShopItem = async () => {
   };
   if (!item.image) delete item.image;
   if (!item.instructions) delete item.instructions;
+  if (!item.minlevel) delete item.minlevel;
   if (!state.shop.items) state.shop.items = [];
   const idx = state.shop.items.findIndex(i => i.id === item.id);
   if (idx >= 0) state.shop.items[idx] = item; else state.shop.items.push(item);
@@ -2148,7 +2459,6 @@ window.Timor = window.App;
     if (m?.active) applyMaintenance(true);
   } catch(e) {}
 
-  // FIX 3: chargement direct depuis Supabase sans passer par le cache localStorage
   await loadSiteData();
 
   if (await handleCallback()) return;
