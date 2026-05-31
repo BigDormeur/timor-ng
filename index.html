@@ -168,8 +168,8 @@
   <h1>TI<span>MOR</span></h1>
   <p class="hero-desc" id="hero-desc">Nation fondée sur la discipline, le commerce et la solidarité.</p>
   <div class="hero-stats">
-    <div class="hero-stat"><span class="num" id="stat-membres">142</span><span class="lbl">Membres</span></div>
-    <div class="hero-stat"><span class="num" id="stat-rang">#3</span><span class="lbl">Rang mondial</span></div>
+    <div class="hero-stat"><span class="num" id="stat-membres">—</span><span class="lbl">Membres</span></div>
+    <div class="hero-stat"><span class="num" id="stat-rang">—</span><span class="lbl">Rang mondial</span></div>
   </div>
   <div class="hero-btns">
     <a href="#" class="btn-primary" onclick="openQuests();return false;">⚔️ Voir les quêtes</a>
@@ -275,7 +275,7 @@
       <div class="admin-feedback" id="admin-feedback"></div>
     </div>
 
-    <!-- Tab: Commandes -->
+    <!-- Tab: Commandes (achats boutique uniquement) -->
     <div class="admin-tab-panel" id="admin-tab-orders">
       <div class="orders-notify-banner" id="orders-notify-banner" style="display:none;">
         <span>⏳</span>
@@ -287,7 +287,6 @@
           <button class="orders-filter-tab active" onclick="filterOrders('pending',this)">⏳ En attente</button>
           <button class="orders-filter-tab" onclick="filterOrders('fulfilled',this)">✅ Traitées</button>
           <button class="orders-filter-tab" onclick="filterOrders('cancelled',this)">✕ Annulées</button>
-          <button class="orders-filter-tab" onclick="filterOrders('proof_pending',this)">📸 Preuves</button>
           <button class="orders-filter-tab" onclick="filterOrders('all',this)">Toutes</button>
         </div>
         <button class="btn-admin" onclick="adminLoadOrders()">↺ Actualiser</button>
@@ -296,21 +295,45 @@
       <div class="admin-feedback" id="admin-orders-feedback"></div>
     </div>
 
-    <!-- Tab: Quêtes -->
+    <!-- Tab: Quêtes (édition + preuves à valider) -->
     <div class="admin-tab-panel" id="admin-tab-quetes-edit">
-      <label class="admin-label">TITRE</label>
-      <input class="admin-input" id="quest-page-title" placeholder="⚔️ Quêtes">
-      <label class="admin-label">DESCRIPTION</label>
-      <textarea class="admin-textarea" id="quest-page-desc" placeholder="Texte d'introduction…"></textarea>
-      <label class="admin-label">QUÊTES (une par ligne)</label>
-      <div class="admin-format-hint">Format : <code>Titre|Description|XP|Pièces|Catégorie|Icône|proof</code> (le dernier champ est optionnel)</div>
-      <textarea class="admin-textarea" id="quest-admin-list" style="min-height:200px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"></textarea>
-      <div class="admin-actions" style="margin-top:8px;">
-        <button class="btn-admin" onclick="adminSaveQuests()">💾 Sauvegarder</button>
-        <button class="btn-admin" onclick="openQuests()">👁 Aperçu</button>
-        <button class="btn-admin" onclick="adminResetQuestsDefault()">↺ Exemples</button>
+      <!-- Sous-onglets internes -->
+      <div class="admin-tabs" style="margin-bottom:12px;">
+        <button class="admin-tab active" onclick="switchQuestAdminTab('edit',this)">✏️ Éditer les quêtes</button>
+        <button class="admin-tab" id="tab-proofs-btn" onclick="switchQuestAdminTab('proofs',this)">📸 Preuves à valider <span class="orders-count-badge" id="proofs-pending-count" style="display:none;">0</span></button>
       </div>
-      <div class="admin-feedback" id="admin-quests-feedback"></div>
+
+      <!-- Panneau édition quêtes -->
+      <div id="quest-admin-edit-panel">
+        <label class="admin-label">TITRE</label>
+        <input class="admin-input" id="quest-page-title" placeholder="⚔️ Quêtes">
+        <label class="admin-label">DESCRIPTION</label>
+        <textarea class="admin-textarea" id="quest-page-desc" placeholder="Texte d'introduction…"></textarea>
+        <label class="admin-label">QUÊTES (une par ligne)</label>
+        <div class="admin-format-hint">Format : <code>Titre|Description|XP|Pièces|Catégorie|Icône|proof</code> (le dernier champ est optionnel)</div>
+        <textarea class="admin-textarea" id="quest-admin-list" style="min-height:200px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;"></textarea>
+        <div class="admin-actions" style="margin-top:8px;">
+          <button class="btn-admin" onclick="adminSaveQuests()">💾 Sauvegarder</button>
+          <button class="btn-admin" onclick="openQuests()">👁 Aperçu</button>
+          <button class="btn-admin" onclick="adminResetQuestsDefault()">↺ Exemples</button>
+        </div>
+        <div class="admin-feedback" id="admin-quests-feedback"></div>
+      </div>
+
+      <!-- Panneau preuves à valider -->
+      <div id="quest-admin-proofs-panel" style="display:none;">
+        <div class="orders-filter-bar">
+          <div class="orders-filter-tabs">
+            <button class="orders-filter-tab active" onclick="filterProofs('proof_pending',this)">📸 En attente</button>
+            <button class="orders-filter-tab" onclick="filterProofs('fulfilled',this)">✅ Validées</button>
+            <button class="orders-filter-tab" onclick="filterProofs('cancelled',this)">✕ Refusées</button>
+            <button class="orders-filter-tab" onclick="filterProofs('all',this)">Toutes</button>
+          </div>
+          <button class="btn-admin" onclick="adminLoadProofs()">↺ Actualiser</button>
+        </div>
+        <div class="orders-list" id="proofs-list"><div class="orders-empty">Chargement…</div></div>
+        <div class="admin-feedback" id="admin-proofs-feedback"></div>
+      </div>
     </div>
 
     <!-- Tab: Tutoriels -->
@@ -442,8 +465,8 @@
   <div class="pays-grid">
     <div class="info-block"><h3>Fondation</h3><span class="big" id="pays-fondation">[Année]</span><p>Date de création sur NationsGlory</p></div>
     <div class="info-block"><h3>Statut</h3><span class="big">Référent</span><p>Pays reconnu officiellement</p></div>
-    <div class="info-block"><h3>Citoyens</h3><span class="big" id="pays-membres">142</span><p>Membres actifs</p></div>
-    <div class="info-block"><h3>Rang mondial</h3><span class="big" id="pays-rang">#3</span><p>Position au classement général</p></div>
+    <div class="info-block"><h3>Citoyens</h3><span class="big" id="pays-membres">—</span><p>Membres actifs</p></div>
+    <div class="info-block"><h3>Rang mondial</h3><span class="big" id="pays-rang">—</span><p>Position au classement général</p></div>
   </div>
   <div class="pays-desc" id="pays-desc">Timor est une nation bâtie sur trois piliers : la <em>discipline</em>, le <em>commerce</em> et la <em>fraternité</em>.</div>
   <div class="divider">Gouvernement</div>
@@ -472,10 +495,7 @@
   <div class="shop-grid" id="shop-grid">
     <div class="shop-empty">Aucun article disponible.</div>
   </div>
-  <div class="shop-inventory-section" id="shop-inventory-section" style="display:none;">
-    <div class="shop-inventory-title">Mes achats</div>
-    <div class="shop-inventory-grid" id="shop-inventory-grid"></div>
-  </div>
+  <!-- FIX 2: section "Mes achats" supprimée de la boutique -->
 </div>
 
 <!-- ══ CLASSEMENT ══ -->
@@ -847,11 +867,12 @@ const WORKER_URL   = 'https://timor-discord-auth.yanismanca66.workers.dev';
 const DISCORD_ID   = '1508123459782443260';
 const REDIRECT     = 'https://yanisss908.github.io/timor-ng/';
 const SESSION_KEY  = 'timor_session_v1';
-const CACHE_KEY    = 'timor_cache_v4';
+// FIX 3: cache supprimé — on ne met plus en cache les données du pays/quêtes/boutique
+// pour toujours avoir les données fraîches depuis Supabase au chargement
 const LB_TTL       = 6 * 60 * 60 * 1000;
 
 // ── Defaults ───────────────────────────────────────────────────────────────
-const DEF_PAYS   = { membres:'142', rang:'#3', fondation:'[Année]',
+const DEF_PAYS   = { membres:'—', rang:'—', fondation:'[Année]',
   herodesc:'Nation fondée sur la discipline, le commerce et la solidarité.',
   paydesc:'Timor est une nation bâtie sur trois piliers.',
   gouv:[{init:'PR',nom:'[Président]',role:'Président de Timor',badge:"Chef d'État"}] };
@@ -874,7 +895,9 @@ let state = {
   quickLinks: [],
   purchases: [],
   orders: [],
+  proofs: [],
   ordersFilter: 'pending',
+  proofsFilter: 'proof_pending',
   lbCache: null,
   lbTs: 0,
   pendingItem: null,
@@ -900,8 +923,6 @@ const dbUpdateUser = async (uid, fields) => {
   const { error } = await sb.from('users').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', uid);
   if (error) throw error;
 };
-
-const clearCache = () => { try { localStorage.removeItem(CACHE_KEY); } catch(e) {} };
 
 // ── Session ────────────────────────────────────────────────────────────────
 const saveSession = p => { try { localStorage.setItem(SESSION_KEY, JSON.stringify(p)); } catch(e) {} };
@@ -967,7 +988,9 @@ async function startSession(profile) {
   updateSpinUI(); startSpinTimer();
 
   try {
-    const { data } = await sb.from('purchases').select('*').eq('uid', profile.uid);
+    // FIX 2: on ne charge que les achats boutique réels (pas les preuves de quêtes)
+    const { data } = await sb.from('purchases').select('*').eq('uid', profile.uid)
+      .not('item_cat', 'eq', 'Quête');
     state.purchases = data || [];
   } catch(e) { state.purchases = []; }
 
@@ -984,28 +1007,15 @@ async function startSession(profile) {
     adminLoadQuestsEditor();
     adminLoadShopEditor();
     adminLoadOrders();
+    adminLoadProofs();
     adminLoadLinksEditor();
     adminLoadSpinEditor();
   }
   if (state.user.role === 'admin') applyMaintenance(false);
 }
 
-// ── Site data ──────────────────────────────────────────────────────────────
+// ── Site data (FIX 3: toujours charger depuis Supabase, pas de cache) ──────
 async function loadSiteData() {
-  try {
-    const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
-    if (cached) {
-      state.tutos      = cached.tutos || [];
-      state.pays       = cached.pays  || DEF_PAYS;
-      state.quests     = cached.quests|| DEF_QUESTS;
-      state.shop       = cached.shop  || DEF_SHOP;
-      state.quickLinks = cached.links || [];
-      renderUI();
-      await loadSpinPrizes();
-      return;
-    }
-  } catch(e) {}
-
   try {
     const [t, p, q, s, l] = await Promise.all([
       sdGet('tutos'), sdGet('pays'), sdGet('quests'), sdGet('shop'), sdGet('quicklinks')
@@ -1015,7 +1025,6 @@ async function loadSiteData() {
     state.quests     = q         ?? DEF_QUESTS;
     state.shop       = s         ?? DEF_SHOP;
     state.quickLinks = l?.links  ?? [];
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ tutos: state.tutos, pays: state.pays, quests: state.quests, shop: state.shop, links: state.quickLinks })); } catch(e) {}
   } catch(e) {
     console.warn('loadSiteData:', e.message);
   }
@@ -1117,10 +1126,10 @@ function renderTutos() {
 function renderPays() {
   const p = state.pays;
   setText('pays-fondation', p.fondation || '[Année]');
-  setText('pays-membres',  p.membres   || '142');
-  setText('pays-rang',     p.rang      || '#3');
-  setText('stat-membres',  p.membres   || '142');
-  setText('stat-rang',     p.rang      || '#3');
+  setText('pays-membres',  p.membres   || '—');
+  setText('pays-rang',     p.rang      || '—');
+  setText('stat-membres',  p.membres   || '—');
+  setText('stat-rang',     p.rang      || '—');
   setText('hero-desc',     p.herodesc  || '');
   setText('pays-desc',     p.paydesc   || '');
   const g = document.getElementById('gov-grid');
@@ -1250,7 +1259,7 @@ function renderShop() {
     `<button class="shop-cat-btn${i === 0 ? ' active' : ''}" onclick="filterShop('${esc(c)}',this)">${esc(c)}</button>`
   ).join('');
   renderShopGrid('Tous');
-  updateInventory();
+  // FIX 2: updateInventory() supprimé — plus de section "Mes achats" dans la boutique
   const bal = document.getElementById('shop-balance-display');
   const ban = document.getElementById('shop-auth-banner');
   if (state.user) {
@@ -1294,17 +1303,6 @@ function renderShopGrid(cat) {
       </div>
     </div>`;
   }).join('');
-}
-
-function updateInventory() {
-  const sec = document.getElementById('shop-inventory-section');
-  const grid = document.getElementById('shop-inventory-grid');
-  if (!sec || !grid) return;
-  if (!state.user || !state.purchases.length) { sec.style.display = 'none'; return; }
-  sec.style.display = '';
-  grid.innerHTML = state.purchases.map(p =>
-    `<div class="shop-inv-item"><span>${p.item_icon || '🛒'}</span>${esc(p.item_name || p.item_id)}</div>`
-  ).join('');
 }
 
 window.filterShop = (cat, btn) => {
@@ -1367,7 +1365,6 @@ window.confirmPurchase = async () => {
         shopData.items = shopData.items.map(i => i.id === item.id ? { ...i, stock: Math.max(0, i.stock - 1) } : i);
         await sdSet('shop', shopData);
         state.shop = shopData;
-        clearCache();
       }
     }
     renderShop(); renderNav();
@@ -1546,12 +1543,15 @@ window.adminModifyCoins = async (sign) => {
   } catch(e) { adminFeedback('Erreur: ' + e.message, 'err'); }
 };
 
+// FIX 1: adminLoadOrders ne charge que les achats boutique (pas les preuves de quêtes)
 window.adminLoadOrders = async () => {
   const list = document.getElementById('orders-list');
   if (!list) return;
   list.innerHTML = '<div class="orders-empty">Chargement…</div>';
   try {
-    const { data, error } = await sb.from('purchases').select('*').order('purchased_at', { ascending: false });
+    const { data, error } = await sb.from('purchases').select('*')
+      .not('item_cat', 'eq', 'Quête')
+      .order('purchased_at', { ascending: false });
     if (error) throw error;
     state.orders = data || [];
     updateOrdersBadge();
@@ -1578,10 +1578,10 @@ function renderOrders() {
   list.innerHTML = filtered.map(o => {
     const s = o.status || 'pending';
     const date = o.purchased_at ? new Date(o.purchased_at).toLocaleString('fr-FR') : '—';
-    const sl = s === 'pending' ? '⏳ En attente' : s === 'fulfilled' ? '✅ Traité' : s === 'proof_pending' ? '📸 Preuve à vérifier' : '✕ Annulé';
-    const sc = s === 'pending' ? 'status-pending' : s === 'fulfilled' ? 'status-fulfilled' : s === 'proof_pending' ? 'status-pending' : 'status-cancelled';
+    const sl = s === 'pending' ? '⏳ En attente' : s === 'fulfilled' ? '✅ Traité' : '✕ Annulé';
+    const sc = s === 'pending' ? 'status-pending' : s === 'fulfilled' ? 'status-fulfilled' : 'status-cancelled';
     const instr = o.instructions ? `<div class="order-instructions"><strong>📋 Instructions</strong>${esc(o.instructions)}</div>` : '';
-    const actions = s === 'pending' || s === 'proof_pending'
+    const actions = s === 'pending'
       ? `<div class="order-actions"><button class="btn-fulfill" onclick="adminFulfillOrder('${o.id}')">✅ Valider</button><button class="btn-cancel-order" onclick="adminCancelOrder('${o.id}')">✕</button></div>`
       : `<div class="order-actions" style="font-size:0.72rem;color:var(--text-dim);">${sl}</div>`;
     return `<div class="order-card ${s}" id="order-${o.id}">
@@ -1600,7 +1600,7 @@ function renderOrders() {
 }
 
 window.filterOrders = (filter, btn) => {
-  document.querySelectorAll('.orders-filter-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#admin-tab-orders .orders-filter-tab').forEach(b => b.classList.remove('active'));
   btn?.classList.add('active');
   state.ordersFilter = filter;
   renderOrders();
@@ -1627,6 +1627,108 @@ window.adminCancelOrder = async (id) => {
     if (i >= 0) state.orders[i].status = 'cancelled';
     updateOrdersBadge(); renderOrders(); toast('Commande annulée.');
   } catch(e) { toast('Erreur: ' + e.message); }
+};
+
+// FIX 1: système de preuves de quêtes séparé dans l'onglet Quêtes
+window.adminLoadProofs = async () => {
+  const list = document.getElementById('proofs-list');
+  if (!list) return;
+  list.innerHTML = '<div class="orders-empty">Chargement…</div>';
+  try {
+    const { data, error } = await sb.from('purchases').select('*')
+      .eq('item_cat', 'Quête')
+      .order('purchased_at', { ascending: false });
+    if (error) throw error;
+    state.proofs = data || [];
+    updateProofsBadge();
+    renderProofs();
+  } catch(e) { list.innerHTML = `<div class="orders-empty" style="color:var(--danger);">Erreur : ${esc(e.message)}</div>`; }
+};
+
+function updateProofsBadge() {
+  const pending = state.proofs.filter(p => (p.status || 'proof_pending') === 'proof_pending');
+  const cnt = document.getElementById('proofs-pending-count');
+  const tab = document.getElementById('tab-proofs-btn');
+  if (cnt) { cnt.textContent = pending.length; cnt.style.display = pending.length ? '' : 'none'; }
+  if (tab) tab.classList.toggle('has-notif', pending.length > 0);
+}
+
+function renderProofs() {
+  const list = document.getElementById('proofs-list');
+  if (!list) return;
+  const f = state.proofsFilter;
+  const filtered = f === 'all' ? state.proofs : state.proofs.filter(o => (o.status || 'proof_pending') === f);
+  if (!filtered.length) { list.innerHTML = '<div class="orders-empty">Aucune preuve ici.</div>'; return; }
+  list.innerHTML = filtered.map(o => {
+    const s = o.status || 'proof_pending';
+    const date = o.purchased_at ? new Date(o.purchased_at).toLocaleString('fr-FR') : '—';
+    const sl = s === 'proof_pending' ? '📸 À vérifier' : s === 'fulfilled' ? '✅ Validée' : '✕ Refusée';
+    const sc = s === 'proof_pending' ? 'status-pending' : s === 'fulfilled' ? 'status-fulfilled' : 'status-cancelled';
+    const instr = o.instructions ? `<div class="order-instructions"><strong>📋 Instructions</strong>${esc(o.instructions)}</div>` : '';
+    const actions = s === 'proof_pending'
+      ? `<div class="order-actions"><button class="btn-fulfill" onclick="adminFulfillProof('${o.id}','${esc(o.uid)}','${esc(o.item_id)}')">✅ Valider</button><button class="btn-cancel-order" onclick="adminRejectProof('${o.id}')">✕ Refuser</button></div>`
+      : `<div class="order-actions" style="font-size:0.72rem;color:var(--text-dim);">${sl}</div>`;
+    return `<div class="order-card ${s}" id="proof-${o.id}">
+      <div class="order-card-header">
+        <span class="order-icon">${o.item_icon || '📸'}</span>
+        <span class="order-item-name">${esc(o.item_name || o.item_id)}</span>
+        <span class="order-status-badge ${sc}">${sl}</span>
+      </div>
+      <div class="order-card-body">
+        <div class="order-info"><div class="order-buyer">Joueur : <span>${esc(o.username || '?')}</span></div><div class="order-date">${date}</div></div>
+        ${instr}${actions}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.filterProofs = (filter, btn) => {
+  document.querySelectorAll('#quest-admin-proofs-panel .orders-filter-tab').forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+  state.proofsFilter = filter;
+  renderProofs();
+};
+
+window.adminFulfillProof = async (id, uid, questId) => {
+  const btn = document.querySelector(`#proof-${id} .btn-fulfill`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Validation…'; }
+  try {
+    const { error } = await sb.from('purchases').update({ status: 'fulfilled', fulfilled_at: new Date().toISOString(), fulfilled_by: state.user?.uid }).eq('id', id);
+    if (error) throw error;
+    // Attribuer l'XP de la quête au joueur
+    const quest = (state.quests.quests || []).find(q => q.id === questId);
+    if (quest && uid) {
+      const db = await dbGetUser(uid);
+      if (db) {
+        const newXP = (db.xp || 0) + (quest.xp || 0);
+        const upd = { xp: newXP };
+        if (quest.coins > 0) upd.coins = (db.coins || 0) + quest.coins;
+        await dbUpdateUser(uid, upd);
+      }
+    }
+    const i = state.proofs.findIndex(p => p.id === id);
+    if (i >= 0) state.proofs[i].status = 'fulfilled';
+    updateProofsBadge(); renderProofs(); toast('✅ Preuve validée et XP attribué !');
+  } catch(e) { if (btn) { btn.disabled = false; btn.textContent = '✅ Valider'; } toast('Erreur: ' + e.message); }
+};
+
+window.adminRejectProof = async (id) => {
+  if (!confirm('Refuser cette preuve ?')) return;
+  try {
+    const { error } = await sb.from('purchases').update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancelled_by: state.user?.uid }).eq('id', id);
+    if (error) throw error;
+    const i = state.proofs.findIndex(p => p.id === id);
+    if (i >= 0) state.proofs[i].status = 'cancelled';
+    updateProofsBadge(); renderProofs(); toast('Preuve refusée.');
+  } catch(e) { toast('Erreur: ' + e.message); }
+};
+
+window.switchQuestAdminTab = (tab, btn) => {
+  document.querySelectorAll('#admin-tab-quetes-edit > .admin-tabs .admin-tab').forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+  document.getElementById('quest-admin-edit-panel').style.display = tab === 'edit' ? '' : 'none';
+  document.getElementById('quest-admin-proofs-panel').style.display = tab === 'proofs' ? '' : 'none';
+  if (tab === 'proofs') adminLoadProofs();
 };
 
 // ── Admin Quêtes ───────────────────────────────────────────────────────────
@@ -1657,7 +1759,7 @@ window.adminSaveQuests = async () => {
     quests,
   };
   setFb(fb, 'Sauvegarde…');
-  try { await sdSet('quests', data); state.quests = data; clearCache(); setFb(fb, '✓ Sauvegardé !', 'ok'); renderQuests(); toast('Quêtes mises à jour !'); }
+  try { await sdSet('quests', data); state.quests = data; setFb(fb, '✓ Sauvegardé !', 'ok'); renderQuests(); toast('Quêtes mises à jour !'); }
   catch(e) { setFb(fb, 'Erreur: ' + e.message, 'err'); }
 };
 
@@ -1714,7 +1816,7 @@ window.closeTutoEditor = () => {
 window.adminDeleteTuto = async () => {
   if (!state.editingTutoId || !confirm('Supprimer ?')) return;
   state.tutos = state.tutos.filter(t => t.id !== state.editingTutoId);
-  try { await sdSet('tutos', { list: state.tutos }); clearCache(); closeTutoEditor(); renderTutos(); adminLoadTutoEditor(); toast('Tutoriel supprimé.'); }
+  try { await sdSet('tutos', { list: state.tutos }); closeTutoEditor(); renderTutos(); adminLoadTutoEditor(); toast('Tutoriel supprimé.'); }
   catch(e) { toast('Erreur: ' + e.message); }
 };
 
@@ -1746,7 +1848,7 @@ window.adminSaveTuto = async () => {
   if (idx >= 0) state.tutos[idx] = t; else state.tutos.push(t);
   const fb = document.getElementById('admin-tuto-feedback');
   setFb(fb, 'Sauvegarde…');
-  try { await sdSet('tutos', { list: state.tutos }); clearCache(); setFb(fb, '✓ Sauvegardé !', 'ok'); renderTutos(); adminLoadTutoEditor(); toast('Tutoriel mis à jour !'); }
+  try { await sdSet('tutos', { list: state.tutos }); setFb(fb, '✓ Sauvegardé !', 'ok'); renderTutos(); adminLoadTutoEditor(); toast('Tutoriel mis à jour !'); }
   catch(e) { setFb(fb, 'Erreur: ' + e.message, 'err'); }
 };
 
@@ -1774,7 +1876,7 @@ window.adminSavePays = async () => {
   };
   const fb = document.getElementById('admin-pays-feedback');
   setFb(fb, 'Sauvegarde…');
-  try { await sdSet('pays', p); state.pays = p; clearCache(); setFb(fb, '✓ Sauvegardé !', 'ok'); renderPays(); toast('Infos pays mises à jour !'); }
+  try { await sdSet('pays', p); state.pays = p; setFb(fb, '✓ Sauvegardé !', 'ok'); renderPays(); toast('Infos pays mises à jour !'); }
   catch(e) { setFb(fb, 'Erreur: ' + e.message, 'err'); }
 };
 
@@ -1824,7 +1926,7 @@ window.closeShopEditor = () => {
 window.adminDeleteShopItem = async () => {
   if (!state.editingShopId || !confirm('Supprimer ?')) return;
   state.shop.items = (state.shop.items || []).filter(i => i.id !== state.editingShopId);
-  try { await sdSet('shop', state.shop); clearCache(); closeShopEditor(); renderShop(); adminLoadShopEditor(); toast('Article supprimé.'); }
+  try { await sdSet('shop', state.shop); closeShopEditor(); renderShop(); adminLoadShopEditor(); toast('Article supprimé.'); }
   catch(e) { toast('Erreur: ' + e.message); }
 };
 
@@ -1852,7 +1954,7 @@ window.adminSaveShopItem = async () => {
   if (idx >= 0) state.shop.items[idx] = item; else state.shop.items.push(item);
   const fb = document.getElementById('admin-shop-feedback');
   setFb(fb, 'Sauvegarde…');
-  try { await sdSet('shop', state.shop); clearCache(); setFb(fb, '✓ Sauvegardé !', 'ok'); renderShop(); adminLoadShopEditor(); toast('Article mis à jour !'); }
+  try { await sdSet('shop', state.shop); setFb(fb, '✓ Sauvegardé !', 'ok'); renderShop(); adminLoadShopEditor(); toast('Article mis à jour !'); }
   catch(e) { setFb(fb, 'Erreur: ' + e.message, 'err'); }
 };
 
@@ -1873,7 +1975,7 @@ window.adminSaveQuickLinks = async () => {
   const fb = document.getElementById('admin-links-feedback');
   const links = parseLinks(document.getElementById('ql-admin-links')?.value || '');
   setFb(fb, 'Sauvegarde…');
-  try { await sdSet('quicklinks', { links }); state.quickLinks = links; clearCache(); setFb(fb, '✓ Sauvegardé !', 'ok'); renderQuickLinks(); toast('Liens rapides mis à jour !'); }
+  try { await sdSet('quicklinks', { links }); state.quickLinks = links; setFb(fb, '✓ Sauvegardé !', 'ok'); renderQuickLinks(); toast('Liens rapides mis à jour !'); }
   catch(e) { setFb(fb, 'Erreur: ' + e.message, 'err'); }
 };
 
@@ -2007,6 +2109,7 @@ window.submitProof = async () => {
 
   submitBtn.disabled = false;
 };
+
 window.escalateToModo = async () => {
   const btn = document.querySelector('.btn-proof-modo');
   if (btn) btn.disabled = true;
@@ -2045,6 +2148,7 @@ window.Timor = window.App;
     if (m?.active) applyMaintenance(true);
   } catch(e) {}
 
+  // FIX 3: chargement direct depuis Supabase sans passer par le cache localStorage
   await loadSiteData();
 
   if (await handleCallback()) return;
@@ -2090,8 +2194,8 @@ function toggleTuto(card) {
 }
 
 function switchAdminTab(id, btn) {
-  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#admin-panel > .admin-tabs > .admin-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const panel = document.getElementById('admin-tab-' + id);
   if (panel) panel.classList.add('active');
