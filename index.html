@@ -2380,7 +2380,11 @@ window.escalateToModo = async () => {
     if (btn) btn.disabled = false;
   }
 };
-
+window.adminRelaunchOnboarding = () => {
+  if (!confirm('Relancer le tutoriel de bienvenue ? (localStorage réinitialisé)')) return;
+  try { localStorage.removeItem('timor_onboarding_done_v1'); } catch(e) {}
+  location.reload();
+};
 window.App = { loginWithDiscord, logout };
 window.Timor = window.App;
 
