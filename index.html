@@ -255,7 +255,6 @@
     .ob-wait-counter.visible { display: block; }
 
     /* Boutons */
-    .ob-btns { display: flex; gap: 8px; align-items: center; }
     .ob-btn-next {
       flex: 1; background: linear-gradient(135deg, #a855f7, #7c3aed);
       color: #fff; border: none; border-radius: 11px;
@@ -2876,7 +2875,6 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
 
 <!-- ════════════════════════════════════════
      ONBOARDING V2 — HTML + SCRIPT COMPLET
-     Remplace intégralement l'ancien système
 ════════════════════════════════════════ -->
 
 <!-- HTML Onboarding -->
@@ -2902,8 +2900,6 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
 </div>
 
 <div class="ob-ng-fact" id="ob-ng-fact"></div>
-
-<!-- Mini-map latérale -->
 <div id="ob-minimap"></div>
 
 <div id="ob-finish-overlay">
@@ -2919,7 +2915,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
   </div>
 </div>
 
-<!-- Script Onboarding V2 -->
+<!-- Script Onboarding V2 — CORRIGÉ : adminRelaunchOnboarding fonctionne sans reload -->
 <script>
 (function () {
   'use strict';
@@ -3012,8 +3008,8 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
   let currentStep     = 0;
   let _active         = false;
   let _originalClaim  = null;
-  let _listeners      = [];   // { el, fn, capture }
-  let _observers      = [];   // MutationObserver[]
+  let _listeners      = [];
+  let _observers      = [];
   let _rafSpot        = null;
   let _spotTarget     = null;
 
@@ -3037,9 +3033,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
   const finishBtn   = document.getElementById('ob-finish-close-btn');
   const finishRwVal = document.getElementById('ob-finish-reward-val');
 
-  /* ──────────────────────────────────────
-     SPOTLIGHT — RAF continu pour suivre scroll
-  ────────────────────────────────────── */
+  /* ── SPOTLIGHT ── */
   function trackSpotlight() {
     if (_spotTarget && _active) {
       const r = _spotTarget.getBoundingClientRect();
@@ -3058,7 +3052,6 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
   function setSpotTarget(el) {
     _spotTarget = el;
     if (el) {
-      // Scroll vers l'élément si hors viewport
       const r = el.getBoundingClientRect();
       if (r.top < 80 || r.bottom > window.innerHeight - 80) {
         window.scrollTo({ top: window.scrollY + r.top - window.innerHeight * 0.3, behavior: 'smooth' });
@@ -3066,9 +3059,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }
   }
 
-  /* ──────────────────────────────────────
-     BULLE — position FIXE dans le viewport
-  ────────────────────────────────────── */
+  /* ── BULLE ── */
   function placeBubble() {
     const bw     = Math.min(320, window.innerWidth - 32);
     const bh     = 340;
@@ -3098,9 +3089,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     bubble.style.left = left + 'px';
   }
 
-  /* ──────────────────────────────────────
-     BADGE "ACTION REQUISE"
-  ────────────────────────────────────── */
+  /* ── BADGE ── */
   function updateActiveBadge(show) {
     if (!activeBadge || !btnNext) return;
     if (show) {
@@ -3113,9 +3102,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }
   }
 
-  /* ──────────────────────────────────────
-     MINI-MAP LATÉRALE
-  ────────────────────────────────────── */
+  /* ── MINI-MAP ── */
   function renderMinimap() {
     if (!minimapEl) return;
     minimapEl.innerHTML = STEPS.map((s, i) => {
@@ -3125,9 +3112,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     minimapEl.classList.add('visible');
   }
 
-  /* ──────────────────────────────────────
-     PROGRESS DOTS DANS LA BULLE
-  ────────────────────────────────────── */
+  /* ── PROGRESS DOTS ── */
   function renderProgress() {
     if (!progEl) return;
     progEl.innerHTML = STEPS.map((_, i) => {
@@ -3136,9 +3121,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }).join('');
   }
 
-  /* ──────────────────────────────────────
-     UNLOCK DU BOUTON SUIVANT
-  ────────────────────────────────────── */
+  /* ── UNLOCK BOUTON SUIVANT ── */
   function unlockNext(label) {
     if (!btnNext) return;
     btnNext.disabled = false;
@@ -3154,9 +3137,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     if (window.toast) window.toast('✅ Action validée !');
   }
 
-  /* ──────────────────────────────────────
-     TOOLTIP ANECDOTE NG
-  ────────────────────────────────────── */
+  /* ── ANECDOTE NG ── */
   let _ngTimer = null;
   function showNGFact(text, el) {
     if (!ngFact || !text) return;
@@ -3178,9 +3159,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     _ngTimer = setTimeout(() => ngFact.classList.remove('show'), 6000);
   }
 
-  /* ──────────────────────────────────────
-     NETTOYAGE
-  ────────────────────────────────────── */
+  /* ── NETTOYAGE ── */
   function cleanListeners() {
     _listeners.forEach(({ el, fn, capture }) => {
       try { el.removeEventListener('click', fn, capture); } catch(e) {}
@@ -3192,16 +3171,13 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     document.querySelectorAll('.ob-target-pulse').forEach(e => e.classList.remove('ob-target-pulse'));
   }
 
-  /* ──────────────────────────────────────
-     AFFICHER UNE ÉTAPE
-  ────────────────────────────────────── */
+  /* ── AFFICHER UNE ÉTAPE ── */
   function showStep(idx) {
     if (idx >= STEPS.length) { endTuto(); return; }
     cleanListeners();
     currentStep = idx;
     const s = STEPS[idx];
 
-    /* Ouvre la section/page si nécessaire */
     if (s.id === 'claim' || s.action === 'quest_claim') {
       if (window.openQuests) window.openQuests();
       setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
@@ -3211,7 +3187,6 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
       if (window.showSection) window.showSection('accueil');
     }
 
-    /* DOM */
     renderProgress();
     renderMinimap();
     if (stepLbl) stepLbl.textContent = 'ÉTAPE ' + (idx + 1) + ' / ' + STEPS.length;
@@ -3228,7 +3203,6 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }
     if (waitCtr) waitCtr.classList.remove('visible');
 
-    /* Boutons */
     if (btnSkip) btnSkip.style.display = s.showSkip ? '' : 'none';
     const needsAction = s.action && s.action !== 'none';
     btnNext.disabled    = needsAction;
@@ -3236,17 +3210,14 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     btnNext.classList.remove('unlocked');
     updateActiveBadge(needsAction);
 
-    /* Cible spotlight */
     const targetEl = s.target ? s.target() : null;
     setSpotTarget(targetEl);
     placeBubble();
     if (targetEl) targetEl.classList.add('ob-target-pulse');
 
-    /* Anecdote NG avec délai */
     if (s.ngFact) setTimeout(() => showNGFact(s.ngFact, targetEl), 1500);
 
     /* ── LOGIQUE D'ACTION ── */
-
     if (s.action === 'click_element' && s.actionTarget) {
       const els = document.querySelectorAll(s.actionTarget);
       els.forEach(el => {
@@ -3260,7 +3231,6 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
       const sec = document.getElementById(s.sectionId);
       if (sec) {
         let done = false;
-        // Vérifie si déjà active
         if (sec.classList.contains('active')) { unlockNext('Continuer →'); done = true; }
         if (!done) {
           const mo = new MutationObserver(() => {
@@ -3301,14 +3271,12 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }
 
     if (s.action === 'quests_open') {
-      // Intercepte clic sur le teaser quêtes
       const qt = document.querySelector('.quests-teaser');
       if (qt) {
         const fn = () => unlockNext('Continuer →');
         qt.addEventListener('click', fn, { once: true, capture: true });
         _listeners.push({ el: qt, fn, capture: true });
       }
-      // Surveille ouverture page quêtes
       const qp = document.getElementById('quests-page');
       if (qp) {
         let done = false;
@@ -3334,7 +3302,6 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
       }
     }
 
-    /* Boutique : surveille section */
     if (s.id === 'shop' && s.sectionId) {
       const sec = document.getElementById(s.sectionId);
       if (sec) {
@@ -3353,21 +3320,16 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }
   }
 
-  /* ──────────────────────────────────────
-     AVANCER
-  ────────────────────────────────────── */
+  /* ── AVANCER ── */
   function advanceStep() {
     const s = STEPS[currentStep];
-    // Ferme la roulette si ouverte lors du step spin
     if (s?.id === 'spin') {
       if (window.closeSpinModal) window.closeSpinModal();
     }
     showStep(currentStep + 1);
   }
 
-  /* ──────────────────────────────────────
-     FIN DU TUTO
-  ────────────────────────────────────── */
+  /* ── FIN DU TUTO ── */
   async function endTuto() {
     _active = false;
     if (_rafSpot) { cancelAnimationFrame(_rafSpot); _rafSpot = null; }
@@ -3401,9 +3363,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }
   }
 
-  /* ──────────────────────────────────────
-     SKIP
-  ────────────────────────────────────── */
+  /* ── SKIP ── */
   function skipTuto() {
     if (!confirm('Passer le tutoriel ? Tu ne recevras pas la récompense de bienvenue.')) return;
     _active = false;
@@ -3419,9 +3379,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     if (window.toast) window.toast('Tuto passé. Accessible via le bouton Admin.');
   }
 
-  /* ──────────────────────────────────────
-     EVENTS
-  ────────────────────────────────────── */
+  /* ── EVENTS ── */
   if (btnNext) btnNext.onclick = () => { if (!btnNext.disabled) advanceStep(); };
   if (btnSkip) btnSkip.onclick = skipTuto;
   if (finishBtn) finishBtn.onclick = () => {
@@ -3430,22 +3388,18 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     if (window.toast) window.toast('🎉 Bienvenue dans la nation Timor !');
   };
 
-  // Resize : repositionne la bulle
   window.addEventListener('resize', placeBubble);
 
-  // Clic sur backdrop → shake la bulle
   backdrop.addEventListener('click', e => {
     if (e.target === backdrop && bubble) {
       bubble.classList.remove('shake');
-      void bubble.offsetWidth; // reflow
+      void bubble.offsetWidth;
       bubble.classList.add('shake');
       setTimeout(() => bubble.classList.remove('shake'), 500);
     }
   });
 
-  /* ──────────────────────────────────────
-     CHARGEMENT DES ÉTAPES CUSTOM (DB)
-  ────────────────────────────────────── */
+  /* ── CHARGEMENT DES ÉTAPES CUSTOM (DB) ── */
   async function loadCustomSteps() {
     try {
       if (!window._sb) return;
@@ -3472,8 +3426,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
         if (actionText?.trim()) {
           step.actionBox = { type: actionType?.trim() || 'info', text: actionText.trim() };
           if ((actionType || '').trim() === 'action') {
-            step.action = 'none'; // Les étapes custom ne font qu'afficher, pas détecter
-            // Sauf si le titre indique une quête
+            step.action = 'none';
             if (desc?.toLowerCase().includes('quête') && actionText?.includes('+XP')) {
               step.action = 'quest_claim';
               step.showSkip = false;
@@ -3485,9 +3438,7 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     } catch(e) { /* garde les defaults */ }
   }
 
-  /* ──────────────────────────────────────
-     DÉMARRAGE
-  ────────────────────────────────────── */
+  /* ── DÉMARRAGE ── */
   async function tryStart() {
     if (isOBDone()) return;
     if (window.dbGetUser && window.state?.user) {
@@ -3521,14 +3472,47 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
     }
   }, 200);
 
-  /* ── API PUBLIQUE ── */
-  window._obReset = () => { try { localStorage.removeItem(OB_KEY); } catch(e) {} location.reload(); };
-  window._obStart = startOB;
+  /* ══════════════════════════════════════════
+     API PUBLIQUE — CORRECTION PRINCIPALE
+     adminRelaunchOnboarding fonctionne sans reload
+  ══════════════════════════════════════════ */
 
-  // Surcharge adminRelaunchOnboarding pour utiliser le nouveau reset
-  window.adminRelaunchOnboarding = () => {
-    if (!confirm('Relancer le tutoriel ? (localStorage réinitialisé + rechargement)')) return;
+  /* Efface seulement le localStorage (pas de reload) */
+  window._obReset = () => {
+    try { localStorage.removeItem(OB_KEY); } catch(e) {}
+  };
+
+  /* Redémarre le tuto EN DIRECT, sans rechargement de page */
+  window._obForceStart = async () => {
+    /* 1. Reset état */
     window._obReset();
+    _active = false;
+    currentStep = 0;
+    if (_rafSpot) { cancelAnimationFrame(_rafSpot); _rafSpot = null; }
+    cleanListeners();
+
+    /* 2. Fermer tout ce qui pourrait être ouvert */
+    if (window.closeQuests)    window.closeQuests();
+    if (window.closeSpinModal) window.closeSpinModal();
+    if (window.showSection)    window.showSection('accueil');
+
+    /* 3. Masquer l'overlay de fin au cas où */
+    if (finishOv) finishOv.classList.remove('show');
+
+    /* 4. Recharger les étapes custom depuis la DB */
+    STEPS = STEPS_DEFAULT;
+    OB_REWARD_XP    = 100;
+    OB_REWARD_COINS = 50;
+    await loadCustomSteps();
+
+    /* 5. Lancer */
+    startOB();
+  };
+
+  /* Bouton "Tester le tuto" dans le panel admin — sans confirm, sans reload */
+  window.adminRelaunchOnboarding = () => {
+    window._obForceStart();
+    if (window.toast) window.toast('🎓 Tutoriel relancé !');
   };
 
 })();
