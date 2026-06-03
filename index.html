@@ -2457,6 +2457,538 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
   } catch(e) {}
 })();
 </script>
+<!-- ════ ONBOARDING TUTO ════ -->
+<style>
+  /* ── Overlay de fond ── */
+  #ob-backdrop {
+    position: fixed; inset: 0; z-index: 8000;
+    background: rgba(0,0,0,0.82);
+    pointer-events: all;
+    transition: opacity .3s;
+  }
+  #ob-backdrop.hidden { opacity: 0; pointer-events: none; }
 
+  /* ── Découpe spotlight ── */
+  #ob-spotlight {
+    position: fixed; z-index: 8001; pointer-events: none;
+    border-radius: 14px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.82);
+    transition: top .45s cubic-bezier(.4,0,.2,1),
+                left .45s cubic-bezier(.4,0,.2,1),
+                width .45s cubic-bezier(.4,0,.2,1),
+                height .45s cubic-bezier(.4,0,.2,1),
+                opacity .3s;
+    border: 2px solid rgba(168,85,247,.5);
+    opacity: 0;
+  }
+  #ob-spotlight.show { opacity: 1; }
+
+  /* ── Bulle explicative ── */
+  #ob-bubble {
+    position: fixed; z-index: 8100;
+    background: #13131f;
+    border: 1px solid rgba(168,85,247,.4);
+    border-radius: 18px;
+    padding: 22px 24px 20px;
+    max-width: 340px; width: calc(100vw - 48px);
+    box-shadow: 0 8px 40px rgba(0,0,0,.6);
+    transition: top .45s cubic-bezier(.4,0,.2,1), left .45s cubic-bezier(.4,0,.2,1), opacity .3s;
+    opacity: 0;
+    pointer-events: all;
+  }
+  #ob-bubble.show { opacity: 1; }
+
+  .ob-step-counter {
+    font-size: .68rem; font-weight: 700; letter-spacing: .08em;
+    color: #a855f7; margin-bottom: 8px;
+  }
+  .ob-bubble-icon { font-size: 1.9rem; margin-bottom: 8px; }
+  .ob-bubble-title {
+    font-size: 1rem; font-weight: 700; color: #eee;
+    margin-bottom: 6px; line-height: 1.3;
+  }
+  .ob-bubble-desc {
+    font-size: .82rem; color: #aaa; line-height: 1.6; margin-bottom: 16px;
+  }
+  .ob-bubble-action {
+    font-size: .75rem; font-weight: 700; color: #c9a84c;
+    background: #c9a84c15; border: 1px solid #c9a84c40;
+    border-radius: 8px; padding: 7px 14px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ob-bubble-action.info { color: #4a7fa5; background: #4a7fa515; border-color: #4a7fa540; }
+
+  .ob-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ob-btn-next {
+    background: #a855f7; color: #fff; border: none;
+    border-radius: 10px; padding: 9px 20px;
+    font-size: .82rem; font-weight: 700; cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .ob-btn-next:hover { background: #9333ea; }
+  .ob-btn-next:active { transform: scale(.97); }
+  .ob-btn-next:disabled { background: #5a3d7a; cursor: not-allowed; }
+  .ob-btn-skip {
+    background: transparent; color: #555; border: 1px solid #333;
+    border-radius: 10px; padding: 9px 16px;
+    font-size: .78rem; cursor: pointer; transition: color .15s;
+  }
+  .ob-btn-skip:hover { color: #888; }
+
+  .ob-progress {
+    display: flex; gap: 5px; align-items: center; margin-bottom: 14px;
+  }
+  .ob-progress-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #2a2a3f; transition: background .3s, width .3s;
+  }
+  .ob-progress-dot.active { background: #a855f7; width: 18px; border-radius: 3px; }
+  .ob-progress-dot.done { background: #52c97a; }
+
+  /* ── Fin de tuto ── */
+  #ob-finish-overlay {
+    position: fixed; inset: 0; z-index: 8200;
+    background: rgba(0,0,0,.88);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .4s;
+  }
+  #ob-finish-overlay.show { opacity: 1; pointer-events: all; }
+  .ob-finish-box {
+    background: #13131f; border: 1px solid rgba(82,201,122,.35);
+    border-radius: 22px; padding: 40px 44px; max-width: 420px; width: 90%;
+    text-align: center; box-shadow: 0 0 80px rgba(82,201,122,.12);
+  }
+  .ob-finish-icon { font-size: 3rem; margin-bottom: 12px; }
+  .ob-finish-title { font-size: 1.6rem; font-weight: 700; color: #52c97a; margin-bottom: 6px; }
+  .ob-finish-sub { font-size: .85rem; color: #888; margin-bottom: 16px; }
+  .ob-finish-reward {
+    background: #52c97a18; border: 1px solid #52c97a40;
+    border-radius: 10px; padding: 12px 20px; font-size: .88rem; color: #ccc;
+    margin-bottom: 22px; line-height: 1.7;
+  }
+  .ob-finish-btn {
+    background: #52c97a; color: #fff; border: none;
+    border-radius: 12px; padding: 11px 32px;
+    font-size: .9rem; font-weight: 700; cursor: pointer;
+    transition: background .15s;
+  }
+  .ob-finish-btn:hover { background: #3db368; }
+
+  /* ── Pulse sur élément ciblé ── */
+  .ob-pulse-target {
+    animation: ob-pulse 1.8s infinite;
+    position: relative; z-index: 8050;
+  }
+  @keyframes ob-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(168,85,247,.5); }
+    50% { box-shadow: 0 0 0 8px rgba(168,85,247,0); }
+  }
+</style>
+
+<!-- Backdrop + Spotlight -->
+<div id="ob-backdrop" class="hidden"></div>
+<div id="ob-spotlight"></div>
+
+<!-- Bulle -->
+<div id="ob-bubble">
+  <div class="ob-progress" id="ob-progress"></div>
+  <div class="ob-step-counter" id="ob-step-counter">ÉTAPE 1 / 7</div>
+  <div class="ob-bubble-icon" id="ob-bubble-icon">⚔️</div>
+  <div class="ob-bubble-title" id="ob-bubble-title">Titre</div>
+  <div class="ob-bubble-desc" id="ob-bubble-desc">Desc</div>
+  <div class="ob-bubble-action" id="ob-bubble-action" style="display:none;"></div>
+  <div class="ob-btns" id="ob-btns">
+    <button class="ob-btn-next" id="ob-btn-next">Suivant →</button>
+    <button class="ob-btn-skip" id="ob-btn-skip">Passer le tuto</button>
+  </div>
+</div>
+
+<!-- Overlay de fin -->
+<div id="ob-finish-overlay">
+  <div class="ob-finish-box">
+    <div class="ob-finish-icon">🏆</div>
+    <div class="ob-finish-title">TUTO TERMINÉ !</div>
+    <div class="ob-finish-sub">Tu connais maintenant tous les aspects de Timor.</div>
+    <div class="ob-finish-reward">
+      🎁 Récompense de bienvenue<br>
+      <strong style="color:#52c97a;">⚡ +100 XP · 🪙 +50 pièces</strong>
+    </div>
+    <button class="ob-finish-btn" id="ob-finish-close-btn">Commencer l'aventure ⚔️</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const OB_KEY = 'timor_onboarding_done_v1';
+
+  /* ── Vérifie si déjà fait ── */
+  function isOBDone() { try { return !!localStorage.getItem(OB_KEY); } catch(e) { return false; } }
+  function markOBDone() { try { localStorage.setItem(OB_KEY, '1'); } catch(e) {} }
+
+  /* ──────────────────────────────────────────────────
+     Définition des étapes
+  ────────────────────────────────────────────────── */
+  const STEPS = [
+    {
+      id: 'welcome',
+      target: null,            // pas de spotlight = centré
+      icon: '⚔️',
+      title: 'Bienvenue sur Timor !',
+      desc: 'Tu viens de rejoindre la nation. Ce court tutoriel va te faire découvrir toutes les fonctionnalités du site en moins de 2 minutes.',
+      actionText: null,
+      nextLabel: 'Commencer la visite →',
+      showSkip: true,
+    },
+    {
+      id: 'nav',
+      target: () => document.querySelector('nav'),
+      icon: '🧭',
+      title: 'La navigation',
+      desc: 'En haut tu trouveras toutes les sections du site : l\'Accueil, les Tutoriels, Le Pays, la Boutique, le Classement, la Carte et la Roulette.',
+      actionText: { type: 'info', text: 'ℹ️ Explore chaque section à ta guise depuis ce menu' },
+      nextLabel: 'Compris →',
+      showSkip: true,
+    },
+    {
+      id: 'profile',
+      target: () => document.getElementById('profile-level-card'),
+      icon: '📊',
+      title: 'Ton profil & niveau',
+      desc: 'Ici s\'affichent ton niveau, tes XP et tes pièces 🪙. En gagnant de l\'XP tu montes de grade — de Recrue jusqu\'à Gloire Éternelle (niv. 20) !',
+      actionText: { type: 'info', text: 'ℹ️ Chaque niveau débloque des pièces bonus et de nouveaux articles en boutique' },
+      nextLabel: 'Super →',
+      showSkip: true,
+    },
+    {
+      id: 'spin',
+      target: () => document.getElementById('spin-teaser'),
+      icon: '🎰',
+      title: 'La Roulette quotidienne',
+      desc: 'Chaque jour tu peux tenter ta chance sur la roulette pour gagner de l\'XP, des pièces ou des récompenses spéciales !',
+      actionText: { type: 'action', text: '👆 Clique sur "Tourner 🎰" pour ouvrir la roulette' },
+      nextLabel: 'Suivant →',
+      waitForClick: () => document.getElementById('spin-teaser'),
+      showSkip: true,
+    },
+    {
+      id: 'quests-teaser',
+      target: () => document.getElementById('quests-teaser') || document.querySelector('.quests-teaser'),
+      icon: '⚔️',
+      title: 'Les Quêtes',
+      desc: 'Accomplis des missions pour gagner de l\'XP et des pièces ! Il y a des quêtes pour tous les niveaux : débutants, intermédiaires et avancées.',
+      actionText: { type: 'info', text: 'ℹ️ Certaines quêtes nécessitent une preuve en screenshot' },
+      nextLabel: 'Voir les quêtes →',
+      showSkip: true,
+    },
+    {
+      id: 'claim-quest',
+      target: null,
+      icon: '🎯',
+      title: 'Réclame ta première quête !',
+      desc: 'La page Quêtes est maintenant ouverte. Clique sur le bouton "+XP" de n\'importe quelle quête pour la valider et recevoir ta récompense. Cette étape est obligatoire !',
+      actionText: { type: 'action', text: '👆 Clique sur un bouton "+XP" dans la liste ci-dessous' },
+      nextLabel: 'En attente…',
+      nextDisabled: true,
+      openQuests: true,
+      waitForQuestClaim: true,
+      showSkip: false,
+    },
+    {
+      id: 'boutique',
+      target: null,
+      icon: '🛒',
+      title: 'La Boutique',
+      desc: 'Avec tes pièces tu peux acheter des rôles Discord, des avantages exclusifs et d\'autres récompenses. Certains articles se débloquent à partir d\'un certain niveau.',
+      actionText: { type: 'info', text: 'ℹ️ Accumule des pièces en jouant pour accéder aux meilleurs articles !' },
+      nextLabel: 'Terminer le tuto 🎉',
+      showSkip: false,
+    },
+  ];
+
+  const TOTAL = STEPS.length;
+  let currentStep = 0;
+  let questClaimedInOB = false;
+  let originalClaimQuest = null;
+
+  /* ── Éléments DOM ── */
+  const backdrop   = document.getElementById('ob-backdrop');
+  const spotlight  = document.getElementById('ob-spotlight');
+  const bubble     = document.getElementById('ob-bubble');
+  const progEl     = document.getElementById('ob-progress');
+  const counterEl  = document.getElementById('ob-step-counter');
+  const iconEl     = document.getElementById('ob-bubble-icon');
+  const titleEl    = document.getElementById('ob-bubble-title');
+  const descEl     = document.getElementById('ob-bubble-desc');
+  const actionEl   = document.getElementById('ob-bubble-action');
+  const btnNext    = document.getElementById('ob-btn-next');
+  const btnSkip    = document.getElementById('ob-btn-skip');
+  const finishOv   = document.getElementById('ob-finish-overlay');
+  const finishBtn  = document.getElementById('ob-finish-close-btn');
+
+  /* ── Positionner le spotlight ── */
+  function placeSpotlight(el) {
+    if (!el) { spotlight.classList.remove('show'); return; }
+    const r = el.getBoundingClientRect();
+    const pad = 10;
+    spotlight.style.top    = (r.top    - pad) + 'px';
+    spotlight.style.left   = (r.left   - pad) + 'px';
+    spotlight.style.width  = (r.width  + pad * 2) + 'px';
+    spotlight.style.height = (r.height + pad * 2) + 'px';
+    spotlight.classList.add('show');
+  }
+
+  /* ── Positionner la bulle ── */
+  function placeBubble(el) {
+    const bw = Math.min(340, window.innerWidth - 48);
+    bubble.style.width = bw + 'px';
+
+    if (!el) {
+      bubble.style.left = ((window.innerWidth - bw) / 2) + 'px';
+      bubble.style.top  = ((window.innerHeight - 300) / 2) + 'px';
+      bubble.classList.add('show');
+      return;
+    }
+    const r   = el.getBoundingClientRect();
+    const pad = 16;
+
+    let top  = r.bottom + pad + window.scrollY;
+    let left = r.left   + window.scrollX;
+
+    if (left + bw > window.innerWidth - 16) left = window.innerWidth - bw - 16;
+    if (left < 16) left = 16;
+
+    // si l'élément est tout en bas → bulle au-dessus
+    if (r.bottom + 220 > window.innerHeight) {
+      top = r.top + window.scrollY - 220 - pad;
+    }
+
+    bubble.style.top  = top  + 'px';
+    bubble.style.left = left + 'px';
+    bubble.classList.add('show');
+  }
+
+  /* ── Rendre la progression ── */
+  function renderProgress() {
+    progEl.innerHTML = STEPS.map((_, i) => {
+      const cls = i < currentStep ? 'done' : i === currentStep ? 'active' : '';
+      return `<div class="ob-progress-dot ${cls}"></div>`;
+    }).join('');
+  }
+
+  /* ── Afficher une étape ── */
+  function showStep(idx) {
+    if (idx >= TOTAL) { finishTuto(); return; }
+    currentStep = idx;
+    const s = STEPS[idx];
+
+    /* scroll vers l'accueil si besoin */
+    if (s.openQuests) {
+      if (window.openQuests) window.openQuests();
+      setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
+    }
+
+    /* mettre à jour la section affichée si nécessaire */
+    if (s.id === 'boutique') {
+      if (window.showSection) window.showSection('accueil');
+    }
+
+    /* spotlight */
+    const targetEl = s.target ? s.target() : null;
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => placeSpotlight(targetEl), 350);
+      /* enlève ancienne classe pulse */
+      document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
+      targetEl.classList.add('ob-pulse-target');
+    } else {
+      spotlight.classList.remove('show');
+      document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
+    }
+
+    /* contenu bulle */
+    renderProgress();
+    counterEl.textContent = 'ÉTAPE ' + (idx + 1) + ' / ' + TOTAL;
+    iconEl.textContent    = s.icon;
+    titleEl.textContent   = s.title;
+    descEl.textContent    = s.desc;
+
+    if (s.actionText) {
+      actionEl.style.display = 'flex';
+      actionEl.className = 'ob-bubble-action' + (s.actionText.type === 'info' ? ' info' : '');
+      actionEl.textContent = s.actionText.text;
+    } else {
+      actionEl.style.display = 'none';
+    }
+
+    btnNext.textContent = s.nextLabel || 'Suivant →';
+    btnNext.disabled    = !!s.nextDisabled;
+    btnSkip.style.display = s.showSkip ? '' : 'none';
+
+    setTimeout(() => placeBubble(targetEl), 350);
+
+    /* ── Intercepte l'étape spin ── */
+    if (s.waitForClick) {
+      const watchEl = s.waitForClick();
+      if (watchEl) {
+        watchEl._ob_click = function() {
+          advanceStep();
+        };
+        watchEl.addEventListener('click', watchEl._ob_click, { once: true });
+      }
+    }
+
+    /* ── Intercepte la réclamation de quête ── */
+    if (s.waitForQuestClaim) {
+      hookQuestClaim();
+    }
+  }
+
+  /* ── Hook sur claimQuest pour détecter la réclamation ── */
+  function hookQuestClaim() {
+    if (originalClaimQuest) return; // déjà hooké
+    originalClaimQuest = window.claimQuest;
+    window.claimQuest = async function(questId, xpAmount, coinsAmount) {
+      await originalClaimQuest(questId, xpAmount, coinsAmount);
+      if (!questClaimedInOB) {
+        questClaimedInOB = true;
+        btnNext.disabled = false;
+        btnNext.textContent = 'Parfait, continuer →';
+        const s = STEPS[currentStep];
+        if (s && s.actionText) {
+          actionEl.className = 'ob-bubble-action info';
+          actionEl.textContent = '✅ Quête réclamée ! Clique sur Continuer.';
+          actionEl.style.display = 'flex';
+        }
+        descEl.textContent = '🎉 Bravo ! Tu as réclamé ta première quête et reçu ta récompense. Clique sur "Continuer" pour la suite.';
+        unhookQuestClaim();
+      }
+    };
+  }
+
+  function unhookQuestClaim() {
+    if (originalClaimQuest) {
+      window.claimQuest = originalClaimQuest;
+      originalClaimQuest = null;
+    }
+  }
+
+  /* ── Avancer ── */
+  function advanceStep() {
+    // referme la roulette si ouverte
+    if (STEPS[currentStep].id === 'spin') {
+      if (window.closeSpinModal) window.closeSpinModal();
+    }
+    showStep(currentStep + 1);
+  }
+
+  /* ── Terminer ── */
+  async function finishTuto() {
+    markOBDone();
+    unhookQuestClaim();
+    document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
+    backdrop.classList.add('hidden');
+    spotlight.classList.remove('show');
+    bubble.classList.remove('show');
+
+    finishOv.classList.add('show');
+    if (window.launchConfetti) window.launchConfetti();
+
+    /* Bonus de bienvenue */
+    if (window._sb && window.state && window.state.user) {
+      try {
+        const db = await window.dbGetUser ? window.dbGetUser(window.state.user.uid) : null;
+        if (db) {
+          const newXP    = (db.xp    || 0) + 100;
+          const newCoins = (db.coins || 0) + 50;
+          await window.dbUpdateUser(window.state.user.uid, { xp: newXP, coins: newCoins, onboarding_done: true });
+          window.state.user.xp    = newXP;
+          window.state.user.coins = newCoins;
+          if (window.renderProfileLevel) window.renderProfileLevel(newXP, newCoins);
+          if (window.renderNav) window.renderNav();
+        }
+      } catch(e) { console.warn('OB bonus:', e.message); }
+    }
+
+    /* Marque aussi en base si possible */
+    if (window._sb && window.state?.user?.uid) {
+      try { await window.dbUpdateUser(window.state.user.uid, { onboarding_done: true }); } catch(e) {}
+    }
+  }
+
+  /* ── Passer le tuto ── */
+  function skipTuto() {
+    if (!confirm('Passer le tutoriel ? Tu pourras le relancer depuis les paramètres.')) return;
+    markOBDone();
+    unhookQuestClaim();
+    document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
+    backdrop.classList.add('hidden');
+    spotlight.classList.remove('show');
+    bubble.classList.remove('show');
+  }
+
+  /* ── Boutons ── */
+  btnNext.onclick  = () => { if (!btnNext.disabled) advanceStep(); };
+  btnSkip.onclick  = skipTuto;
+  finishBtn.onclick = () => {
+    finishOv.classList.remove('show');
+    if (window.showSection) window.showSection('accueil');
+    if (window.toast) window.toast('🎉 Bienvenue dans la nation Timor !');
+  };
+
+  /* ── Empêche les clics "à travers" le backdrop sauf sur les éléments autorisés ── */
+  backdrop.addEventListener('click', function(e) { e.stopPropagation(); });
+
+  /* ── Repositionne la bulle au resize ── */
+  window.addEventListener('resize', () => {
+    const s = STEPS[currentStep];
+    if (!s) return;
+    const targetEl = s.target ? s.target() : null;
+    placeSpotlight(targetEl);
+    placeBubble(targetEl);
+  });
+
+  /* ── Exposer pour debug ── */
+  window._obReset = () => { try { localStorage.removeItem(OB_KEY); } catch(e) {} location.reload(); };
+
+  /* ════ DÉCLENCHEMENT ════
+     On attend que la session soit chargée avant de lancer.
+     On écoute l'événement custom dispatché par startSession. */
+  function tryStartOB() {
+    if (isOBDone()) return;
+    /* seulement si utilisateur connecté */
+    if (!window.state?.user) return;
+    /* vérifie aussi en base (flag onboarding_done) */
+    (async () => {
+      try {
+        if (window.dbGetUser) {
+          const db = await window.dbGetUser(window.state.user.uid);
+          if (db?.onboarding_done) { markOBDone(); return; }
+        }
+      } catch(e) {}
+      startOB();
+    })();
+  }
+
+  function startOB() {
+    backdrop.classList.remove('hidden');
+    showStep(0);
+  }
+
+  /* Patch startSession pour injecter le déclenchement */
+  const _origModule = setInterval(() => {
+    if (window.state !== undefined) {
+      clearInterval(_origModule);
+      /* on poll l'état utilisateur toutes les 500ms jusqu'à connexion */
+      const poll = setInterval(() => {
+        if (window.state?.user) {
+          clearInterval(poll);
+          setTimeout(tryStartOB, 800); /* petit délai pour laisser l'UI s'afficher */
+        }
+      }, 500);
+    }
+  }, 200);
+
+})();
+</script>
 </body>
 </html>
