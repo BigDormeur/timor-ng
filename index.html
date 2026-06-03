@@ -92,6 +92,329 @@
       font-size: 0.68rem; color: var(--text-dim, #888);
       margin-top: 4px; text-align: center;
     }
+
+    /* ══════════════════════════════════════════
+       ONBOARDING V2 — CSS COMPLET
+    ══════════════════════════════════════════ */
+
+    /* ── OVERLAY DE FOND ── */
+    #ob-backdrop {
+      position: fixed; inset: 0; z-index: 8000;
+      background: rgba(0,0,0,0);
+      pointer-events: none;
+      transition: background .4s ease;
+    }
+    #ob-backdrop.active {
+      background: rgba(0,0,0,0.65);
+      pointer-events: all;
+    }
+
+    /* ── DÉCOUPE SPOTLIGHT ── */
+    #ob-spotlight {
+      position: fixed;
+      z-index: 8001;
+      pointer-events: none;
+      border-radius: 14px;
+      outline: 4px solid rgba(168,85,247,0.7);
+      box-shadow:
+        0 0 0 9999px rgba(0,0,0,0.62),
+        0 0 0 8px rgba(168,85,247,0.15),
+        0 0 40px rgba(168,85,247,0.3);
+      transition:
+        top    .5s cubic-bezier(.34,1.56,.64,1),
+        left   .5s cubic-bezier(.34,1.56,.64,1),
+        width  .4s cubic-bezier(.4,0,.2,1),
+        height .4s cubic-bezier(.4,0,.2,1),
+        opacity .3s ease;
+      opacity: 0;
+    }
+    #ob-spotlight.visible { opacity: 1; }
+
+    /* Coins animés */
+    #ob-spotlight::before,
+    #ob-spotlight::after {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      border-color: #a855f7; border-style: solid;
+      border-radius: 2px;
+      animation: ob-corner-blink 1.4s ease-in-out infinite;
+    }
+    #ob-spotlight::before {
+      top: -3px; left: -3px;
+      border-width: 2px 0 0 2px;
+    }
+    #ob-spotlight::after {
+      bottom: -3px; right: -3px;
+      border-width: 0 2px 2px 0;
+      animation-delay: .7s;
+    }
+    @keyframes ob-corner-blink {
+      0%,100% { opacity:.4; } 50% { opacity:1; }
+    }
+
+    /* ── BULLE PRINCIPALE — toujours FIXE dans le viewport ── */
+    #ob-bubble {
+      position: fixed;
+      z-index: 8300;
+      width: 320px;
+      max-width: calc(100vw - 32px);
+      background: linear-gradient(145deg, #16162a 0%, #13131f 100%);
+      border: 1px solid rgba(168,85,247,0.35);
+      border-radius: 20px;
+      padding: 0;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,.8),
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 1px 0 rgba(255,255,255,0.08) inset;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(.94) translateY(8px);
+      transition:
+        top  .45s cubic-bezier(.34,1.4,.64,1),
+        left .45s cubic-bezier(.34,1.4,.64,1),
+        opacity .25s ease,
+        transform .25s ease;
+    }
+    #ob-bubble.visible {
+      opacity: 1;
+      pointer-events: all;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Barre top colorée animée */
+    .ob-bubble-topbar {
+      height: 4px;
+      background: linear-gradient(90deg, #a855f7, #06b6d4, #52c97a, #a855f7);
+      background-size: 200% 100%;
+      animation: ob-bar-slide 3s linear infinite;
+    }
+    @keyframes ob-bar-slide {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    .ob-bubble-inner { padding: 20px 22px 18px; }
+
+    /* Progress dots */
+    .ob-progress {
+      display: flex; gap: 4px; align-items: center; margin-bottom: 14px;
+    }
+    .ob-dot {
+      height: 4px; border-radius: 2px; transition: all .3s ease;
+      background: rgba(255,255,255,.15);
+      flex: 1;
+    }
+    .ob-dot.done { background: #52c97a; }
+    .ob-dot.active { background: #a855f7; box-shadow: 0 0 6px #a855f7aa; }
+
+    /* Contenu */
+    .ob-step-lbl {
+      font-size: .62rem; font-weight: 800; letter-spacing: .12em;
+      color: #a855f7; margin-bottom: 10px; text-transform: uppercase;
+    }
+    .ob-icon-wrap {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 12px;
+    }
+    .ob-title {
+      font-size: 1rem; font-weight: 800; color: #f0f0f0;
+      margin-bottom: 7px; line-height: 1.25;
+      font-family: 'DM Serif Display', Georgia, serif;
+    }
+    .ob-desc {
+      font-size: .8rem; color: #9a9ab0; line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    /* Encart action */
+    .ob-action-box {
+      border-radius: 10px; padding: 9px 13px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: .76rem; font-weight: 700;
+      border: 1px solid;
+    }
+    .ob-action-box.action {
+      background: rgba(201,168,76,.1); border-color: rgba(201,168,76,.3); color: #c9a84c;
+    }
+    .ob-action-box.info {
+      background: rgba(74,127,165,.1); border-color: rgba(74,127,165,.3); color: #4a7fa5;
+    }
+    .ob-action-box.success {
+      background: rgba(82,201,122,.1); border-color: rgba(82,201,122,.3); color: #52c97a;
+    }
+
+    /* Compteur de lecture */
+    .ob-wait-counter {
+      font-size: .68rem; color: #555; text-align: center; margin-bottom: 10px;
+      display: none;
+    }
+    .ob-wait-counter.visible { display: block; }
+
+    /* Boutons */
+    .ob-btns { display: flex; gap: 8px; align-items: center; }
+    .ob-btn-next {
+      flex: 1; background: linear-gradient(135deg, #a855f7, #7c3aed);
+      color: #fff; border: none; border-radius: 11px;
+      padding: 10px 16px; font-size: .82rem; font-weight: 700;
+      cursor: pointer; transition: all .2s ease;
+      box-shadow: 0 4px 16px rgba(168,85,247,.35);
+      position: relative; overflow: hidden;
+    }
+    .ob-btn-next::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+      opacity: 0; transition: opacity .2s;
+    }
+    .ob-btn-next:hover::after { opacity: 1; }
+    .ob-btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(168,85,247,.5); }
+    .ob-btn-next:active { transform: translateY(0) scale(.98); }
+    .ob-btn-next:disabled {
+      background: rgba(100,80,130,.4); color: rgba(255,255,255,.35);
+      cursor: not-allowed; transform: none; box-shadow: none;
+    }
+    .ob-btn-next.unlocked {
+      animation: ob-btn-pop .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes ob-btn-pop {
+      0% { transform: scale(.9); } 60% { transform: scale(1.06); } 100% { transform: scale(1); }
+    }
+    .ob-btn-skip {
+      background: transparent; color: rgba(255,255,255,.25);
+      border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+      padding: 9px 13px; font-size: .74rem; cursor: pointer;
+      transition: all .2s; white-space: nowrap;
+    }
+    .ob-btn-skip:hover { color: rgba(255,255,255,.5); border-color: rgba(255,255,255,.2); }
+
+    /* ── BADGE "ACTION REQUISE" ── */
+    #ob-active-badge {
+      position: fixed; z-index: 8200;
+      background: linear-gradient(135deg, #a855f7, #7c3aed);
+      color: #fff; font-size: .72rem; font-weight: 800;
+      padding: 6px 14px; border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(168,85,247,.5);
+      pointer-events: none; opacity: 0;
+      transition: opacity .3s ease;
+      white-space: nowrap;
+      letter-spacing: .04em;
+    }
+    #ob-active-badge.visible { opacity: 1; }
+
+    /* ── PULSATION SUR CIBLE ── */
+    .ob-target-pulse {
+      position: relative;
+      z-index: 8050 !important;
+    }
+    .ob-target-pulse::after {
+      content: '';
+      position: absolute; inset: -6px;
+      border-radius: inherit;
+      border: 2px solid rgba(168,85,247,.6);
+      animation: ob-pulse-ring 1.6s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes ob-pulse-ring {
+      0% { transform: scale(1); opacity: .8; }
+      100% { transform: scale(1.12); opacity: 0; }
+    }
+
+    /* ── TOOLTIP ANECDOTE NG ── */
+    .ob-ng-fact {
+      position: fixed; z-index: 8350;
+      background: #1a1a2e; border: 1px solid rgba(201,168,76,.3);
+      border-radius: 12px; padding: 10px 14px;
+      font-size: .72rem; color: #c9a84c;
+      max-width: 220px; line-height: 1.5;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      pointer-events: none;
+      opacity: 0; transition: opacity .3s ease, transform .3s ease;
+      transform: translateY(-4px);
+    }
+    .ob-ng-fact.show { opacity: 1; transform: translateY(0); }
+
+    /* ── MINI-MAP DE PROGRESSION ── */
+    #ob-minimap {
+      position: fixed; z-index: 8200;
+      right: 20px; top: 50%;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 6px;
+      pointer-events: none; opacity: 0;
+      transition: opacity .3s ease;
+    }
+    #ob-minimap.visible { opacity: 1; }
+    .ob-minimap-step {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      transition: all .3s ease;
+      position: relative;
+    }
+    .ob-minimap-step.done { background: #52c97a; }
+    .ob-minimap-step.active { background: #a855f7; transform: scale(1.5); box-shadow: 0 0 8px #a855f7; }
+    .ob-minimap-step .ob-minimap-tooltip {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      background: #1a1a2e; border: 1px solid rgba(168,85,247,.3);
+      border-radius: 6px; padding: 3px 8px;
+      font-size: .62rem; color: #ccc; white-space: nowrap;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    .ob-minimap-step:hover .ob-minimap-tooltip { opacity: 1; }
+
+    /* ── FINISH OVERLAY ── */
+    #ob-finish-overlay {
+      position: fixed; inset: 0; z-index: 8400;
+      background: rgba(0,0,0,.9);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .4s ease;
+    }
+    #ob-finish-overlay.show { opacity: 1; pointer-events: all; }
+
+    .ob-finish-box {
+      background: linear-gradient(145deg, #16162a, #13131f);
+      border: 1px solid rgba(82,201,122,.3);
+      border-radius: 24px; padding: 44px 48px;
+      max-width: 440px; width: 90%; text-align: center;
+      box-shadow: 0 0 120px rgba(82,201,122,.1), 0 40px 80px rgba(0,0,0,.6);
+    }
+    .ob-finish-emoji {
+      font-size: 3.5rem; margin-bottom: 12px; display: block;
+      animation: ob-trophy-bounce .8s cubic-bezier(.34,1.56,.64,1) .2s both;
+    }
+    @keyframes ob-trophy-bounce {
+      0% { transform: scale(0) rotate(-10deg); } 100% { transform: scale(1) rotate(0deg); }
+    }
+    .ob-finish-title { font-size: 1.8rem; font-weight: 900; color: #52c97a; margin-bottom: 6px; letter-spacing: .04em; }
+    .ob-finish-sub { font-size: .85rem; color: #777; margin-bottom: 20px; }
+    .ob-finish-reward {
+      background: rgba(82,201,122,.08); border: 1px solid rgba(82,201,122,.25);
+      border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; line-height: 2;
+    }
+    .ob-finish-reward-title { font-size: .7rem; font-weight: 800; letter-spacing: .1em; color: #555; margin-bottom: 6px; }
+    .ob-finish-reward-val { font-size: 1rem; font-weight: 800; color: #52c97a; }
+    .ob-finish-btn {
+      background: linear-gradient(135deg, #52c97a, #3db368);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 13px 36px; font-size: .92rem; font-weight: 800;
+      cursor: pointer; transition: all .2s;
+      box-shadow: 0 6px 24px rgba(82,201,122,.35);
+    }
+    .ob-finish-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(82,201,122,.5); }
+
+    /* ── SHAKE BULLE quand backdrop cliqué ── */
+    @keyframes ob-bubble-shake {
+      0%,100% { transform: scale(1) translateX(0); }
+      20% { transform: scale(1) translateX(-6px); }
+      40% { transform: scale(1) translateX(6px); }
+      60% { transform: scale(1) translateX(-4px); }
+      80% { transform: scale(1) translateX(4px); }
+    }
+    #ob-bubble.shake { animation: ob-bubble-shake .4s ease; }
   </style>
 </head>
 <body>
@@ -544,7 +867,6 @@
       <div class="admin-feedback" id="admin-spin-feedback"></div>
     </div>
 
-    <!-- MODIFICATION 3B : Panneau Onboarding admin -->
     <div class="admin-tab-panel" id="admin-tab-ob-edit">
       <label class="admin-label">ÉTAPES DU TUTORIEL (une par ligne)</label>
       <div class="admin-format-hint" style="margin-bottom:10px;">
@@ -2416,28 +2738,21 @@ window.escalateToModo = async () => {
   }
 };
 
-window.adminRelaunchOnboarding = () => {
-  if (!confirm('Relancer le tutoriel de bienvenue ? (localStorage réinitialisé)')) return;
-  try { localStorage.removeItem('timor_onboarding_done_v1'); } catch(e) {}
-  location.reload();
-};
-
-// ── MODIFICATION 4 : Fonctions admin Onboarding ──
-const OB_DEFAULTS = [
-  '⚔️|Bienvenue sur Timor !|Tu viens de rejoindre la nation. Ce court tutoriel va te faire découvrir toutes les fonctionnalités du site en moins de 2 minutes.||info|Commencer la visite →',
-  '🧭|La navigation|En haut tu trouveras toutes les sections : Accueil, Tutoriels, Le Pays, Boutique, Classement, Carte et Roulette.|ℹ️ Explore chaque section depuis ce menu|info|Compris →',
-  '📊|Ton profil & niveau|Ici s\'affichent ton niveau, tes XP et tes pièces 🪙. En gagnant de l\'XP tu montes de grade jusqu\'à Gloire Éternelle (niv. 20) !|ℹ️ Chaque niveau débloque des pièces bonus|info|Super →',
-  '🎰|La Roulette quotidienne|Chaque jour tu peux tenter ta chance sur la roulette pour gagner de l\'XP, des pièces ou des récompenses spéciales !|👆 Clique sur Tourner pour ouvrir la roulette|action|Suivant →',
-  '⚔️|Les Quêtes|Accomplis des missions pour gagner de l\'XP et des pièces ! Il y a des quêtes pour tous les niveaux.|ℹ️ Certaines quêtes nécessitent une preuve en screenshot|info|Voir les quêtes →',
-  '🎯|Réclame ta première quête !|La page Quêtes est maintenant ouverte. Clique sur un bouton "+XP" pour valider une quête et recevoir ta récompense. Cette étape est obligatoire !|👆 Clique sur un bouton +XP dans la liste|action|En attente…',
-  '🛒|La Boutique|Avec tes pièces tu peux acheter des rôles Discord, des avantages exclusifs et d\'autres récompenses. Certains articles se débloquent par niveau.|ℹ️ Accumule des pièces en jouant !|info|Terminer le tuto 🎉',
-];
-
 window.adminLoadOnboardingEditor = async () => {
   const fb = document.getElementById('admin-ob-feedback');
   try {
     const data = await sdGet('onboarding_steps');
-    const steps = data?.steps || OB_DEFAULTS;
+    const OB_DEFAULTS_PIPE = [
+      '⚔️|Bienvenue sur Timor !|Ce tutoriel interactif va te faire découvrir le site en moins de 3 minutes.|||Commencer la visite →',
+      '🧭|La barre de navigation|Clique sur l\'onglet "Le Pays" dans la barre de navigation pour découvrir Timor.|👆 Clique sur "Le Pays" dans le menu en haut|action|Continuer →',
+      '🏛️|Timor — Notre nation|Lis les informations sur Timor puis continue.|ℹ️ Timor est un pays référent sur NationsGlory|info|Compris →',
+      '🎰|La Roulette Quotidienne|Chaque jour tu peux gagner de l\'XP et des pièces gratuitement !|👆 Clique sur le widget Roulette pour l\'ouvrir|action|Suivant →',
+      '⚔️|Les Quêtes|Les quêtes te donnent de l\'XP pour monter de niveau.|👆 Clique sur "Voir les quêtes ⚔️"|action|En attente…',
+      '🎯|Réclame ta première récompense !|Clique sur le bouton "+XP" d\'une quête pour recevoir ta récompense.|👆 Clique sur un bouton "+XP" dans la liste de quêtes|action|En attente de ta quête…',
+      '🛒|La Boutique de Timor|Avec tes pièces tu peux acheter des rôles Discord et des avantages exclusifs.|👆 Clique sur "Boutique" dans la navigation|action|En attente…',
+      '🌟|Tu es prêt !|Tu as découvert toutes les fonctionnalités de Timor. Bonne aventure !|||Terminer le tuto 🎉',
+    ];
+    const steps = data?.steps || OB_DEFAULTS_PIPE;
     const ta = document.getElementById('ob-admin-steps');
     if (ta) ta.value = steps.join('\n');
     setVal('ob-reward-xp',    data?.reward_xp    ?? 100);
@@ -2462,8 +2777,18 @@ window.adminSaveOnboarding = async () => {
 };
 
 window.adminResetOnboardingDefault = () => {
+  const OB_DEFAULTS_PIPE = [
+    '⚔️|Bienvenue sur Timor !|Ce tutoriel interactif va te faire découvrir le site en moins de 3 minutes.|||Commencer la visite →',
+    '🧭|La barre de navigation|Clique sur l\'onglet "Le Pays" dans la barre de navigation pour découvrir Timor.|👆 Clique sur "Le Pays" dans le menu en haut|action|Continuer →',
+    '🏛️|Timor — Notre nation|Lis les informations sur Timor puis continue.|ℹ️ Timor est un pays référent sur NationsGlory|info|Compris →',
+    '🎰|La Roulette Quotidienne|Chaque jour tu peux gagner de l\'XP et des pièces gratuitement !|👆 Clique sur le widget Roulette pour l\'ouvrir|action|Suivant →',
+    '⚔️|Les Quêtes|Les quêtes te donnent de l\'XP pour monter de niveau.|👆 Clique sur "Voir les quêtes ⚔️"|action|En attente…',
+    '🎯|Réclame ta première récompense !|Clique sur le bouton "+XP" d\'une quête pour recevoir ta récompense.|👆 Clique sur un bouton "+XP" dans la liste de quêtes|action|En attente de ta quête…',
+    '🛒|La Boutique de Timor|Avec tes pièces tu peux acheter des rôles Discord et des avantages exclusifs.|👆 Clique sur "Boutique" dans la navigation|action|En attente…',
+    '🌟|Tu es prêt !|Tu as découvert toutes les fonctionnalités de Timor. Bonne aventure !|||Terminer le tuto 🎉',
+  ];
   const ta = document.getElementById('ob-admin-steps');
-  if (ta) ta.value = OB_DEFAULTS.join('\n');
+  if (ta) ta.value = OB_DEFAULTS_PIPE.join('\n');
   setVal('ob-reward-xp', 100); setVal('ob-reward-coins', 50);
   toast('Valeurs par défaut chargées (non sauvegardé).');
 };
@@ -2549,412 +2874,665 @@ document.getElementById('spin-overlay').addEventListener('click', function(e) {
 })();
 </script>
 
-<!-- ════ ONBOARDING TUTO — CSS AMÉLIORÉ (Modification 1) ════ -->
-<style>
-  /* ── ONBOARDING ── */
-  #ob-backdrop {
-    position: fixed; inset: 0; z-index: 8000;
-    background: rgba(0,0,0,0.55);
-    pointer-events: all;
-    transition: opacity .3s;
-  }
-  #ob-backdrop.hidden { opacity: 0; pointer-events: none; }
+<!-- ════════════════════════════════════════
+     ONBOARDING V2 — HTML + SCRIPT COMPLET
+     Remplace intégralement l'ancien système
+════════════════════════════════════════ -->
 
-  #ob-spotlight {
-    position: fixed; z-index: 8001; pointer-events: none;
-    border-radius: 14px;
-    box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);
-    transition:
-      top .45s cubic-bezier(.4,0,.2,1),
-      left .45s cubic-bezier(.4,0,.2,1),
-      width .45s cubic-bezier(.4,0,.2,1),
-      height .45s cubic-bezier(.4,0,.2,1),
-      opacity .3s;
-    border: 2px solid rgba(168,85,247,.6);
-    opacity: 0;
-  }
-  #ob-spotlight.show { opacity: 1; }
-
-  /* ── BULLE : POSITION FIXE, TOUJOURS DANS LE VIEWPORT ── */
-  #ob-bubble {
-    position: fixed;
-    z-index: 8200;
-    background: #13131f;
-    border: 1px solid rgba(168,85,247,.4);
-    border-radius: 18px;
-    padding: 22px 24px 20px;
-    max-width: 340px; width: calc(100vw - 48px);
-    box-shadow: 0 8px 40px rgba(0,0,0,.7);
-    transition: top .45s cubic-bezier(.4,0,.2,1), left .45s cubic-bezier(.4,0,.2,1), opacity .3s;
-    opacity: 0;
-    pointer-events: all;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-  }
-  #ob-bubble.show { opacity: 1; }
-
-  .ob-step-counter { font-size: .68rem; font-weight: 700; letter-spacing: .08em; color: #a855f7; margin-bottom: 8px; }
-  .ob-bubble-icon { font-size: 1.9rem; margin-bottom: 8px; }
-  .ob-bubble-title { font-size: 1rem; font-weight: 700; color: #eee; margin-bottom: 6px; line-height: 1.3; }
-  .ob-bubble-desc { font-size: .82rem; color: #aaa; line-height: 1.6; margin-bottom: 16px; }
-  .ob-bubble-action { font-size: .75rem; font-weight: 700; color: #c9a84c; background: #c9a84c15; border: 1px solid #c9a84c40; border-radius: 8px; padding: 7px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
-  .ob-bubble-action.info { color: #4a7fa5; background: #4a7fa515; border-color: #4a7fa540; }
-  .ob-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-  .ob-btn-next { background: #a855f7; color: #fff; border: none; border-radius: 10px; padding: 9px 20px; font-size: .82rem; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s; }
-  .ob-btn-next:hover { background: #9333ea; }
-  .ob-btn-next:active { transform: scale(.97); }
-  .ob-btn-next:disabled { background: #5a3d7a; cursor: not-allowed; }
-  .ob-btn-skip { background: transparent; color: #555; border: 1px solid #333; border-radius: 10px; padding: 9px 16px; font-size: .78rem; cursor: pointer; transition: color .15s; }
-  .ob-btn-skip:hover { color: #888; }
-  .ob-progress { display: flex; gap: 5px; align-items: center; margin-bottom: 14px; }
-  .ob-progress-dot { width: 6px; height: 6px; border-radius: 50%; background: #2a2a3f; transition: background .3s, width .3s; }
-  .ob-progress-dot.active { background: #a855f7; width: 18px; border-radius: 3px; }
-  .ob-progress-dot.done { background: #52c97a; }
-
-  #ob-finish-overlay { position: fixed; inset: 0; z-index: 8200; background: rgba(0,0,0,.88); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .4s; }
-  #ob-finish-overlay.show { opacity: 1; pointer-events: all; }
-  .ob-finish-box { background: #13131f; border: 1px solid rgba(82,201,122,.35); border-radius: 22px; padding: 40px 44px; max-width: 420px; width: 90%; text-align: center; box-shadow: 0 0 80px rgba(82,201,122,.12); }
-  .ob-finish-icon { font-size: 3rem; margin-bottom: 12px; }
-  .ob-finish-title { font-size: 1.6rem; font-weight: 700; color: #52c97a; margin-bottom: 6px; }
-  .ob-finish-sub { font-size: .85rem; color: #888; margin-bottom: 16px; }
-  .ob-finish-reward { background: #52c97a18; border: 1px solid #52c97a40; border-radius: 10px; padding: 12px 20px; font-size: .88rem; color: #ccc; margin-bottom: 22px; line-height: 1.7; }
-  .ob-finish-btn { background: #52c97a; color: #fff; border: none; border-radius: 12px; padding: 11px 32px; font-size: .9rem; font-weight: 700; cursor: pointer; transition: background .15s; }
-  .ob-finish-btn:hover { background: #3db368; }
-  .ob-pulse-target { animation: ob-pulse 1.8s infinite; position: relative; z-index: 8050; }
-  @keyframes ob-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(168,85,247,.5); } 50% { box-shadow: 0 0 0 8px rgba(168,85,247,0); } }
-</style>
-
-<div id="ob-backdrop" class="hidden"></div>
+<!-- HTML Onboarding -->
+<div id="ob-backdrop"></div>
 <div id="ob-spotlight"></div>
+<div id="ob-active-badge">⚡ Action requise</div>
 
 <div id="ob-bubble">
-  <div class="ob-progress" id="ob-progress"></div>
-  <div class="ob-step-counter" id="ob-step-counter">ÉTAPE 1 / 7</div>
-  <div class="ob-bubble-icon" id="ob-bubble-icon">⚔️</div>
-  <div class="ob-bubble-title" id="ob-bubble-title">Titre</div>
-  <div class="ob-bubble-desc" id="ob-bubble-desc">Desc</div>
-  <div class="ob-bubble-action" id="ob-bubble-action" style="display:none;"></div>
-  <div class="ob-btns" id="ob-btns">
-    <button class="ob-btn-next" id="ob-btn-next">Suivant →</button>
-    <button class="ob-btn-skip" id="ob-btn-skip">Passer le tuto</button>
+  <div class="ob-bubble-topbar"></div>
+  <div class="ob-bubble-inner">
+    <div class="ob-progress" id="ob-progress"></div>
+    <div class="ob-step-lbl" id="ob-step-lbl">ÉTAPE 1 / 8</div>
+    <div class="ob-icon-wrap" id="ob-icon-wrap">⚔️</div>
+    <div class="ob-title" id="ob-title">Titre</div>
+    <div class="ob-desc" id="ob-desc">Description</div>
+    <div class="ob-action-box info" id="ob-action-box" style="display:none;"></div>
+    <div class="ob-wait-counter" id="ob-wait-counter"></div>
+    <div class="ob-btns">
+      <button class="ob-btn-next" id="ob-btn-next">Suivant →</button>
+      <button class="ob-btn-skip" id="ob-btn-skip">Passer</button>
+    </div>
   </div>
 </div>
 
+<div class="ob-ng-fact" id="ob-ng-fact"></div>
+
+<!-- Mini-map latérale -->
+<div id="ob-minimap"></div>
+
 <div id="ob-finish-overlay">
   <div class="ob-finish-box">
-    <div class="ob-finish-icon">🏆</div>
+    <span class="ob-finish-emoji">🏆</span>
     <div class="ob-finish-title">TUTO TERMINÉ !</div>
-    <div class="ob-finish-sub">Tu connais maintenant tous les aspects de Timor.</div>
+    <div class="ob-finish-sub">Tu connais maintenant tous les secrets de Timor.</div>
     <div class="ob-finish-reward">
-      🎁 Récompense de bienvenue<br>
-      <strong style="color:#52c97a;">⚡ +100 XP · 🪙 +50 pièces</strong>
+      <div class="ob-finish-reward-title">RÉCOMPENSE DE BIENVENUE</div>
+      <div class="ob-finish-reward-val" id="ob-finish-reward-val">⚡ +100 XP · 🪙 +50 pièces</div>
     </div>
     <button class="ob-finish-btn" id="ob-finish-close-btn">Commencer l'aventure ⚔️</button>
   </div>
 </div>
 
-<!-- ════ ONBOARDING SCRIPT — Version corrigée (Modifications 2 & 5) ════ -->
+<!-- Script Onboarding V2 -->
 <script>
 (function () {
-  const OB_KEY = 'timor_onboarding_done_v1';
-  function isOBDone() { try { return !!localStorage.getItem(OB_KEY); } catch(e) { return false; } }
-  function markOBDone() { try { localStorage.setItem(OB_KEY, '1'); } catch(e) {} }
+  'use strict';
 
-  let STEPS = [
-    { id:'welcome',     target:null, icon:'⚔️', title:'Bienvenue sur Timor !',        desc:'Tu viens de rejoindre la nation. Ce court tutoriel va te faire découvrir toutes les fonctionnalités du site en moins de 2 minutes.',                                                         actionText:null,                                                                       nextLabel:'Commencer la visite →',  showSkip:true },
-    { id:'nav',         target:() => document.querySelector('nav'),                    icon:'🧭', title:'La navigation',               desc:'En haut tu trouveras toutes les sections : Accueil, Tutoriels, Le Pays, Boutique, Classement, Carte et Roulette.',                              actionText:{type:'info',   text:'ℹ️ Explore chaque section depuis ce menu'},          nextLabel:'Compris →',              showSkip:true },
-    { id:'profile',     target:() => document.getElementById('profile-level-card'),   icon:'📊', title:'Ton profil & niveau',          desc:'Ici s\'affichent ton niveau, tes XP et tes pièces 🪙. En gagnant de l\'XP tu montes de grade — de Recrue jusqu\'à Gloire Éternelle (niv. 20) !', actionText:{type:'info',   text:'ℹ️ Chaque niveau débloque des pièces bonus'},        nextLabel:'Super →',                showSkip:true },
-    { id:'spin',        target:() => document.getElementById('spin-teaser'),           icon:'🎰', title:'La Roulette quotidienne',      desc:'Chaque jour tu peux tenter ta chance sur la roulette pour gagner de l\'XP, des pièces ou des récompenses spéciales !',                         actionText:{type:'action', text:'👆 Clique sur "Tourner 🎰" pour ouvrir la roulette'}, nextLabel:'Suivant →',              waitForClick:() => document.getElementById('spin-teaser'), showSkip:true },
-    { id:'quests-teaser',target:() => document.getElementById('quests-teaser') || document.querySelector('.quests-teaser'), icon:'⚔️', title:'Les Quêtes', desc:'Accomplis des missions pour gagner de l\'XP et des pièces ! Il y a des quêtes pour tous les niveaux.',                    actionText:{type:'info',   text:'ℹ️ Certaines quêtes nécessitent une preuve screenshot'}, nextLabel:'Voir les quêtes →',      showSkip:true },
-    { id:'claim-quest', target:null,                                                   icon:'🎯', title:'Réclame ta première quête !', desc:'La page Quêtes est maintenant ouverte. Clique sur le bouton "+XP" de n\'importe quelle quête pour la valider.',                                 actionText:{type:'action', text:'👆 Clique sur un bouton "+XP" dans la liste'},       nextLabel:'En attente…',            nextDisabled:true, openQuests:true, waitForQuestClaim:true, showSkip:false },
-    { id:'boutique',    target:null,                                                   icon:'🛒', title:'La Boutique',                 desc:'Avec tes pièces tu peux acheter des rôles Discord, des avantages exclusifs. Certains articles se débloquent par niveau.',                        actionText:{type:'info',   text:'ℹ️ Accumule des pièces en jouant !'},                nextLabel:'Terminer le tuto 🎉',    showSkip:false },
+  const OB_KEY    = 'timor_onboarding_done_v1';
+  const isOBDone  = () => { try { return !!localStorage.getItem(OB_KEY); } catch(e) { return false; } };
+  const markOBDone = () => { try { localStorage.setItem(OB_KEY, '1'); } catch(e) {} };
+
+  /* ── ÉTAPES PAR DÉFAUT ── */
+  const STEPS_DEFAULT = [
+    {
+      id: 'welcome', icon: '⚔️',
+      title: 'Bienvenue sur Timor !',
+      desc: 'Ce tutoriel interactif va te faire découvrir le site ET le jeu NationsGlory en moins de 3 minutes. Certaines étapes nécessitent une vraie action de ta part !',
+      action: 'none', nextLabel: 'Commencer la visite →', showSkip: true,
+      ngFact: '🌍 NationsGlory est un jeu de stratégie politique en temps réel sur Minecraft.',
+    },
+    {
+      id: 'nav', icon: '🧭',
+      title: 'La barre de navigation',
+      desc: 'Clique sur l\'onglet "Le Pays" dans la barre de navigation pour découvrir Timor.',
+      target: () => document.querySelector('nav'),
+      action: 'section', sectionId: 'pays',
+      actionBox: { type: 'action', text: '👆 Clique sur "Le Pays" dans le menu en haut' },
+      nextLabel: 'Continuer →', showSkip: true,
+      ngFact: '🏛️ Chaque pays sur NationsGlory a un gouvernement, des lois et une économie propre.',
+    },
+    {
+      id: 'pays', icon: '🏛️',
+      title: 'Timor — Notre nation',
+      desc: 'Voici les informations sur Timor : fondation, membres, rang mondial et gouvernement. Lis ces infos puis clique "Continuer".',
+      target: () => document.getElementById('pays'),
+      action: 'scroll_into',
+      actionBox: { type: 'info', text: 'ℹ️ Timor est un pays référent sur NationsGlory — reconnu officiellement' },
+      nextLabel: 'Compris →', showSkip: true, waitMs: 4000,
+      ngFact: '📊 Le rang mondial dépend de la richesse, la population et les victoires militaires.',
+    },
+    {
+      id: 'spin', icon: '🎰',
+      title: 'La Roulette Quotidienne',
+      desc: 'Chaque jour tu peux gagner de l\'XP et des pièces gratuitement. Clique sur le widget ci-dessous pour OUVRIR la roulette maintenant !',
+      target: () => document.getElementById('spin-teaser'),
+      action: 'click_element', actionTarget: '#spin-teaser',
+      actionBox: { type: 'action', text: '👆 Clique sur le widget Roulette pour l\'ouvrir' },
+      nextLabel: 'En attente…', showSkip: true,
+      ngFact: '💰 Les pièces servent à acheter des rôles Discord et des avantages en jeu.',
+    },
+    {
+      id: 'quests-open', icon: '⚔️',
+      title: 'Les Quêtes',
+      desc: 'Les quêtes te donnent de l\'XP pour monter de niveau. Clique sur "Voir les quêtes" pour ouvrir la page des quêtes.',
+      target: () => document.querySelector('.quests-teaser'),
+      action: 'quests_open',
+      actionBox: { type: 'action', text: '👆 Clique sur "Voir les quêtes ⚔️"' },
+      nextLabel: 'En attente…', showSkip: false,
+      ngFact: '🎯 Compléter des quêtes augmente ton rang — de Recrue à Gloire Éternelle.',
+    },
+    {
+      id: 'claim', icon: '🎯',
+      title: 'Réclame ta première récompense !',
+      desc: 'La page Quêtes est ouverte. Clique sur le bouton "+XP" d\'une quête pour recevoir ta récompense. C\'est obligatoire pour continuer !',
+      target: null, action: 'quest_claim',
+      actionBox: { type: 'action', text: '👆 Clique sur un bouton "+XP" dans la liste de quêtes' },
+      nextLabel: 'En attente de ta quête…', showSkip: false,
+      ngFact: '⚡ Les 20 niveaux vont de Recrue à Gloire Éternelle — chaque palier débloque des pièces bonus.',
+    },
+    {
+      id: 'shop', icon: '🛒',
+      title: 'La Boutique de Timor',
+      desc: 'Avec tes pièces tu peux acheter des rôles Discord, des titres et des avantages exclusifs. Certains articles se débloquent avec le niveau.',
+      target: null, action: 'section', sectionId: 'boutique',
+      actionBox: { type: 'action', text: '👆 Clique sur "Boutique" dans la navigation' },
+      nextLabel: 'En attente…', showSkip: false,
+      ngFact: '🏪 Sur NationsGlory, le commerce entre pays est une vraie stratégie diplomatique.',
+    },
+    {
+      id: 'done', icon: '🌟',
+      title: 'Tu es prêt !',
+      desc: 'Tu as découvert toutes les fonctionnalités de Timor. Continue à gagner de l\'XP, monte de niveau et participe aux quêtes !',
+      target: null, action: 'none',
+      nextLabel: 'Terminer le tuto 🎉', showSkip: false,
+      ngFact: '🤝 Les alliances diplomatiques entre pays sont la clé pour survivre sur NationsGlory.',
+    },
   ];
 
+  /* ── ÉTAT ── */
+  let STEPS           = STEPS_DEFAULT;
   let OB_REWARD_XP    = 100;
   let OB_REWARD_COINS = 50;
-  let TOTAL = STEPS.length;
+  let currentStep     = 0;
+  let _active         = false;
+  let _originalClaim  = null;
+  let _listeners      = [];   // { el, fn, capture }
+  let _observers      = [];   // MutationObserver[]
+  let _rafSpot        = null;
+  let _spotTarget     = null;
 
-  async function loadCustomSteps() {
-    try {
-      if (!window._sb) return;
-      const { data } = await window._sb.from('sitedata').select('value').eq('key','onboarding_steps').single();
-      if (!data?.value?.steps?.length) return;
-      OB_REWARD_XP    = data.value.reward_xp    ?? 100;
-      OB_REWARD_COINS = data.value.reward_coins ?? 50;
-      const raw = data.value.steps;
-      STEPS = raw.map((line, i) => {
-        const [icon, title, desc, actionText, actionType, nextLabel] = line.split('|');
-        const step = {
-          id:        'step_' + i,
-          target:    null,
-          icon:      icon      || '⚔️',
-          title:     title     || 'Étape',
-          desc:      desc      || '',
-          nextLabel: nextLabel || 'Suivant →',
-          showSkip:  i < raw.length - 2,
-          actionText: actionText ? { type: actionType || 'info', text: actionText } : null,
-        };
-        if (title?.toLowerCase().includes('quête') && actionText?.includes('+XP')) {
-          step.nextDisabled    = true;
-          step.openQuests      = true;
-          step.waitForQuestClaim = true;
-          step.showSkip        = false;
-        }
-        return step;
-      });
-      TOTAL = STEPS.length;
-    } catch(e) { /* garde les defaults */ }
+  /* ── ÉLÉMENTS DOM ── */
+  const backdrop    = document.getElementById('ob-backdrop');
+  const spotlight   = document.getElementById('ob-spotlight');
+  const bubble      = document.getElementById('ob-bubble');
+  const activeBadge = document.getElementById('ob-active-badge');
+  const progEl      = document.getElementById('ob-progress');
+  const stepLbl     = document.getElementById('ob-step-lbl');
+  const iconWrap    = document.getElementById('ob-icon-wrap');
+  const titleEl     = document.getElementById('ob-title');
+  const descEl      = document.getElementById('ob-desc');
+  const actionBox   = document.getElementById('ob-action-box');
+  const waitCtr     = document.getElementById('ob-wait-counter');
+  const btnNext     = document.getElementById('ob-btn-next');
+  const btnSkip     = document.getElementById('ob-btn-skip');
+  const ngFact      = document.getElementById('ob-ng-fact');
+  const minimapEl   = document.getElementById('ob-minimap');
+  const finishOv    = document.getElementById('ob-finish-overlay');
+  const finishBtn   = document.getElementById('ob-finish-close-btn');
+  const finishRwVal = document.getElementById('ob-finish-reward-val');
+
+  /* ──────────────────────────────────────
+     SPOTLIGHT — RAF continu pour suivre scroll
+  ────────────────────────────────────── */
+  function trackSpotlight() {
+    if (_spotTarget && _active) {
+      const r = _spotTarget.getBoundingClientRect();
+      const pad = 10;
+      spotlight.style.top    = (r.top    - pad) + 'px';
+      spotlight.style.left   = (r.left   - pad) + 'px';
+      spotlight.style.width  = (r.width  + pad * 2) + 'px';
+      spotlight.style.height = (r.height + pad * 2) + 'px';
+      spotlight.classList.add('visible');
+    } else {
+      spotlight.classList.remove('visible');
+    }
+    if (_active) _rafSpot = requestAnimationFrame(trackSpotlight);
   }
 
-  let currentStep = 0;
-  let questClaimedInOB = false;
-  let originalClaimQuest = null;
-
-  const backdrop  = document.getElementById('ob-backdrop');
-  const spotlight = document.getElementById('ob-spotlight');
-  const bubble    = document.getElementById('ob-bubble');
-  const progEl    = document.getElementById('ob-progress');
-  const counterEl = document.getElementById('ob-step-counter');
-  const iconEl    = document.getElementById('ob-bubble-icon');
-  const titleEl   = document.getElementById('ob-bubble-title');
-  const descEl    = document.getElementById('ob-bubble-desc');
-  const actionEl  = document.getElementById('ob-bubble-action');
-  const btnNext   = document.getElementById('ob-btn-next');
-  const btnSkip   = document.getElementById('ob-btn-skip');
-  const finishOv  = document.getElementById('ob-finish-overlay');
-  const finishBtn = document.getElementById('ob-finish-close-btn');
-
-  function placeSpotlight(el) {
-    if (!el) { spotlight.classList.remove('show'); return; }
-    const r = el.getBoundingClientRect(), pad = 10;
-    spotlight.style.top    = (r.top    - pad) + 'px';
-    spotlight.style.left   = (r.left   - pad) + 'px';
-    spotlight.style.width  = (r.width  + pad * 2) + 'px';
-    spotlight.style.height = (r.height + pad * 2) + 'px';
-    spotlight.classList.add('show');
+  function setSpotTarget(el) {
+    _spotTarget = el;
+    if (el) {
+      // Scroll vers l'élément si hors viewport
+      const r = el.getBoundingClientRect();
+      if (r.top < 80 || r.bottom > window.innerHeight - 80) {
+        window.scrollTo({ top: window.scrollY + r.top - window.innerHeight * 0.3, behavior: 'smooth' });
+      }
+    }
   }
 
-  // ── BULLE CORRIGÉE : position FIXE, toujours dans le viewport (Modification 2) ──
-  function placeBubble(el) {
-    const bw      = Math.min(340, window.innerWidth - 32);
+  /* ──────────────────────────────────────
+     BULLE — position FIXE dans le viewport
+  ────────────────────────────────────── */
+  function placeBubble() {
+    const bw     = Math.min(320, window.innerWidth - 32);
+    const bh     = 340;
+    const margin = 16;
     bubble.style.width = bw + 'px';
-    const margin  = 16;
-    const bubbleH = 310;
 
-    if (!el) {
-      bubble.style.left = Math.max(margin, Math.round((window.innerWidth  - bw)      / 2)) + 'px';
-      bubble.style.top  = Math.max(margin, Math.round((window.innerHeight - bubbleH) / 2)) + 'px';
-      bubble.classList.add('show');
+    if (!_spotTarget) {
+      bubble.style.left = Math.round((window.innerWidth  - bw) / 2) + 'px';
+      bubble.style.top  = Math.round((window.innerHeight - bh) / 2) + 'px';
       return;
     }
 
-    const r = el.getBoundingClientRect();
-    const pad = 14;
-
+    const r = _spotTarget.getBoundingClientRect();
+    const pad = 20;
     let top  = r.bottom + pad;
     let left = r.left;
 
-    if (top + bubbleH + margin > window.innerHeight) {
-      top = r.top - bubbleH - pad;
-    }
-    if (top < margin) {
-      top = Math.round((window.innerHeight - bubbleH) / 2);
-    }
-
-    if (left + bw + margin > window.innerWidth) {
-      left = window.innerWidth - bw - margin;
-    }
+    if (top + bh + margin > window.innerHeight) top = r.top - bh - pad;
+    if (top < margin) top = Math.round((window.innerHeight - bh) / 2);
+    if (left + bw + margin > window.innerWidth) left = window.innerWidth - bw - margin;
     if (left < margin) left = margin;
 
-    top  = Math.max(margin, Math.min(top,  window.innerHeight - bubbleH - margin));
-    left = Math.max(margin, Math.min(left, window.innerWidth  - bw      - margin));
+    top  = Math.max(margin, Math.min(top,  window.innerHeight - bh  - margin));
+    left = Math.max(margin, Math.min(left, window.innerWidth  - bw  - margin));
 
     bubble.style.top  = top  + 'px';
     bubble.style.left = left + 'px';
-    bubble.classList.add('show');
   }
 
+  /* ──────────────────────────────────────
+     BADGE "ACTION REQUISE"
+  ────────────────────────────────────── */
+  function updateActiveBadge(show) {
+    if (!activeBadge || !btnNext) return;
+    if (show) {
+      const r = btnNext.getBoundingClientRect();
+      activeBadge.style.left = Math.round(r.left + r.width / 2 - 80) + 'px';
+      activeBadge.style.top  = Math.round(r.top - 36) + 'px';
+      activeBadge.classList.add('visible');
+    } else {
+      activeBadge.classList.remove('visible');
+    }
+  }
+
+  /* ──────────────────────────────────────
+     MINI-MAP LATÉRALE
+  ────────────────────────────────────── */
+  function renderMinimap() {
+    if (!minimapEl) return;
+    minimapEl.innerHTML = STEPS.map((s, i) => {
+      const cls = i < currentStep ? 'done' : i === currentStep ? 'active' : '';
+      return `<div class="ob-minimap-step ${cls}" title="${s.title}"><div class="ob-minimap-tooltip">${s.icon} ${s.title}</div></div>`;
+    }).join('');
+    minimapEl.classList.add('visible');
+  }
+
+  /* ──────────────────────────────────────
+     PROGRESS DOTS DANS LA BULLE
+  ────────────────────────────────────── */
   function renderProgress() {
+    if (!progEl) return;
     progEl.innerHTML = STEPS.map((_, i) => {
       const cls = i < currentStep ? 'done' : i === currentStep ? 'active' : '';
-      return `<div class="ob-progress-dot ${cls}"></div>`;
+      return `<div class="ob-dot ${cls}"></div>`;
     }).join('');
   }
 
+  /* ──────────────────────────────────────
+     UNLOCK DU BOUTON SUIVANT
+  ────────────────────────────────────── */
+  function unlockNext(label) {
+    if (!btnNext) return;
+    btnNext.disabled = false;
+    if (label) btnNext.textContent = label;
+    btnNext.classList.add('unlocked');
+    setTimeout(() => btnNext.classList.remove('unlocked'), 500);
+    updateActiveBadge(false);
+    if (waitCtr) waitCtr.classList.remove('visible');
+    if (actionBox && actionBox.style.display !== 'none') {
+      actionBox.className = 'ob-action-box success';
+      actionBox.textContent = '✅ Action effectuée ! Clique sur Continuer.';
+    }
+    if (window.toast) window.toast('✅ Action validée !');
+  }
+
+  /* ──────────────────────────────────────
+     TOOLTIP ANECDOTE NG
+  ────────────────────────────────────── */
+  let _ngTimer = null;
+  function showNGFact(text, el) {
+    if (!ngFact || !text) return;
+    ngFact.textContent = text;
+    if (el) {
+      const r = el.getBoundingClientRect();
+      ngFact.style.bottom = '';
+      ngFact.style.right  = '';
+      ngFact.style.top    = Math.min(r.bottom + 12, window.innerHeight - 80) + 'px';
+      ngFact.style.left   = Math.min(r.left, window.innerWidth - 240) + 'px';
+    } else {
+      ngFact.style.bottom = '24px';
+      ngFact.style.right  = '24px';
+      ngFact.style.top    = '';
+      ngFact.style.left   = '';
+    }
+    ngFact.classList.add('show');
+    clearTimeout(_ngTimer);
+    _ngTimer = setTimeout(() => ngFact.classList.remove('show'), 6000);
+  }
+
+  /* ──────────────────────────────────────
+     NETTOYAGE
+  ────────────────────────────────────── */
+  function cleanListeners() {
+    _listeners.forEach(({ el, fn, capture }) => {
+      try { el.removeEventListener('click', fn, capture); } catch(e) {}
+    });
+    _listeners = [];
+    _observers.forEach(mo => { try { mo.disconnect(); } catch(e) {} });
+    _observers = [];
+    if (_originalClaim) { window.claimQuest = _originalClaim; _originalClaim = null; }
+    document.querySelectorAll('.ob-target-pulse').forEach(e => e.classList.remove('ob-target-pulse'));
+  }
+
+  /* ──────────────────────────────────────
+     AFFICHER UNE ÉTAPE
+  ────────────────────────────────────── */
   function showStep(idx) {
-    if (idx >= TOTAL) { finishTuto(); return; }
+    if (idx >= STEPS.length) { endTuto(); return; }
+    cleanListeners();
     currentStep = idx;
     const s = STEPS[idx];
 
-    if (s.openQuests) {
+    /* Ouvre la section/page si nécessaire */
+    if (s.id === 'claim' || s.action === 'quest_claim') {
       if (window.openQuests) window.openQuests();
       setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
     }
-    if (s.id === 'boutique') {
+    if (s.id === 'done') {
+      if (window.closeQuests) window.closeQuests();
       if (window.showSection) window.showSection('accueil');
     }
 
-    const targetEl = s.target ? s.target() : null;
-
-    if (targetEl) {
-      placeSpotlight(targetEl);
-      document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
-      targetEl.classList.add('ob-pulse-target');
-    } else {
-      spotlight.classList.remove('show');
-      document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
-    }
-
+    /* DOM */
     renderProgress();
-    counterEl.textContent = 'ÉTAPE ' + (idx + 1) + ' / ' + TOTAL;
-    iconEl.textContent    = s.icon;
-    titleEl.textContent   = s.title;
-    descEl.textContent    = s.desc;
+    renderMinimap();
+    if (stepLbl) stepLbl.textContent = 'ÉTAPE ' + (idx + 1) + ' / ' + STEPS.length;
+    if (iconWrap) iconWrap.textContent = s.icon || '⚔️';
+    if (titleEl)  titleEl.textContent  = s.title || '';
+    if (descEl)   descEl.textContent   = s.desc  || '';
 
-    if (s.actionText) {
-      actionEl.style.display = 'flex';
-      actionEl.className = 'ob-bubble-action' + (s.actionText.type === 'info' ? ' info' : '');
-      actionEl.textContent = s.actionText.text;
+    if (s.actionBox) {
+      actionBox.style.display = 'flex';
+      actionBox.className = 'ob-action-box ' + (s.actionBox.type || 'info');
+      actionBox.textContent = s.actionBox.text || '';
     } else {
-      actionEl.style.display = 'none';
+      actionBox.style.display = 'none';
+    }
+    if (waitCtr) waitCtr.classList.remove('visible');
+
+    /* Boutons */
+    if (btnSkip) btnSkip.style.display = s.showSkip ? '' : 'none';
+    const needsAction = s.action && s.action !== 'none';
+    btnNext.disabled    = needsAction;
+    btnNext.textContent = s.nextLabel || 'Suivant →';
+    btnNext.classList.remove('unlocked');
+    updateActiveBadge(needsAction);
+
+    /* Cible spotlight */
+    const targetEl = s.target ? s.target() : null;
+    setSpotTarget(targetEl);
+    placeBubble();
+    if (targetEl) targetEl.classList.add('ob-target-pulse');
+
+    /* Anecdote NG avec délai */
+    if (s.ngFact) setTimeout(() => showNGFact(s.ngFact, targetEl), 1500);
+
+    /* ── LOGIQUE D'ACTION ── */
+
+    if (s.action === 'click_element' && s.actionTarget) {
+      const els = document.querySelectorAll(s.actionTarget);
+      els.forEach(el => {
+        const fn = () => unlockNext('Continuer →');
+        el.addEventListener('click', fn, { once: true, capture: true });
+        _listeners.push({ el, fn, capture: true });
+      });
     }
 
-    btnNext.textContent   = s.nextLabel || 'Suivant →';
-    btnNext.disabled      = !!s.nextDisabled;
-    btnSkip.style.display = s.showSkip ? '' : 'none';
-
-    requestAnimationFrame(() => placeBubble(targetEl));
-
-    if (s.waitForClick) {
-      const watchEl = s.waitForClick();
-      if (watchEl) {
-        watchEl._ob_click = function() { advanceStep(); };
-        watchEl.addEventListener('click', watchEl._ob_click, { once: true });
-      }
-    }
-    if (s.waitForQuestClaim) hookQuestClaim();
-  }
-
-  function hookQuestClaim() {
-    if (originalClaimQuest) return;
-    originalClaimQuest = window.claimQuest;
-    window.claimQuest = async function(questId, xpAmount, coinsAmount) {
-      await originalClaimQuest(questId, xpAmount, coinsAmount);
-      if (!questClaimedInOB) {
-        questClaimedInOB = true;
-        btnNext.disabled  = false;
-        btnNext.textContent = 'Parfait, continuer →';
-        if (actionEl) {
-          actionEl.className   = 'ob-bubble-action info';
-          actionEl.textContent = '✅ Quête réclamée ! Clique sur Continuer.';
-          actionEl.style.display = 'flex';
+    if (s.action === 'section' && s.sectionId) {
+      const sec = document.getElementById(s.sectionId);
+      if (sec) {
+        let done = false;
+        // Vérifie si déjà active
+        if (sec.classList.contains('active')) { unlockNext('Continuer →'); done = true; }
+        if (!done) {
+          const mo = new MutationObserver(() => {
+            if (!done && sec.classList.contains('active')) {
+              done = true; unlockNext('Continuer →'); mo.disconnect();
+            }
+          });
+          mo.observe(sec, { attributes: true, attributeFilter: ['class'] });
+          _observers.push(mo);
         }
-        descEl.textContent = '🎉 Bravo ! Tu as réclamé ta première quête et reçu ta récompense.';
-        unhookQuestClaim();
-        requestAnimationFrame(() => placeBubble(STEPS[currentStep].target ? STEPS[currentStep].target() : null));
       }
-    };
+    }
+
+    if (s.action === 'scroll_into') {
+      let unlocked = false;
+      const ms = s.waitMs || 3000;
+      if (targetEl) {
+        const io = new IntersectionObserver(entries => {
+          if (entries[0]?.isIntersecting && !unlocked) {
+            setTimeout(() => { if (!unlocked) { unlocked = true; unlockNext('Compris →'); } }, ms);
+          }
+        }, { threshold: 0.3 });
+        io.observe(targetEl);
+        _observers.push({ disconnect: () => io.disconnect() });
+      } else {
+        setTimeout(() => unlockNext('Compris →'), ms);
+      }
+      if (waitCtr) {
+        waitCtr.classList.add('visible');
+        let rem = Math.ceil(ms / 1000);
+        waitCtr.textContent = '⏳ Lis pendant ' + rem + 's pour continuer…';
+        const t = setInterval(() => {
+          rem--;
+          if (waitCtr) waitCtr.textContent = rem > 0 ? '⏳ Encore ' + rem + 's…' : '✅ Tu peux continuer !';
+          if (rem <= 0) clearInterval(t);
+        }, 1000);
+      }
+    }
+
+    if (s.action === 'quests_open') {
+      // Intercepte clic sur le teaser quêtes
+      const qt = document.querySelector('.quests-teaser');
+      if (qt) {
+        const fn = () => unlockNext('Continuer →');
+        qt.addEventListener('click', fn, { once: true, capture: true });
+        _listeners.push({ el: qt, fn, capture: true });
+      }
+      // Surveille ouverture page quêtes
+      const qp = document.getElementById('quests-page');
+      if (qp) {
+        let done = false;
+        const mo = new MutationObserver(() => {
+          if (!done && qp.classList.contains('active')) {
+            done = true; unlockNext('Continuer →'); mo.disconnect();
+          }
+        });
+        mo.observe(qp, { attributes: true, attributeFilter: ['class'] });
+        _observers.push(mo);
+      }
+    }
+
+    if (s.action === 'quest_claim') {
+      if (!_originalClaim) {
+        _originalClaim = window.claimQuest;
+        window.claimQuest = async function(questId, xpAmount, coinsAmount) {
+          if (_originalClaim) await _originalClaim(questId, xpAmount, coinsAmount);
+          window.claimQuest = _originalClaim;
+          _originalClaim = null;
+          unlockNext('Parfait, continuer →');
+        };
+      }
+    }
+
+    /* Boutique : surveille section */
+    if (s.id === 'shop' && s.sectionId) {
+      const sec = document.getElementById(s.sectionId);
+      if (sec) {
+        let done = sec.classList.contains('active');
+        if (done) { unlockNext('Continuer →'); }
+        else {
+          const mo = new MutationObserver(() => {
+            if (!done && sec.classList.contains('active')) {
+              done = true; unlockNext('Continuer →'); mo.disconnect();
+            }
+          });
+          mo.observe(sec, { attributes: true, attributeFilter: ['class'] });
+          _observers.push(mo);
+        }
+      }
+    }
   }
 
-  function unhookQuestClaim() {
-    if (originalClaimQuest) { window.claimQuest = originalClaimQuest; originalClaimQuest = null; }
-  }
-
+  /* ──────────────────────────────────────
+     AVANCER
+  ────────────────────────────────────── */
   function advanceStep() {
-    if (STEPS[currentStep]?.id === 'spin') {
+    const s = STEPS[currentStep];
+    // Ferme la roulette si ouverte lors du step spin
+    if (s?.id === 'spin') {
       if (window.closeSpinModal) window.closeSpinModal();
     }
     showStep(currentStep + 1);
   }
 
-  async function finishTuto() {
-    markOBDone(); unhookQuestClaim();
-    document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
-    backdrop.classList.add('hidden');
-    spotlight.classList.remove('show');
-    bubble.classList.remove('show');
-    finishOv.classList.add('show');
+  /* ──────────────────────────────────────
+     FIN DU TUTO
+  ────────────────────────────────────── */
+  async function endTuto() {
+    _active = false;
+    if (_rafSpot) { cancelAnimationFrame(_rafSpot); _rafSpot = null; }
+    cleanListeners();
+    markOBDone();
 
+    backdrop.classList.remove('active');
+    spotlight.classList.remove('visible');
+    bubble.classList.remove('visible');
+    if (activeBadge) activeBadge.classList.remove('visible');
+    if (minimapEl) minimapEl.classList.remove('visible');
+    if (ngFact) ngFact.classList.remove('show');
+
+    finishOv.classList.add('show');
+    if (finishRwVal) finishRwVal.textContent = '⚡ +' + OB_REWARD_XP + ' XP · 🪙 +' + OB_REWARD_COINS + ' pièces';
     if (window.launchConfetti) window.launchConfetti();
 
     if (window._sb && window.state?.user) {
       try {
         const db = window.dbGetUser ? await window.dbGetUser(window.state.user.uid) : null;
-        if (db) {
-          const newXP    = (db.xp    || 0) + OB_REWARD_XP;
-          const newCoins = (db.coins || 0) + OB_REWARD_COINS;
-          await window.dbUpdateUser(window.state.user.uid, { xp: newXP, coins: newCoins, onboarding_done: true });
-          window.state.user.xp    = newXP;
-          window.state.user.coins = newCoins;
-          if (window.renderProfileLevel) window.renderProfileLevel(newXP, newCoins);
+        if (db && !db.onboarding_done) {
+          const nxp = (db.xp    || 0) + OB_REWARD_XP;
+          const nc  = (db.coins || 0) + OB_REWARD_COINS;
+          await window.dbUpdateUser(window.state.user.uid, { xp: nxp, coins: nc, onboarding_done: true });
+          window.state.user.xp    = nxp;
+          window.state.user.coins = nc;
+          if (window.renderProfileLevel) window.renderProfileLevel(nxp, nc);
           if (window.renderNav) window.renderNav();
-          // Mise à jour de l'affichage récompense
-          const rewardEl = document.querySelector('.ob-finish-reward strong');
-          if (rewardEl) rewardEl.textContent = '⚡ +' + OB_REWARD_XP + ' XP · 🪙 +' + OB_REWARD_COINS + ' pièces';
         }
-      } catch(e) { console.warn('OB bonus:', e.message); }
+      } catch(e) { console.warn('[OB] bonus:', e.message); }
     }
   }
 
+  /* ──────────────────────────────────────
+     SKIP
+  ────────────────────────────────────── */
   function skipTuto() {
-    if (!confirm('Passer le tutoriel ? Tu pourras le relancer depuis les paramètres admin.')) return;
-    markOBDone(); unhookQuestClaim();
-    document.querySelectorAll('.ob-pulse-target').forEach(e => e.classList.remove('ob-pulse-target'));
-    backdrop.classList.add('hidden');
-    spotlight.classList.remove('show');
-    bubble.classList.remove('show');
+    if (!confirm('Passer le tutoriel ? Tu ne recevras pas la récompense de bienvenue.')) return;
+    _active = false;
+    if (_rafSpot) { cancelAnimationFrame(_rafSpot); _rafSpot = null; }
+    cleanListeners();
+    markOBDone();
+    backdrop.classList.remove('active');
+    spotlight.classList.remove('visible');
+    bubble.classList.remove('visible');
+    if (activeBadge) activeBadge.classList.remove('visible');
+    if (minimapEl) minimapEl.classList.remove('visible');
+    if (ngFact) ngFact.classList.remove('show');
+    if (window.toast) window.toast('Tuto passé. Accessible via le bouton Admin.');
   }
 
-  btnNext.onclick   = () => { if (!btnNext.disabled) advanceStep(); };
-  btnSkip.onclick   = skipTuto;
-  finishBtn.onclick = () => {
+  /* ──────────────────────────────────────
+     EVENTS
+  ────────────────────────────────────── */
+  if (btnNext) btnNext.onclick = () => { if (!btnNext.disabled) advanceStep(); };
+  if (btnSkip) btnSkip.onclick = skipTuto;
+  if (finishBtn) finishBtn.onclick = () => {
     finishOv.classList.remove('show');
     if (window.showSection) window.showSection('accueil');
     if (window.toast) window.toast('🎉 Bienvenue dans la nation Timor !');
   };
 
-  backdrop.addEventListener('click', e => e.stopPropagation());
+  // Resize : repositionne la bulle
+  window.addEventListener('resize', placeBubble);
 
-  window.addEventListener('resize', () => {
-    const s = STEPS[currentStep];
-    if (!s) return;
-    const targetEl = s.target ? s.target() : null;
-    placeSpotlight(targetEl);
-    placeBubble(targetEl);
+  // Clic sur backdrop → shake la bulle
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop && bubble) {
+      bubble.classList.remove('shake');
+      void bubble.offsetWidth; // reflow
+      bubble.classList.add('shake');
+      setTimeout(() => bubble.classList.remove('shake'), 500);
+    }
   });
 
-  window._obReset = () => { try { localStorage.removeItem(OB_KEY); } catch(e) {} location.reload(); };
+  /* ──────────────────────────────────────
+     CHARGEMENT DES ÉTAPES CUSTOM (DB)
+  ────────────────────────────────────── */
+  async function loadCustomSteps() {
+    try {
+      if (!window._sb) return;
+      const { data } = await window._sb.from('sitedata')
+        .select('value').eq('key', 'onboarding_steps').single();
+      if (!data?.value?.steps?.length) return;
 
-  function tryStartOB() {
-    if (isOBDone()) return;
-    if (!window.state?.user) return;
-    (async () => {
-      try {
-        if (window.dbGetUser) {
-          const db = await window.dbGetUser(window.state.user.uid);
-          if (db?.onboarding_done) { markOBDone(); return; }
+      OB_REWARD_XP    = data.value.reward_xp    ?? 100;
+      OB_REWARD_COINS = data.value.reward_coins ?? 50;
+
+      STEPS = data.value.steps.map((line, i) => {
+        const [icon, title, desc, actionText, actionType, nextLabel] = line.split('|');
+        const step = {
+          id:        'step_' + i,
+          target:    null,
+          icon:      icon?.trim()      || '⚔️',
+          title:     title?.trim()     || 'Étape',
+          desc:      desc?.trim()      || '',
+          nextLabel: nextLabel?.trim() || 'Suivant →',
+          showSkip:  i < data.value.steps.length - 2,
+          action:    'none',
+          ngFact:    null,
+        };
+        if (actionText?.trim()) {
+          step.actionBox = { type: actionType?.trim() || 'info', text: actionText.trim() };
+          if ((actionType || '').trim() === 'action') {
+            step.action = 'none'; // Les étapes custom ne font qu'afficher, pas détecter
+            // Sauf si le titre indique une quête
+            if (desc?.toLowerCase().includes('quête') && actionText?.includes('+XP')) {
+              step.action = 'quest_claim';
+              step.showSkip = false;
+            }
+          }
         }
+        return step;
+      });
+    } catch(e) { /* garde les defaults */ }
+  }
+
+  /* ──────────────────────────────────────
+     DÉMARRAGE
+  ────────────────────────────────────── */
+  async function tryStart() {
+    if (isOBDone()) return;
+    if (window.dbGetUser && window.state?.user) {
+      try {
+        const db = await window.dbGetUser(window.state.user.uid);
+        if (db?.onboarding_done) { markOBDone(); return; }
       } catch(e) {}
-      await loadCustomSteps();
-      startOB();
-    })();
+    }
+    await loadCustomSteps();
+    startOB();
   }
 
   function startOB() {
-    backdrop.classList.remove('hidden');
+    _active = true;
+    backdrop.classList.add('active');
+    bubble.classList.add('visible');
+    _rafSpot = requestAnimationFrame(trackSpotlight);
     showStep(0);
   }
 
+  /* Attendre que l'app soit prête ET connectée */
   const _waitApp = setInterval(() => {
     if (window.state !== undefined) {
       clearInterval(_waitApp);
       const poll = setInterval(() => {
-        if (window.state?.user) { clearInterval(poll); setTimeout(tryStartOB, 800); }
-      }, 500);
+        if (window.state?.user) {
+          clearInterval(poll);
+          setTimeout(tryStart, 900);
+        }
+      }, 400);
     }
   }, 200);
 
+  /* ── API PUBLIQUE ── */
+  window._obReset = () => { try { localStorage.removeItem(OB_KEY); } catch(e) {} location.reload(); };
+  window._obStart = startOB;
+
+  // Surcharge adminRelaunchOnboarding pour utiliser le nouveau reset
+  window.adminRelaunchOnboarding = () => {
+    if (!confirm('Relancer le tutoriel ? (localStorage réinitialisé + rechargement)')) return;
+    window._obReset();
+  };
+
 })();
 </script>
+
 </body>
 </html>
