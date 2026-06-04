@@ -245,17 +245,28 @@
     }
     #ob-bubble.shake { animation: ob-bubble-shake .4s ease; }
 
-    /* ══ MAINTENANCE BUTTON — état actif (vert) ══ */
-    .btn-maintenance.active {
-      background: #52c97a18 !important;
-      color: #52c97a !important;
-      border: 1px solid #52c97a40 !important;
+    /* ══ MAINTENANCE BUTTON — surcharge du style.css ══
+       style.css force rouge par défaut et vert si .active
+       On neutralise le rouge par défaut et on garde le vert actif */
+    .btn-maintenance {
+      background: rgba(192,57,43,0.07) !important;
+      color: #a0241b !important;
+      border: 1px solid rgba(192,57,43,0.22) !important;
     }
-    .btn-maintenance.active:hover { background: #52c97a28 !important; }
+    .btn-maintenance:hover {
+      background: rgba(192,57,43,0.14) !important;
+    }
+    .btn-maintenance.active {
+      background: rgba(26,122,68,0.10) !important;
+      color: #1a7a44 !important;
+      border: 1px solid rgba(26,122,68,0.30) !important;
+    }
+    .btn-maintenance.active:hover {
+      background: rgba(26,122,68,0.18) !important;
+    }
 
     /* ══ MAINTENANCE OVERLAY — protection anti-suppression ══
-       On pilote via body.maintenance-active au lieu d'un style inline
-       pour qu'un suppression du div via F12 soit immédiatement ré-appliquée */
+       Piloté via body.maintenance-active pour résister à F12 */
     body.maintenance-active #maintenance-overlay {
       display: flex !important;
       position: fixed !important;
