@@ -963,7 +963,7 @@ window.setVal=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val;};
 window.fmtNum=n=>Number(n||0).toLocaleString('fr-FR');
 window.setFb=(el,msg,type='')=>{if(el){el.textContent=msg;el.className='admin-feedback'+(type?' '+type:'');}};
 window.toast=msg=>{const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3500);};
-const sb=window._sb;const WORKER_URL='https://timor-discord-auth.yanismanca66.workers.dev';const DISCORD_ID='1508123459782443260';const REDIRECT='https://bigdormeur.github.io/timor-ng';const SESSION_KEY='timor_session_v1';const LB_TTL=6*60*60*1000;
+const sb=window._sb;const WORKER_URL='https://timor-discord-auth.yanismanca66.workers.dev';const DISCORD_ID='1508123459782443260';const REDIRECT='https://bigdormeur.github.io/timor-ng';const SESSION_KEY='timor_session_v2';const LB_TTL=6*60*60*1000;
 const DEF_PAYS={membres:'—',rang:'—',fondation:'[Année]',herodesc:'Nation fondée sur la discipline, le commerce et la solidarité.',paydesc:'Timor est une nation bâtie sur trois piliers.',gouv:[{init:'PR',nom:'[Président]',role:'Président de Timor',badge:"Chef d'État"}]};
 const DEF_QUESTS={title:'⚔️ Quêtes',desc:"Accomplis des missions pour gagner de l'XP.",quests:[]};
 const DEF_SHOP={items:[]};
@@ -974,23 +974,111 @@ const sdSet=async(key,value)=>{const{error}=await sb.from('sitedata').upsert({ke
 const dbGetUser=async uid=>{const{data}=await sb.from('users').select('*').eq('id',uid).single();return data;};
 const dbUpdateUser=async(uid,fields)=>{const{error}=await sb.from('users').update({...fields,updated_at:new Date().toISOString()}).eq('id',uid);if(error)throw error;};
 window.dbGetUser=dbGetUser;window.dbUpdateUser=dbUpdateUser;window.sdGet=sdGet;window.sdSet=sdSet;window.state=state;
-const saveSession=p=>{try{localStorage.setItem(SESSION_KEY,JSON.stringify(p));}catch(e){}};
+const saveSession=p=>{try{localStorage.setItem(SESSION_KEY,JSON.stringify({uid:p.uid,username:p.username,global_name:p.global_name,avatar:p.avatar}));}catch(e){}};
 const loadSession=()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY));}catch(e){return null;}};
 const clearSession=()=>{try{localStorage.removeItem(SESSION_KEY);}catch(e){}};
 function loginWithDiscord(){const p=new URLSearchParams({client_id:DISCORD_ID,redirect_uri:REDIRECT,response_type:'code',scope:'identify'});location.href='https://discord.com/oauth2/authorize?'+p;}
-async function logout(){clearSession();state.user=null;window._spinUID=null;document.body.classList.remove('is-admin','is-modo');document.getElementById('ban-overlay').style.display='none';renderNav();renderUI();await loadLeaderboard();toast('Déconnecté.');}
+async function logout(){clearSession();state.user=null;window._spinUID=null;stopRevalidation();document.body.classList.remove('is-admin','is-modo');document.getElementById('admin-panel').classList.remove('visible');document.getElementById('ban-overlay').style.display='none';renderNav();renderUI();await loadLeaderboard();toast('Déconnecté.');}
 async function handleCallback(){const code=new URLSearchParams(location.search).get('code');if(!code)return false;history.replaceState({},'',location.pathname);toast('⏳ Connexion en cours…');try{const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,redirect_uri:REDIRECT})});if(!res.ok)throw new Error(await res.text());const profile=await res.json();saveSession(profile);await startSession(profile);return true;}catch(e){toast('⚠ Erreur de connexion : '+e.message);return false;}}
 async function startSession(profile){
-  const db=await dbGetUser(profile.uid);
-  if(db?.banned===true){clearSession();const overlay=document.getElementById('ban-overlay');const reasonEl=document.getElementById('ban-reason-display');if(reasonEl)reasonEl.textContent=db.banned_reason||'Aucune raison spécifiée.';if(overlay)overlay.style.display='flex';return;}
-  state.user={...profile,xp:db?.xp??0,coins:db?.coins??0,role:db?.role||profile.role||'citoyen',avatar:db?.avatar||profile.avatar||'',global_name:db?.global_name||profile.global_name||profile.username||'Citoyen'};
-  saveSession({...profile,role:state.user.role});window._spinUID=profile.uid;
+  // ✅ Rôle et ban toujours lus depuis la BDD — jamais depuis localStorage ou le worker
+  let db;
+  try{db=await dbGetUser(profile.uid);}catch(e){toast('⚠ Erreur de chargement du profil.');return;}
+
+  // ✅ Vérification du ban depuis la BDD
+  if(db?.banned===true){
+    clearSession();stopRevalidation();
+    const overlay=document.getElementById('ban-overlay');
+    const reasonEl=document.getElementById('ban-reason-display');
+    if(reasonEl)reasonEl.textContent=db.banned_reason||'Aucune raison spécifiée.';
+    if(overlay)overlay.style.display='flex';
+    return;
+  }
+
+  // ✅ Rôle validé depuis la BDD uniquement
+  const ALLOWED_ROLES=['admin','modo','citoyen'];
+  const safeRole=ALLOWED_ROLES.includes(db?.role)?db.role:'citoyen';
+
+  state.user={
+    uid:profile.uid,
+    username:db?.username||profile.username||'Citoyen',
+    global_name:db?.global_name||profile.global_name||profile.username||'Citoyen',
+    avatar:db?.avatar||profile.avatar||'',
+    xp:db?.xp??0,
+    coins:db?.coins??0,
+    role:safeRole,
+  };
+
+  // ✅ Session sauvegardée SANS le rôle
+  saveSession({uid:profile.uid,username:profile.username,global_name:profile.global_name,avatar:profile.avatar});
+  window._spinUID=profile.uid;
+
   if(db?.last_spin_at){const dbTs=new Date(db.last_spin_at).getTime();if(dbTs>spinGetLast())spinSetLast(dbTs);}
   updateSpinUI();startSpinTimer();
+
   try{const{data}=await sb.from('purchases').select('*').eq('uid',profile.uid).not('item_cat','eq','Quête');state.purchases=data||[];}catch(e){state.purchases=[];}
+
   renderNav();renderUI();renderProfileLevel(state.user.xp,state.user.coins);await loadLeaderboard();
-  if(state.user.role==='admin'||state.user.role==='modo'){document.getElementById('admin-panel').classList.add('visible');adminRefreshPlayers();adminLoadTutoEditor();adminLoadPaysEditor();adminLoadQuestsEditor();adminLoadShopEditor();adminLoadOrders();adminLoadProofs();adminLoadLinksEditor();adminLoadSpinEditor();adminLoadOnboardingEditor();}
-  if(state.user.role==='admin')applyMaintenance(false);
+
+  // ✅ Panneau admin affiché SEULEMENT si rôle BDD = admin ou modo
+  if(safeRole==='admin'||safeRole==='modo'){
+    document.getElementById('admin-panel').classList.add('visible');
+    adminRefreshPlayers();adminLoadTutoEditor();adminLoadPaysEditor();adminLoadQuestsEditor();adminLoadShopEditor();adminLoadOrders();adminLoadProofs();adminLoadLinksEditor();adminLoadSpinEditor();adminLoadOnboardingEditor();
+  }else{
+    document.getElementById('admin-panel').classList.remove('visible');
+  }
+
+  if(safeRole==='admin')applyMaintenance(false);
+
+  // ✅ Revalidation périodique : détecte les bans/changements de rôle en cours de session
+  startRevalidation();
+}
+
+// ── Revalidation toutes les 5 min ──────────────────────────────────
+const REVALIDATE_INTERVAL=5*60*1000;
+let _revalidTimer=null;
+function startRevalidation(){stopRevalidation();_revalidTimer=setInterval(revalidateSession,REVALIDATE_INTERVAL);}
+function stopRevalidation(){if(_revalidTimer){clearInterval(_revalidTimer);_revalidTimer=null;}}
+async function revalidateSession(){
+  if(!state.user)return;
+  try{
+    const db=await dbGetUser(state.user.uid);
+    if(!db){await logout();toast('⚠ Session expirée.');return;}
+
+    // Banni entre-temps ?
+    if(db.banned===true){
+      clearSession();stopRevalidation();state.user=null;
+      document.body.classList.remove('is-admin','is-modo');
+      document.getElementById('admin-panel').classList.remove('visible');
+      const overlay=document.getElementById('ban-overlay');
+      const reasonEl=document.getElementById('ban-reason-display');
+      if(reasonEl)reasonEl.textContent=db.banned_reason||'Aucune raison spécifiée.';
+      if(overlay)overlay.style.display='flex';
+      return;
+    }
+
+    // Rôle changé ?
+    const ALLOWED_ROLES=['admin','modo','citoyen'];
+    const newRole=ALLOWED_ROLES.includes(db.role)?db.role:'citoyen';
+    if(newRole!==state.user.role){
+      state.user.role=newRole;
+      document.body.classList.toggle('is-admin',newRole==='admin');
+      document.body.classList.toggle('is-modo',newRole==='modo');
+      if(newRole==='admin'||newRole==='modo'){
+        document.getElementById('admin-panel').classList.add('visible');
+      }else{
+        document.getElementById('admin-panel').classList.remove('visible');
+      }
+      renderNav();
+      toast(newRole==='citoyen'?'Ton rôle a été modifié.':'✦ Nouveau rôle : '+newRole);
+    }
+
+    // XP/coins à jour
+    state.user.xp=db.xp??state.user.xp;
+    state.user.coins=db.coins??state.user.coins;
+    renderProfileLevel(state.user.xp,state.user.coins);
+    renderNav();
+  }catch(e){console.warn('[revalidate]',e.message);}
 }
 async function loadSiteData(){
   try{const[t,p,q,s,l]=await Promise.all([sdGet('tutos'),sdGet('pays'),sdGet('quests'),sdGet('shop'),sdGet('quicklinks')]);state.tutos=t?.list??[];state.pays=p??DEF_PAYS;state.quests=q??DEF_QUESTS;state.shop=s??DEF_SHOP;state.quickLinks=l?.links??[];}catch(e){console.warn('loadSiteData:',e.message);}
