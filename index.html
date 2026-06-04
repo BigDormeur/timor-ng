@@ -244,6 +244,30 @@
       80% { transform: scale(1) translateX(4px); }
     }
     #ob-bubble.shake { animation: ob-bubble-shake .4s ease; }
+
+    /* ══ MAINTENANCE BUTTON — état actif (vert) ══ */
+    .btn-maintenance.active {
+      background: #52c97a18 !important;
+      color: #52c97a !important;
+      border: 1px solid #52c97a40 !important;
+    }
+    .btn-maintenance.active:hover { background: #52c97a28 !important; }
+
+    /* ══ MAINTENANCE OVERLAY — protection anti-suppression ══
+       On pilote via body.maintenance-active au lieu d'un style inline
+       pour qu'un suppression du div via F12 soit immédiatement ré-appliquée */
+    body.maintenance-active #maintenance-overlay {
+      display: flex !important;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 99999 !important;
+      pointer-events: all !important;
+    }
+    /* Bloquer les interactions derrière même si le div est retiré */
+    body.maintenance-active > *:not(#maintenance-overlay) {
+      pointer-events: none !important;
+      user-select: none !important;
+    }
   </style>
 </head>
 <body>
@@ -1082,7 +1106,7 @@ async function revalidateSession(){
 }
 async function loadSiteData(){
   try{const[t,p,q,s,l]=await Promise.all([sdGet('tutos'),sdGet('pays'),sdGet('quests'),sdGet('shop'),sdGet('quicklinks')]);state.tutos=t?.list??[];state.pays=p??DEF_PAYS;state.quests=q??DEF_QUESTS;state.shop=s??DEF_SHOP;state.quickLinks=l?.links??[];}catch(e){console.warn('loadSiteData:',e.message);}
-  const maint=await sdGet('maintenance');if(maint?.active&&state.user?.role!=='admin')applyMaintenance(true);
+  const maint=await sdGet('maintenance');if(maint?.active&&state.user?.role!=='admin'){applyMaintenance(true);if(window._startMaintenanceGuard)window._startMaintenanceGuard();}
   renderUI();await loadSpinPrizes();
 }
 async function loadSpinPrizes(){try{const v=await sdGet('spinprizes');if(v?.prizes?.length>=2)window._spinPrizes=v.prizes;}catch(e){}drawWheel(window._spinAngle||0);buildSpinLegend();}
@@ -1178,8 +1202,47 @@ window.loadMyOrders=async()=>{if(!state.user)return;const listEl=document.getEle
 async function loadLeaderboard(force=false){const el=document.getElementById('leaderboard-dynamic');if(!el)return;if(!force&&state.lbCache&&(Date.now()-state.lbTs)<LB_TTL){renderLeaderboard(state.lbCache);return;}try{const{data,error}=await sb.from('users').select('id,global_name,username,xp,coins,avatar').order('xp',{ascending:false}).limit(10);if(error)throw error;state.lbCache=data;state.lbTs=Date.now();renderLeaderboard(data);}catch(e){console.warn('LB:',e.message);}}
 function renderLeaderboard(rows){const el=document.getElementById('leaderboard-dynamic');if(!el)return;if(!rows?.length){el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--text-dim);">Aucun joueur classé.</div>';return;}const medals=['🥇','🥈','🥉'];const topCls=['top1','top2','top3'];const rkCls=['rank-1','rank-2','rank-3'];el.innerHTML=rows.map((p,i)=>{const name=esc(p.global_name||p.username||'Inconnu');const xp=p.xp??0,coins=p.coins??0,lvl=getLevelFromXP(xp);const avt=p.avatar?`<div class="lb-avatar"><img src="${esc(p.avatar)}" alt="" onerror="this.parentNode.textContent='${name.slice(0,2).toUpperCase()}'"></div>`:`<div class="lb-avatar">${name.slice(0,2).toUpperCase()}</div>`;return`<div class="lb-row${i<3?' '+topCls[i]:''}"><div class="lb-rank ${i<3?rkCls[i]:'rank-other'}">${i<3?medals[i]:i+1}</div>${avt}<div class="lb-info"><div class="lb-name">${name}</div><div class="lb-detail">Niveau ${lvl} · 🪙 ${fmtNum(coins)}</div></div><div style="text-align:right;"><div class="lb-xp">${fmtNum(xp)} XP</div><div class="lb-level-badge">Niv. ${lvl}</div></div></div>`;}).join('');}
 function renderQuickLinks(){const c=document.getElementById('ql-links-container');if(!c)return;if(!state.quickLinks.length){c.innerHTML='<div class="ql-empty">Aucun lien disponible.</div>';return;}c.innerHTML=state.quickLinks.map(l=>{const badge=l.badge?`<span class="ql-item-badge">${esc(l.badge)}</span>`:'';if(l.external)return`<a class="ql-item" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ql-item-icon">${esc(l.icon||'🔗')}</span><span class="ql-item-label">${esc(l.label)}</span>${badge}</a>`;return`<button class="ql-item" onclick="showSection('${esc(l.url)}');closeQuickLinks()"><span class="ql-item-icon">${esc(l.icon||'🔗')}</span><span class="ql-item-label">${esc(l.label)}</span>${badge}</button>`;}).join('');}
-function applyMaintenance(active){const overlay=document.getElementById('maintenance-overlay');const btn=document.getElementById('btn-toggle-maintenance');const lbl=document.getElementById('maintenance-status-label');if(overlay)overlay.style.display=active?'flex':'none';if(btn){btn.textContent=active?'✅ Désactiver':'🔧 Activer la maintenance';btn.classList.toggle('active',active);}if(lbl)lbl.textContent=active?'🔴 Site en maintenance':'🟢 Site en ligne';}
-window.toggleMaintenance=async()=>{try{const cur=await sdGet('maintenance');const next=!cur?.active;await sdSet('maintenance',{active:next});applyMaintenance(next);toast(next?'🔧 Site en maintenance':'✅ Site en ligne');}catch(e){toast('Erreur : '+e.message);}};
+function applyMaintenance(active){
+  // ✅ Piloter via classe CSS sur body — résistant à la suppression du div via F12
+  document.body.classList.toggle('maintenance-active', active);
+  const overlay=document.getElementById('maintenance-overlay');
+  const btn=document.getElementById('btn-toggle-maintenance');
+  const lbl=document.getElementById('maintenance-status-label');
+  if(overlay){
+    overlay.style.display=active?'flex':'none';
+    overlay.style.zIndex=active?'99999':'';
+  }
+  if(btn){btn.textContent=active?'✅ Désactiver':'🔧 Activer la maintenance';btn.classList.toggle('active',active);}
+  if(lbl)lbl.textContent=active?'🔴 Site en maintenance':'🟢 Site en ligne';
+}
+// ══ Protection anti-F12 : surveille le DOM et réapplique la maintenance si supprimée ══
+(function(){
+  const GUARD_INTERVAL = 800;
+  let _guardTimer = null;
+  function guardMaintenance(){
+    if(!document.body.classList.contains('maintenance-active')) return;
+    const overlay=document.getElementById('maintenance-overlay');
+    if(!overlay){
+      // Le div a été supprimé — on le recrée
+      const el=document.createElement('div');
+      el.id='maintenance-overlay';
+      el.className='maintenance-overlay';
+      el.innerHTML='<div class="maintenance-content"><div class="maintenance-icon">⚔️</div><div class="maintenance-title">TIMOR</div><div class="maintenance-subtitle">Maintenance exceptionnelle</div><div class="maintenance-text">Merci de patienter,<br>le site sera de retour très bientôt.</div><div class="maintenance-loader"><div class="maintenance-bar-track"><div class="maintenance-bar-fill"></div></div></div></div>';
+      document.body.insertBefore(el, document.body.firstChild);
+      applyMaintenance(true);
+    } else if(overlay.style.display!=='flex'){
+      overlay.style.display='flex';
+      overlay.style.zIndex='99999';
+    }
+  }
+  // MutationObserver sur le body pour détecter suppressions/modifications
+  const mo=new MutationObserver(()=>guardMaintenance());
+  mo.observe(document.body,{childList:true,subtree:false,attributes:true,attributeFilter:['class']});
+  // Fallback timer au cas où
+  window._startMaintenanceGuard=()=>{ if(!_guardTimer)_guardTimer=setInterval(guardMaintenance,GUARD_INTERVAL); };
+  window._stopMaintenanceGuard=()=>{ clearInterval(_guardTimer);_guardTimer=null; };
+})();
+window.toggleMaintenance=async()=>{try{const cur=await sdGet('maintenance');const next=!cur?.active;await sdSet('maintenance',{active:next});applyMaintenance(next);if(next){if(window._startMaintenanceGuard)window._startMaintenanceGuard();}else{if(window._stopMaintenanceGuard)window._stopMaintenanceGuard();}toast(next?'🔧 Site en maintenance':'✅ Site en ligne');}catch(e){toast('Erreur : '+e.message);}};
 window.adminRefreshPlayers=async()=>{const sel=document.getElementById('admin-target-player');const fb=document.getElementById('admin-feedback');if(!sel)return;setFb(fb,'Chargement…');try{const{data,error}=await sb.from('users').select('*').order('xp',{ascending:false});if(error)throw error;state.adminPlayers={};sel.innerHTML=`<option value="">— Sélectionne un joueur (${data.length}) —</option>`;data.forEach(p=>{state.adminPlayers[p.id]=p;const opt=document.createElement('option');opt.value=p.id;const bannedTag=p.banned?' 🔨[BANNI]':'';opt.textContent=(p.global_name||p.username||'Inconnu')+' — '+fmtNum(p.xp)+' XP — ['+(p.role||'citoyen')+']'+bannedTag;sel.appendChild(opt);});setFb(fb,data.length+' joueur(s).','ok');}catch(e){setFb(fb,'Erreur: '+e.message,'err');}};
 window.onAdminPlayerChange=()=>{const uid=document.getElementById('admin-target-player')?.value;const roleSec=document.getElementById('admin-role-section');const banSec=document.getElementById('admin-ban-section');if(!uid||!state.adminPlayers[uid]){if(roleSec)roleSec.style.display='none';if(banSec)banSec.style.display='none';return;}if(roleSec)roleSec.style.display='';if(banSec)banSec.style.display='';const p=state.adminPlayers[uid];const role=p.role||'citoyen';const rd=document.getElementById('admin-player-role-display');if(rd){rd.className='role-badge-display nav-role-badge'+(role==='admin'?' role-admin':role==='modo'?' role-modo':'');rd.textContent=role.charAt(0).toUpperCase()+role.slice(1);}const g=document.getElementById('btn-grant-modo'),r=document.getElementById('btn-revoke-modo');if(g)g.style.display=(role==='admin'||role==='modo')?'none':'';if(r)r.style.display=role==='modo'?'':'none';const canBan=state.user?.role==='admin'||(state.user?.role==='modo'&&role==='citoyen');if(banSec)banSec.style.display=canBan?'':'none';if(canBan){const isBanned=p.banned===true;const statusLbl=document.getElementById('admin-ban-status-label');if(statusLbl){statusLbl.textContent=isBanned?'🔨 Banni':'✓ Actif';statusLbl.style.color=isBanned?'#e05252':'#52c97a';}const btnBan=document.getElementById('btn-ban-player');const btnUnban=document.getElementById('btn-unban-player');if(btnBan)btnBan.style.display=isBanned?'none':'';if(btnUnban)btnUnban.style.display=isBanned?'':'none';const ri=document.getElementById('admin-ban-reason');if(ri)ri.value=isBanned?(p.banned_reason||''):'';}};
 const adminFeedback=(msg,type)=>setFb(document.getElementById('admin-feedback'),msg,type);
@@ -1233,7 +1296,7 @@ window.adminSaveOnboarding=async()=>{const fb=document.getElementById('admin-ob-
 window.adminResetOnboardingDefault=()=>{const OB_DEFAULTS_PIPE=["⚔️|Bienvenue sur Timor !|Ce tutoriel interactif va te faire découvrir le site en moins de 3 minutes.|||Commencer la visite →","🧭|La barre de navigation|Clique sur l'onglet \"Le Pays\" dans la barre de navigation pour découvrir Timor.|👆 Clique sur \"Le Pays\" dans le menu en haut|action|Continuer →","🏛️|Timor — Notre nation|Lis les informations sur Timor puis continue.|ℹ️ Timor est un pays référent sur NationsGlory|info|Compris →","🎰|La Roulette Quotidienne|Chaque jour tu peux gagner de l'XP et des pièces gratuitement !|👆 Clique sur le widget Roulette pour l'ouvrir|action|Suivant →","⚔️|Les Quêtes|Les quêtes te donnent de l'XP pour monter de niveau.|👆 Clique sur \"Voir les quêtes ⚔️\"|action|En attente…","🎯|Réclame ta première récompense !|Clique sur le bouton \"+XP\" d'une quête pour recevoir ta récompense.|👆 Clique sur un bouton \"+XP\" dans la liste de quêtes|action|En attente de ta quête…","🛒|La Boutique de Timor|Avec tes pièces tu peux acheter des rôles Discord et des avantages exclusifs.|👆 Clique sur \"Boutique\" dans la navigation|action|En attente…","🌟|Tu es prêt !|Tu as découvert toutes les fonctionnalités de Timor. Bonne aventure !|||Terminer le tuto 🎉"];const ta=document.getElementById('ob-admin-steps');if(ta)ta.value=OB_DEFAULTS_PIPE.join('\n');setVal('ob-reward-xp',100);setVal('ob-reward-coins',50);toast('Valeurs par défaut chargées (non sauvegardé).');};
 window.App={loginWithDiscord,logout};window.Timor=window.App;
 (async()=>{
-  try{const m=await sdGet('maintenance');if(m?.active)applyMaintenance(true);}catch(e){}
+  try{const m=await sdGet('maintenance');if(m?.active){applyMaintenance(true);if(window._startMaintenanceGuard)window._startMaintenanceGuard();}}catch(e){}
   await loadSiteData();
   if(await handleCallback())return;
   const session=loadSession();
