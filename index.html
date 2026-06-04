@@ -1520,8 +1520,10 @@ document.getElementById('spin-overlay').addEventListener('click',function(e){if(
     document.querySelectorAll('.ob-target-pulse, .ob-spin-highlight').forEach(e => {
       e.classList.remove('ob-target-pulse', 'ob-spin-highlight');
     });
-    /* Toujours restaurer le backdrop en mode normal après nettoyage */
+    /* Toujours restaurer le backdrop (bloquant) entre les étapes */
     setBackdropPassthrough(false);
+    /* Remettre le z-index du bubble au-dessus du backdrop */
+    if (bubble) bubble.style.pointerEvents = '';
   }
 
   /* ════════════════════════════════════════
@@ -1535,7 +1537,15 @@ document.getElementById('spin-overlay').addEventListener('click',function(e){if(
 
     if (s.id === 'claim' || s.action === 'quest_claim') {
       if (window.openQuests) window.openQuests();
-      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+      /* Laisser le DOM se mettre à jour avant de scroller vers les boutons */
+      setTimeout(() => {
+        const firstBtn = document.querySelector('.quest-claim-btn, .quest-card:not(.done) .quest-claim-btn');
+        if (firstBtn) {
+          firstBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 300);
     }
     if (s.id === 'done') {
       if (window.closeQuests) window.closeQuests();
@@ -1567,8 +1577,24 @@ document.getElementById('spin-overlay').addEventListener('click',function(e){if(
     const targetEl = s.target ? s.target() : null;
     setSpotTarget(targetEl);
     placeBubble();
-    if (targetEl) targetEl.classList.add('ob-target-pulse');
     if (s.ngFact) setTimeout(() => showNGFact(s.ngFact, targetEl), 1500);
+
+    /* ══ PASSTHROUGH ══
+       Pour toutes les étapes qui demandent un clic sur la page,
+       le backdrop passe en pointer-events:none pour ne pas bloquer.
+       Les étapes purement informatives gardent le backdrop bloquant. */
+    const CLICKABLE_ACTIONS = ['section', 'spin_open', 'quests_open', 'quest_claim'];
+    if (CLICKABLE_ACTIONS.includes(s.action)) {
+      setBackdropPassthrough(true);
+      /* Surbrillance sur la cible pour guider l'œil */
+      if (targetEl) {
+        targetEl.classList.remove('ob-target-pulse');
+        targetEl.classList.add('ob-spin-highlight');
+      }
+    } else {
+      setBackdropPassthrough(false);
+      if (targetEl) targetEl.classList.add('ob-target-pulse');
+    }
 
     /* ══ ACTIONS ══ */
 
@@ -1617,38 +1643,17 @@ document.getElementById('spin-overlay').addEventListener('click',function(e){if(
       }
     }
 
-    /* ★ ÉTAPE SPIN CORRIGÉE
-       1. on s'assure que la section accueil est active
-       2. backdrop passe en "passthrough" → pointer-events:none → clics traversent
-       3. la cible reçoit ob-spin-highlight pour être visible ET cliquable
-       4. MutationObserver sur spin-overlay pour détecter l'ouverture
-       5. quand ouvert → on débloque "Suivant"
-    */
     if (s.action === 'spin_open') {
-      /* revenir à l'accueil si nécessaire */
       if (window.showSection) window.showSection('accueil');
-
-      /* Le backdrop ne bloque plus les clics */
-      setBackdropPassthrough(true);
-
-      /* Surbrillance spéciale sur le teaser */
-      if (targetEl) {
-        targetEl.classList.remove('ob-target-pulse');
-        targetEl.classList.add('ob-spin-highlight');
-      }
-
       const spinOverlay = document.getElementById('spin-overlay');
       if (spinOverlay) {
         let done = spinOverlay.classList.contains('show');
         if (done) {
-          setBackdropPassthrough(false);
           unlockNext('Roulette ouverte ✓ →');
         } else {
           const mo = new MutationObserver(() => {
             if (!done && spinOverlay.classList.contains('show')) {
-              done = true;
-              mo.disconnect();
-              setBackdropPassthrough(false);   /* restaurer le backdrop */
+              done = true; mo.disconnect();
               unlockNext('Roulette ouverte ✓ →');
             }
           });
@@ -1660,12 +1665,17 @@ document.getElementById('spin-overlay').addEventListener('click',function(e){if(
 
     /* Ouvrir les quêtes */
     if (s.action === 'quests_open') {
-      const qt = document.querySelector('.quests-teaser');
-      if (qt) {
-        const fn = () => unlockNext('Continuer →');
-        qt.addEventListener('click', fn, { once: true, capture: true });
-        _listeners.push({ el: qt, fn, capture: true });
-      }
+      /* Écouter tous les éléments qui peuvent ouvrir les quêtes */
+      const questTriggers = [
+        document.querySelector('.quests-teaser'),
+        document.querySelector('.btn-primary[onclick*="openQuests"]'),
+        document.querySelector('[onclick*="openQuests"]'),
+      ].filter(Boolean);
+      questTriggers.forEach(el => {
+        const fn = () => {};  /* la détection se fait via MutationObserver */
+        el.addEventListener('click', fn, { once: true, capture: true });
+        _listeners.push({ el, fn, capture: true });
+      });
       const qp = document.getElementById('quests-page');
       if (qp) {
         let done = qp.classList.contains('active');
@@ -1684,6 +1694,8 @@ document.getElementById('spin-overlay').addEventListener('click',function(e){if(
 
     /* Réclamer une quête */
     if (s.action === 'quest_claim') {
+      /* S'assurer que la page quêtes est bien ouverte */
+      if (window.openQuests) window.openQuests();
       if (!_originalClaim) {
         _originalClaim = window.claimQuest;
         window.claimQuest = async function(questId, xpAmount, coinsAmount) {
