@@ -898,3 +898,10 @@ footer a { color: rgba(124,58,237,0.60); text-decoration: none; }
 .rules-alert { background: var(--danger-dim); border: 1px solid rgba(192,57,43,0.22); border-left: 3px solid var(--danger); border-radius: 0 10px 10px 0; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 0.8rem; color: #8b1c15; line-height: 1.6; }
 .rules-alert strong { font-weight: 700; display: block; margin-bottom: 4px; }
 .rules-alert code { font-family: 'JetBrains Mono', monospace; background: rgba(192,57,43,0.12); padding: 1px 5px; border-radius: 4px; font-size: 0.72rem; }
+/* Ajoute ces règles */
+#admin-panel {
+  display: none;
+}
+#admin-panel.visible {
+  display: block;
+}
