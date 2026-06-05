@@ -1064,6 +1064,9 @@ async function startSession(profile){
   }
 
   if(safeRole==='admin')applyMaintenance(false);
+  if(safeRole==='admin'||safeRole==='modo'){
+  document.getElementById('admin-panel').classList.add('visible');
+}
 
   // ✅ Revalidation périodique : détecte les bans/changements de rôle en cours de session
   startRevalidation();
