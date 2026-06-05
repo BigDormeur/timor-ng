@@ -1019,7 +1019,8 @@ async function startSession(profile){
   // ✅ Rôle et ban toujours lus depuis la BDD — jamais depuis localStorage ou le worker
   let db;
   try{db=await dbGetUser(profile.uid);}catch(e){toast('⚠ Erreur de chargement du profil.');return;}
-
+console.log('profile.uid:', profile.uid);
+  console.log('db result:', db);
   // ✅ Vérification du ban depuis la BDD
   if(db?.banned===true){
     clearSession();stopRevalidation();
