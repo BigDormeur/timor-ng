@@ -1132,8 +1132,8 @@ function renderNav(){
   document.getElementById('btn-login').onclick=loginWithDiscord;document.getElementById('auth-banner').style.display='';document.getElementById('profile-level-card').style.display='none';setText('dash-welcome','Tableau de bord');const mo=document.getElementById('my-orders-section');if(mo)mo.style.display='none';return;}
   const u=state.user;const lvl=getLevelFromXP(u.xp);const role=u.role;
   // ✅ N'accorder l'accès admin/modo QUE si rôle validé depuis la BDD
-  if(role==='admin'){document.body.classList.add('is-admin');document.getElementById('admin-panel').classList.add('visible');}
-  else if(role==='modo'){document.body.classList.add('is-modo');document.getElementById('admin-panel').classList.add('visible');}
+ if(role==='admin'){document.body.classList.add('is-admin');}
+else if(role==='modo'){document.body.classList.add('is-modo');}
   // citoyen → panel reste caché (déjà retiré ci-dessus)
   document.getElementById('auth-banner').style.display='none';setText('dash-welcome','Bienvenue, '+u.global_name+' !');
   const badge=role==='admin'?'<span class="nav-role-badge role-admin">Admin</span>':role==='modo'?'<span class="nav-role-badge role-modo">Modo</span>':'';
